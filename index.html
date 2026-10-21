@@ -16,7 +16,7 @@
             box-sizing: border-box;
             margin: 0;
             padding: 0;
-            -webkit-tap-highlight-color: transparent; /* Убирает синий квадрат при клике на телефоне */
+            -webkit-tap-highlight-color: transparent;
         }
 
         html {
@@ -30,7 +30,7 @@
             line-height: 1.6;
         }
 
-        /* --- ШАПКА И НАВИГАЦИЯ --- */
+        /* --- ШАПКА (Теперь здесь только логотип) --- */
         header {
             text-align: center;
             padding: 30px 20px;
@@ -44,15 +44,37 @@
         .logo {
             max-width: 250px;
             height: auto;
-            margin-bottom: 25px;
         }
 
-        /* Контейнер кнопок */
+        /* --- ГЛАВНЫЙ ЭКРАН --- */
+        .hero {
+            height: 85vh; /* Чуть увеличили высоту, чтобы было больше воздуха */
+            min-height: 600px;
+            display: flex;
+            align-items: flex-end; /* ПРИЖИМАЕМ КОНТЕНТ К НИЗУ */
+            justify-content: center;
+            text-align: center;
+            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(5, 5, 5, 1)), url('images/MONO1.jpg') center/cover no-repeat;
+            padding: 20px;
+            padding-bottom: 60px; /* Отступ от самого низа экрана */
+        }
+
+        .hero-content {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 40px; /* Расстояние между кнопками и главным заголовком */
+            width: 100%;
+            animation: fadeIn 1.5s ease;
+        }
+
+        /* Контейнер кнопок (теперь внутри главного экрана) */
         nav {
             display: flex;
             justify-content: center;
             gap: 20px;
             flex-wrap: wrap;
+            width: 100%;
         }
 
         /* Стиль кнопок */
@@ -80,27 +102,11 @@
             transform: translateY(-2px);
         }
 
-        /* --- ГЛАВНЫЙ ЭКРАН --- */
-        .hero {
-            height: 80vh;
-            min-height: 550px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            text-align: center;
-            background: linear-gradient(rgba(0, 0, 0, 0.6), rgba(5, 5, 5, 1)), url('images/MONO1.jpg') center/cover no-repeat;
-            padding: 20px;
-        }
-
-        .hero-content {
-            margin-top: 80px;
-        }
-
         .hero h1 {
             font-size: 3.5rem;
             font-weight: 300;
             letter-spacing: 5px;
-            margin-bottom: 15px;
+            margin-bottom: 0;
             text-transform: uppercase;
             text-shadow: 0 5px 15px rgba(0,0,0,0.8);
         }
@@ -157,7 +163,6 @@
             filter: brightness(0.85);
         }
 
-        /* Эффект при наведении на фото */
         .card::after {
             content: "УВЕЛИЧИТЬ";
             position: absolute;
@@ -184,7 +189,7 @@
             opacity: 1;
         }
 
-        /* --- ПОЛНОЭКРАННАЯ ГАЛЕРЕЯ (LIGHTBOX) --- */
+        /* --- ПОЛНОЭКРАННАЯ ГАЛЕРЕЯ --- */
         .lightbox {
             display: none;
             position: fixed;
@@ -193,10 +198,10 @@
             width: 100%;
             height: 100%;
             background-color: rgba(0, 0, 0, 0.98);
-            z-index: 9999; /* Поверх всего */
+            z-index: 9999;
             justify-content: center;
             align-items: center;
-            touch-action: none; /* Запрещаем обычный скролл при открытой галерее */
+            touch-action: none;
         }
 
         .lightbox.active {
@@ -238,10 +243,9 @@
 
         @keyframes fadeIn {
             from { opacity: 0; }
-            to { opacity: 1; }
+            to { opacity: 1; transform: translateY(0); }
         }
 
-        /* Подвал */
         footer {
             text-align: center;
             padding: 50px 20px;
@@ -254,7 +258,6 @@
         @media (max-width: 768px) {
             .hero h1 { font-size: 2rem; }
             
-            /* Кнопки на телефоне выстраиваются в колонку */
             nav {
                 flex-direction: column;
                 align-items: center;
@@ -267,19 +270,16 @@
                 text-align: center;
                 padding: 16px 20px;
                 font-size: 14px;
-                background: rgba(255, 255, 255, 0.08); /* Чуть светлее для видимости */
+                background: rgba(255, 255, 255, 0.08);
             }
 
             .grid {
-                grid-template-columns: 1fr; /* Одна колонка на телефоне */
+                grid-template-columns: 1fr;
                 gap: 15px;
             }
             
             .card img { height: 250px; }
-            
             .section-title { font-size: 1.4rem; }
-
-            /* Кнопки галереи на мобильном прячем по бокам, листание будет свайпом */
             .lightbox-prev, .lightbox-next { display: none; }
             .lightbox-close { width: 45px; height: 45px; font-size: 25px; }
         }
@@ -289,14 +289,14 @@
 
     <header>
         <img src="images/logo.png" alt="Система Арт" class="logo">
-        <nav>
-            <a href="#static" class="nav-btn">Статические проекты</a>
-            <a href="#dynamic" class="nav-btn">Управляемые проекты</a>
-        </nav>
     </header>
 
     <section class="hero">
         <div class="hero-content">
+            <nav>
+                <a href="#static" class="nav-btn">Статические проекты</a>
+                <a href="#dynamic" class="nav-btn">Управляемые проекты</a>
+            </nav>
             <h1>Архитектурное освещение</h1>
         </div>
     </section>
@@ -316,7 +316,7 @@
                 <div class="card"><img src="images/MONO3.jpg" alt="Статика"></div>
                 <div class="card"><img src="images/MONO4.jpg" alt="Статика"></div>
                 <div class="card"><img src="images/MONO5.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO6.jpg" alt="Статика"></div>          
+                <div class="card"><img src="images/MONO6.jpg" alt="Статика"></div>  
                 <div class="card"><img src="images/MONO8.jpg" alt="Статика"></div>
                 <div class="card"><img src="images/MONO9.jpg" alt="Статика"></div>
                 <div class="card"><img src="images/MONO10.jpg" alt="Статика"></div>
@@ -340,7 +340,6 @@
                 <div class="card"><img src="images/MONO31.jpg" alt="Статика"></div>
                 <div class="card"><img src="images/MONO32.jpg" alt="Статика"></div>
                 <div class="card"><img src="images/MONO33.jpg" alt="Статика"></div>
-                
                 <div class="card"><img src="images/MONO35.jpg" alt="Статика"></div>
             </div>
         </section>
@@ -364,7 +363,6 @@
                 <div class="card"><img src="images/RGB11.jpg" alt="Управляемый"></div>
                 <div class="card"><img src="images/RGB12.jpg" alt="Управляемый"></div>
                 <div class="card"><img src="images/RGB16.jpg" alt="Управляемый"></div>
-                
             </div>
         </section>
     </main>
@@ -383,13 +381,11 @@
     </div>
 
     <script>
-        // Надежный скрипт для открытия фото и свайпов на телефоне
         const allImages = Array.from(document.querySelectorAll('.card img'));
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
         let currentIndex = 0;
 
-        // Открытие
         allImages.forEach((img, index) => {
             img.addEventListener('click', () => {
                 currentIndex = index;
@@ -398,17 +394,14 @@
             });
         });
 
-        // Закрытие
         document.getElementById('closeBtn').addEventListener('click', () => {
             lightbox.classList.remove('active');
         });
 
-        // Клик мимо картинки = закрытие
         lightbox.addEventListener('click', (e) => {
             if (e.target === lightbox) lightbox.classList.remove('active');
         });
 
-        // Функции листания
         function showNext() {
             currentIndex = (currentIndex < allImages.length - 1) ? currentIndex + 1 : 0;
             lightboxImg.src = allImages[currentIndex].src;
@@ -421,7 +414,6 @@
         document.getElementById('nextBtn').addEventListener('click', showNext);
         document.getElementById('prevBtn').addEventListener('click', showPrev);
 
-        // Управление с клавиатуры
         document.addEventListener('keydown', (e) => {
             if (lightbox.classList.contains('active')) {
                 if (e.key === 'ArrowRight') showNext();
@@ -430,7 +422,6 @@
             }
         });
 
-        // СВАЙПЫ ДЛЯ ТЕЛЕФОНА
         let touchstartX = 0;
         let touchendX = 0;
         
@@ -444,9 +435,7 @@
         }, false);
         
         function handleSwipe() {
-            // Если свайп влево
             if (touchendX < touchstartX - 50) showNext();
-            // Если свайп вправо
             if (touchendX > touchstartX + 50) showPrev();
         }
     </script>
