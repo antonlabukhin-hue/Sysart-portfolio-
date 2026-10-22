@@ -3,378 +3,242 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Система Арт - Портфолио архитектурного освещения</title>
+    <meta name="theme-color" content="#0a0a0a">
+    <title>Система Арт - Портфолио</title>
     <style>
-        :root {
-            --bg-color: #050505;
-            --card-bg: #111111;
-            --text-main: #ffffff;
-            --accent: #ff2a2a; /* Фирменный красный */
+        @import url('https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap');
+
+        :root { 
+            --ink: #0a0a0a; 
+            --paper: #ffffff; 
+            --muted: #8c8b86; 
+            --line: rgba(255,255,255,.18); 
+            --lime: #ef3b36; /* Фирменный красный акцент[cite: 15] */
+            --max: 1440px; 
         }
         
-        * {
-            box-sizing: border-box;
-            margin: 0;
-            padding: 0;
-            -webkit-tap-highlight-color: transparent;
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html { scroll-behavior: smooth; background: var(--ink); }
+        body { 
+            margin: 0; 
+            background: var(--ink); 
+            color: var(--paper); 
+            font-family: 'Manrope', Arial, sans-serif; 
+            -webkit-font-smoothing: antialiased; 
         }
-
-        html {
-            scroll-behavior: smooth;
-        }
-
-        body {
-            background-color: var(--bg-color);
-            color: var(--text-main);
-            font-family: 'Helvetica Neue', Arial, sans-serif;
-            line-height: 1.6;
-        }
-
-        /* --- ШАПКА (Теперь здесь только логотип) --- */
-        header {
-            text-align: center;
-            padding: 30px 20px;
-            background: linear-gradient(180deg, rgba(0,0,0,0.95) 0%, transparent 100%);
-            position: absolute;
+        a, button { color: inherit; text-decoration: none; font: inherit; background: none; border: none; cursor: pointer; }
+        
+        /* --- ШАПКА --- */
+        .site-header { 
+            height: 84px; 
+            display: flex; 
+            align-items: center; 
+            justify-content: space-between; 
+            padding: 0 clamp(22px, 4vw, 64px); 
+            border-bottom: 1px solid var(--line); 
+            position: absolute; 
             width: 100%;
             top: 0;
-            z-index: 100;
+            z-index: 50; 
+            background: linear-gradient(180deg, rgba(10,10,10,0.9) 0%, transparent 100%);
         }
-
-        .logo {
-            max-width: 250px;
-            height: auto;
-        }
+        .site-header img { height: 40px; }
+        
+        .main-nav { display: flex; gap: 34px; font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
+        .main-nav a:hover { color: var(--lime); }
 
         /* --- ГЛАВНЫЙ ЭКРАН --- */
-        .hero {
-            height: 85vh; /* Чуть увеличили высоту, чтобы было больше воздуха */
-            min-height: 600px;
-            display: flex;
-            align-items: flex-end; /* ПРИЖИМАЕМ КОНТЕНТ К НИЗУ */
-            justify-content: center;
-            text-align: center;
-            background: linear-gradient(rgba(0, 0, 0, 0.4), rgba(5, 5, 5, 1)), url('images/RGB18.jpg') center/cover no-repeat;
-            padding: 20px;
-            padding-bottom: 60px; /* Отступ от самого низа экрана */
+        .hero { 
+            min-height: 100vh; 
+            position: relative; 
+            display: flex; 
+            flex-direction: column; 
+            justify-content: flex-end; 
+            padding: clamp(100px, 15vw, 150px) clamp(22px, 8.2vw, 132px) clamp(40px, 6vw, 80px); 
+            background: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%), linear-gradient(rgba(0,0,0,0.6), rgba(10,10,10,1)), url('images/MONO1.jpg') center/cover no-repeat;
         }
-
-        .hero-content {
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            gap: 40px; /* Расстояние между кнопками и главным заголовком */
-            width: 100%;
-            animation: fadeIn 1.5s ease;
+        .hero:after { 
+            content: ''; position: absolute; right: 9%; top: 0; bottom: 0; width: 1px; 
+            background: linear-gradient(180deg, transparent, var(--line) 23%, var(--line) 77%, transparent); opacity: .75; 
         }
+        .hero-kicker { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 13px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 20px;}
+        .kicker-line { width: 45px; height: 1px; background: var(--lime); display: inline-block; }
+        .hero h1 { font-size: clamp(45px, 9vw, 130px); line-height: .88; letter-spacing: -.05em; font-weight: 700; max-width: 1000px; margin: 0 0 40px; position: relative; z-index: 1; }
+        .hero h1 em { color: var(--lime); font-style: normal; font-weight: 400; }
+        .hero-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; position: relative; z-index: 1; }
+        .hero-intro { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 10px; line-height: 1.6; margin: 0; text-transform: uppercase; letter-spacing: .08em;}
+        
+        .scroll-cue { display: flex; justify-content: center; align-items: center; gap: 13px; font-size: 10px; line-height: 1.55; text-transform: uppercase; letter-spacing: .1em; transition: transform .25s ease; }
+        .scroll-cue:hover { transform: translateY(5px); color: var(--lime); }
+        .scroll-arrow { color: var(--lime); font-size: 25px; line-height: 1; }
+        
+        .hero-index { justify-self: end; display: flex; gap: 10px; align-items: flex-end; color: var(--muted); font-size: 9px; line-height: 1.3; font-family: 'DM Mono', monospace; text-transform: uppercase;}
+        .hero-index strong { font-family: 'Manrope', sans-serif; color: var(--paper); font-size: 45px; line-height: .8; letter-spacing: -.08em; font-weight: 500; }
 
-        /* Контейнер кнопок (теперь внутри главного экрана) */
-        nav {
-            display: flex;
-            justify-content: center;
-            gap: 20px;
-            flex-wrap: wrap;
-            width: 100%;
-        }
+        /* --- СЕКЦИЯ ПРОЕКТОВ И ВКЛАДКИ --- */
+        .project-section { max-width: var(--max); margin: 0 auto; padding: clamp(80px, 12vw, 150px) clamp(22px, 5vw, 80px); }
+        .eyebrow { color: var(--lime); font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 15px; display: block; }
+        .project-section h2 { font-size: clamp(40px, 6vw, 80px); line-height: .9; letter-spacing: -.05em; font-weight: 600; margin: 0 0 50px; }
+        
+        .category-switch { display: flex; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 70px; }
+        .category-tab { width: 50%; display: flex; align-items: center; gap: 16px; padding: 24px 17px; border-right: 1px solid var(--line); text-align: left; color: var(--muted); font-size: clamp(12px, 1.4vw, 17px); font-weight: 500; transition: all .3s ease; }
+        .category-tab:last-child { border-right: 0; }
+        .category-tab:hover, .category-tab.is-active { color: var(--paper); background: rgba(255,255,255,.03); }
+        .category-tab.is-active .tab-number { color: var(--lime); }
+        .tab-number { font-family: 'DM Mono', monospace; font-size: 10px; }
+        
+        .project-panel { display: none; }
+        .project-panel.is-visible { display: block; animation: panelIn .6s ease both; }
+        @keyframes panelIn { from { opacity: 0; transform: translateY(16px); } to { opacity: 1; transform: translateY(0); } }
 
-        /* Стиль кнопок */
-        .nav-btn {
-            background: rgba(255, 255, 255, 0.05);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            color: #fff;
-            padding: 14px 35px;
-            border-radius: 40px;
-            text-decoration: none;
-            font-size: 13px;
-            font-weight: bold;
-            text-transform: uppercase;
-            letter-spacing: 2px;
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            transition: all 0.3s ease;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.3);
-        }
+        /* --- СЕТКА КАРТОЧЕК --- */
+        .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 40px; }
+        .project-card { cursor: pointer; group; }
+        .project-visual { position: relative; display: block; aspect-ratio: 1.15/1; overflow: hidden; background: #151515; }
+        .project-visual img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .7s cubic-bezier(.2,.8,.2,1), filter 0.5s ease; filter: brightness(0.85); }
+        
+        .project-card:hover .project-visual img { transform: scale(1.05); filter: brightness(0.5); }
+        .visual-mark { position: absolute; right: 18px; top: 12px; color: var(--lime); font-size: 25px; font-weight: 300; transition: transform .25s ease; z-index: 2; opacity: 0; }
+        .project-card:hover .visual-mark { transform: translate(4px, -4px); opacity: 1; }
+        
+        .visual-caption { position: absolute; left: 18px; top: 17px; color: rgba(255,255,255,.7); font-size: 9px; font-family: 'DM Mono', monospace; z-index: 2; opacity: 0; transition: opacity 0.3s; }
+        .project-card:hover .visual-caption { opacity: 1; }
 
-        .nav-btn:hover {
-            background: var(--accent);
-            border-color: var(--accent);
-            box-shadow: 0 0 20px rgba(255, 42, 42, 0.4);
-            transform: translateY(-2px);
-        }
+        /* --- LIGHTBOX --- */
+        .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(10, 10, 10, 0.98); z-index: 9999; justify-content: center; align-items: center; touch-action: none; }
+        .lightbox.active { display: flex; animation: fadeIn 0.3s ease; }
+        .lightbox img { max-width: 95%; max-height: 85vh; box-shadow: 0 10px 40px rgba(0,0,0,0.5); user-select: none; }
+        .lightbox-btn { position: absolute; color: white; font-size: 35px; cursor: pointer; background: rgba(255,255,255,0.05); width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; z-index: 10000; border: 1px solid rgba(255,255,255,0.1); }
+        .lightbox-btn:hover { background: var(--lime); border-color: var(--lime); }
+        .lightbox-close { top: 30px; right: 30px; }
+        .lightbox-prev { left: 30px; top: 50%; transform: translateY(-50%); }
+        .lightbox-next { right: 30px; top: 50%; transform: translateY(-50%); }
+        
+        footer { border-top: 1px solid var(--line); display: flex; justify-content: space-between; padding: 30px clamp(22px, 5vw, 80px); color: var(--muted); font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
 
-        .hero h1 {
-            font-size: 3.5rem;
-            font-weight: 300;
-            letter-spacing: 5px;
-            margin-bottom: 0;
-            text-transform: uppercase;
-            text-shadow: 0 5px 15px rgba(0,0,0,0.8);
-        }
-
-        /* --- СЕТКА ПРОЕКТОВ --- */
-        .container {
-            max-width: 1400px;
-            margin: 0 auto;
-            padding: 60px 20px;
-        }
-
-        .section-title {
-            font-size: 2rem;
-            font-weight: 300;
-            margin-bottom: 50px;
-            text-align: center;
-            letter-spacing: 4px;
-            text-transform: uppercase;
-            color: #fff;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            gap: 15px;
-        }
-
-        .section-title::before, .section-title::after {
-            content: "";
-            height: 1px;
-            width: 50px;
-            background-color: var(--accent);
-        }
-
-        .grid {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 20px;
-            margin-bottom: 100px;
-        }
-
-        .card {
-            background-color: var(--card-bg);
-            border-radius: 8px;
-            overflow: hidden;
-            cursor: pointer;
-            position: relative;
-        }
-
-        .card img {
-            width: 100%;
-            height: 300px;
-            object-fit: cover;
-            display: block;
-            transition: transform 0.5s ease, filter 0.5s ease;
-            filter: brightness(0.85);
-        }
-
-        .card::after {
-            content: "УВЕЛИЧИТЬ";
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            color: white;
-            font-size: 14px;
-            letter-spacing: 2px;
-            background: rgba(255, 42, 42, 0.9);
-            padding: 10px 20px;
-            border-radius: 30px;
-            opacity: 0;
-            transition: opacity 0.3s ease;
-            pointer-events: none;
-        }
-
-        .card:hover img {
-            transform: scale(1.03);
-            filter: brightness(0.4);
-        }
-
-        .card:hover::after {
-            opacity: 1;
-        }
-
-        /* --- ПОЛНОЭКРАННАЯ ГАЛЕРЕЯ --- */
-        .lightbox {
-            display: none;
-            position: fixed;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background-color: rgba(0, 0, 0, 0.98);
-            z-index: 9999;
-            justify-content: center;
-            align-items: center;
-            touch-action: none;
-        }
-
-        .lightbox.active {
-            display: flex;
-            animation: fadeIn 0.3s ease;
-        }
-
-        .lightbox img {
-            max-width: 95%;
-            max-height: 85vh;
-            border-radius: 4px;
-            box-shadow: 0 10px 40px rgba(0,0,0,0.5);
-            user-select: none;
-        }
-
-        .lightbox-btn {
-            position: absolute;
-            color: white;
-            font-size: 35px;
-            cursor: pointer;
-            background: rgba(255,255,255,0.1);
-            width: 60px;
-            height: 60px;
-            border-radius: 50%;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            transition: all 0.3s ease;
-            z-index: 10000;
-        }
-
-        .lightbox-btn:hover {
-            background: var(--accent);
-        }
-
-        .lightbox-close { top: 20px; right: 20px; }
-        .lightbox-prev { left: 20px; top: 50%; transform: translateY(-50%); }
-        .lightbox-next { right: 20px; top: 50%; transform: translateY(-50%); }
-
-        @keyframes fadeIn {
-            from { opacity: 0; }
-            to { opacity: 1; transform: translateY(0); }
-        }
-
-        footer {
-            text-align: center;
-            padding: 50px 20px;
-            background-color: #020202;
-        }
-
-        footer .logo { margin-bottom: 15px; opacity: 0.5; max-width: 120px; }
-
-        /* --- АДАПТИВНОСТЬ ДЛЯ ТЕЛЕФОНОВ --- */
-        @media (max-width: 768px) {
-            .hero h1 { font-size: 2rem; }
-            
-            nav {
-                flex-direction: column;
-                align-items: center;
-                gap: 12px;
-            }
-            
-            .nav-btn {
-                width: 90%;
-                max-width: 350px;
-                text-align: center;
-                padding: 16px 20px;
-                font-size: 14px;
-                background: rgba(255, 255, 255, 0.08);
-            }
-
-            .grid {
-                grid-template-columns: 1fr;
-                gap: 15px;
-            }
-            
-            .card img { height: 250px; }
-            .section-title { font-size: 1.4rem; }
+        @media (max-width: 760px) {
+            .hero { padding-top: 120px; }
+            .hero h1 { font-size: clamp(40px, 12vw, 80px); }
+            .hero-bottom { grid-template-columns: 1fr auto; row-gap: 28px; }
+            .hero-intro { grid-column: 1; grid-row: 2; }
+            .hero-index { grid-column: 2; }
+            .scroll-cue { justify-self: end; }
+            .category-switch { flex-direction: column; }
+            .category-tab { width: 100%; border-right: 0; border-bottom: 1px solid var(--line); padding: 19px 10px; }
+            .category-tab:last-child { border-bottom: 0; }
             .lightbox-prev, .lightbox-next { display: none; }
-            .lightbox-close { width: 45px; height: 45px; font-size: 25px; }
+            .lightbox-close { width: 45px; height: 45px; font-size: 25px; top: 15px; right: 15px; }
+            .main-nav { display: none; }
+            footer { flex-direction: column; gap: 15px; text-align: center; }
         }
     </style>
 </head>
 <body>
 
-    <header>
-        <img src="images/logo.png" alt="Система Арт" class="logo">
+    <header class="site-header">
+        <a href="#" aria-label="Sysart Portfolio"><img src="images/logo.png" alt="Система Арт"></a>
+        <nav class="main-nav">
+            <a href="#projects">Проекты</a>
+        </nav>
     </header>
 
-    <section class="hero">
-        <div class="hero-content">
-            <nav>
-                <a href="#static" class="nav-btn">Статические проекты</a>
-                <a href="#dynamic" class="nav-btn">Управляемые проекты</a>
-            </nav>
-            <h1>Архитектурное освещение</h1>
-        </div>
-    </section>
-
-    <main class="container">
-        <section id="static">
-            <h2 class="section-title">Статические</h2>
-            <div class="grid">
-                <div class="card"><img src="images/MONO28.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO34.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO7.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO25.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO20.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO12.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO13.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO14.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO15.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO16.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO17.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO18.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO19.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO21.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO22.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO23.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO24.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO26.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO27.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO29.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO30.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO31.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO32.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO33.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO35.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO1.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO2.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO3.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO4.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO5.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO6.jpg" alt="Статика"></div>  
-                <div class="card"><img src="images/MONO8.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO10.jpg" alt="Статика"></div>
-                <div class="card"><img src="images/MONO11.jpg" alt="Статика"></div>
-                
+    <main>
+        <section class="hero">
+            <div class="hero-kicker"><span class="kicker-line"></span> Архитектурное освещение</div>
+            <h1>Свет<br><em>собирает</em><br>архитектуру.</h1>
+            <div class="hero-bottom">
+                <p class="hero-intro">Визуальный архив проектов<br>Система Арт</p>
+                <a class="scroll-cue" href="#projects"><span class="scroll-arrow">↓</span><span>Смотреть<br>проекты</span></a>
+                <div class="hero-index"><strong>52</strong><span><br>проекта</span></div>
             </div>
         </section>
 
-        <section id="dynamic">
-            <h2 class="section-title">Управляемые</h2>
-            <div class="grid">
-                <div class="card"><img src="images/RGB18.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB10.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB17.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB15.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB14.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB13.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB19.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB1.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB2.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB3.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB4.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB5.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB6.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB8.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB9.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB11.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB12.jpg" alt="Управляемый"></div>
-                <div class="card"><img src="images/RGB16.jpg" alt="Управляемый"></div>
+        <section class="project-section" id="projects">
+            <span class="eyebrow">01 / Selected work</span>
+            <h2>Проекты</h2>
+
+            <div class="category-switch" role="tablist">
+                <button class="category-tab is-active" data-category="static">
+                    <span class="tab-number">01</span> Статические проекты
+                </button>
+                <button class="category-tab" data-category="managed">
+                    <span class="tab-number">02</span> Управляемые проекты
+                </button>
+            </div>
+
+            <!-- СТАТИЧЕСКИЕ ПРОЕКТЫ -->
+            <div class="project-panel is-visible" data-panel="static">
+                <div class="project-grid">
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO28.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO34.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO7.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO25.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO20.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO1.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO2.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO3.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO4.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO5.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO6.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>  
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO8.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO9.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO10.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO11.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO12.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO13.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO14.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO15.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO16.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO17.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO18.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO19.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO21.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO22.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO23.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO24.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO26.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO27.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO29.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO30.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO31.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO32.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO33.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/MONO35.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                </div>
+            </div>
+
+            <!-- УПРАВЛЯЕМЫЕ ПРОЕКТЫ -->
+            <div class="project-panel" data-panel="managed">
+                <div class="project-grid">
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB10.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB17.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB15.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB14.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB13.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB1.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB2.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB3.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB4.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB5.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB6.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB8.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB9.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB11.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB12.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/RGB16.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                </div>
             </div>
         </section>
     </main>
 
     <footer>
-        <img src="images/logo.png" alt="Система Арт" class="logo">
-        <p style="color: #444; font-size: 11px;">© 2026 СИСТЕМА АРТ.</p>
+        <span>SYSART / PORTFOLIO</span>
+        <span>Architectural lighting</span>
+        <span>© 2026 СИСТЕМА АРТ</span>
     </footer>
 
-    <!-- Галерея -->
+    <!-- ГАЛЕРЕЯ (LIGHTBOX) -->
     <div class="lightbox" id="lightbox">
         <div class="lightbox-btn lightbox-close" id="closeBtn">&times;</div>
         <div class="lightbox-btn lightbox-prev" id="prevBtn">&#10094;</div>
@@ -383,34 +247,60 @@
     </div>
 
     <script>
-        const allImages = Array.from(document.querySelectorAll('.card img'));
+        // Скрипт переключения вкладок[cite: 13]
+        const tabs = document.querySelectorAll('.category-tab');
+        const panels = document.querySelectorAll('.project-panel');
+
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const target = tab.dataset.category;
+                
+                tabs.forEach(t => t.classList.remove('is-active'));
+                tab.classList.add('is-active');
+
+                panels.forEach(panel => {
+                    if (panel.dataset.panel === target) {
+                        panel.classList.add('is-visible');
+                    } else {
+                        panel.classList.remove('is-visible');
+                    }
+                });
+                
+                updateLightboxImages(); // Обновляем массив картинок для галереи
+            });
+        });
+
+        // Скрипт галереи с поддержкой свайпов
+        let activeImages = [];
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
         let currentIndex = 0;
 
-        allImages.forEach((img, index) => {
-            img.addEventListener('click', () => {
-                currentIndex = index;
-                lightboxImg.src = img.src;
-                lightbox.classList.add('active');
+        function updateLightboxImages() {
+            const activePanel = document.querySelector('.project-panel.is-visible');
+            activeImages = Array.from(activePanel.querySelectorAll('.project-visual img'));
+            
+            activeImages.forEach((img, index) => {
+                img.parentElement.onclick = () => {
+                    currentIndex = index;
+                    lightboxImg.src = img.src;
+                    lightbox.classList.add('active');
+                };
             });
-        });
+        }
+        
+        updateLightboxImages(); // Запуск при загрузке
 
-        document.getElementById('closeBtn').addEventListener('click', () => {
-            lightbox.classList.remove('active');
-        });
-
-        lightbox.addEventListener('click', (e) => {
-            if (e.target === lightbox) lightbox.classList.remove('active');
-        });
+        document.getElementById('closeBtn').addEventListener('click', () => lightbox.classList.remove('active'));
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); });
 
         function showNext() {
-            currentIndex = (currentIndex < allImages.length - 1) ? currentIndex + 1 : 0;
-            lightboxImg.src = allImages[currentIndex].src;
+            currentIndex = (currentIndex < activeImages.length - 1) ? currentIndex + 1 : 0;
+            lightboxImg.src = activeImages[currentIndex].src;
         }
         function showPrev() {
-            currentIndex = (currentIndex > 0) ? currentIndex - 1 : allImages.length - 1;
-            lightboxImg.src = allImages[currentIndex].src;
+            currentIndex = (currentIndex > 0) ? currentIndex - 1 : activeImages.length - 1;
+            lightboxImg.src = activeImages[currentIndex].src;
         }
 
         document.getElementById('nextBtn').addEventListener('click', showNext);
@@ -424,22 +314,15 @@
             }
         });
 
+        // Свайпы
         let touchstartX = 0;
         let touchendX = 0;
-        
-        lightbox.addEventListener('touchstart', e => {
-            touchstartX = e.changedTouches[0].screenX;
-        }, false);
-        
+        lightbox.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, false);
         lightbox.addEventListener('touchend', e => {
             touchendX = e.changedTouches[0].screenX;
-            handleSwipe();
-        }, false);
-        
-        function handleSwipe() {
             if (touchendX < touchstartX - 50) showNext();
             if (touchendX > touchstartX + 50) showPrev();
-        }
+        }, false);
     </script>
 </body>
 </html>
