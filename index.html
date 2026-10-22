@@ -48,7 +48,7 @@
         .main-nav { display: flex; gap: 34px; font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
         .main-nav a:hover { color: var(--lime); }
 
-        /* --- АНИМАЦИЯ ПОЯВЛЕНИЯ (КАСКАД) --- */
+        /* --- АНИМАЦИЯ ПОЯВЛЕНИЯ --- */
         @keyframes slideUpFade {
             0% { opacity: 0; transform: translateY(40px); }
             100% { opacity: 1; transform: translateY(0); }
@@ -62,17 +62,27 @@
             flex-direction: column; 
             justify-content: flex-end; 
             padding: clamp(100px, 15vw, 150px) clamp(22px, 8.2vw, 132px) clamp(40px, 6vw, 80px); 
-            background: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%), linear-gradient(rgba(0,0,0,0.6), rgba(10,10,10,1)), url('images/MON28.jpg') center/cover no-repeat;
+            background: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%), linear-gradient(rgba(0,0,0,0.6), rgba(10,10,10,1)), url('images/MONO1.jpg') center/cover no-repeat;
         }
         .hero:after { 
             content: ''; position: absolute; right: 9%; top: 0; bottom: 0; width: 1px; 
             background: linear-gradient(180deg, transparent, var(--line) 23%, var(--line) 77%, transparent); opacity: .75; 
         }
         
-        /* Применяем анимацию с задержками к элементам героя */
+        /* ГЕОМЕТРИЧЕСКИЙ КРУГ-ОРБИТА */
+        .hero-orbit { 
+            position: absolute; right: 8%; top: 31%; width: 145px; height: 145px; 
+            border: 1px solid rgba(239,59,54,.4); border-radius: 50%; opacity: .62; pointer-events: none; z-index: 0;
+            animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.8s both;
+        }
+        .hero-orbit:before, .hero-orbit:after { content: ''; position: absolute; inset: 18px; border: 1px solid rgba(239,59,54,.25); border-radius: 50%; }
+        .hero-orbit:after { inset: 49%; width: 4px; height: 4px; border: 0; background: var(--lime); box-shadow: 0 0 28px 6px rgba(239,59,54,.75); }
+        .hero-orbit span { position: absolute; width: 1px; height: 200%; background: rgba(239,59,54,.28); left: 50%; top: -50%; transform: rotate(37deg); }
+        .hero-orbit i { position: absolute; width: 200%; height: 1px; background: rgba(239,59,54,.15); top: 50%; left: -50%; transform: rotate(-37deg); }
+
         .hero-kicker { 
             font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 13px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 20px;
-            animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+            animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both; z-index: 1;
         }
         .kicker-line { width: 45px; height: 1px; background: var(--lime); display: inline-block; }
         
@@ -96,9 +106,11 @@
         .hero-index strong { font-family: 'Manrope', sans-serif; color: var(--paper); font-size: 45px; line-height: .8; letter-spacing: -.08em; font-weight: 500; }
 
         /* --- СЕКЦИЯ ПРОЕКТОВ И ВКЛАДКИ --- */
-        .project-section { max-width: var(--max); margin: 0 auto; padding: clamp(80px, 12vw, 150px) clamp(22px, 5vw, 80px); }
+        .project-section, .statement-section, .contact-section { max-width: var(--max); margin: 0 auto; padding-left: clamp(22px, 5vw, 80px); padding-right: clamp(22px, 5vw, 80px); }
+        .project-section { padding-top: clamp(80px, 12vw, 150px); padding-bottom: clamp(110px, 15vw, 220px); }
         .eyebrow { color: var(--lime); font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 15px; display: block; }
-        .project-section h2 { font-size: clamp(40px, 6vw, 80px); line-height: .9; letter-spacing: -.05em; font-weight: 600; margin: 0 0 50px; }
+        
+        h2 { font-size: clamp(40px, 6vw, 80px); line-height: .9; letter-spacing: -.05em; font-weight: 600; margin: 0 0 50px; }
         
         .category-switch { display: flex; border-top: 1px solid var(--line); border-bottom: 1px solid var(--line); margin-bottom: 70px; }
         .category-tab { width: 50%; display: flex; align-items: center; gap: 16px; padding: 24px 17px; border-right: 1px solid var(--line); text-align: left; color: var(--muted); font-size: clamp(12px, 1.4vw, 17px); font-weight: 500; transition: all .3s ease; }
@@ -124,6 +136,31 @@
         .visual-caption { position: absolute; left: 18px; top: 17px; color: rgba(255,255,255,.7); font-size: 9px; font-family: 'DM Mono', monospace; z-index: 2; opacity: 0; transition: opacity 0.3s; }
         .project-card:hover .visual-caption { opacity: 1; }
 
+        /* --- НОВЫЕ БЛОКИ ABOUT И CONTACT --- */
+        .statement-section { padding-top: clamp(100px, 13vw, 190px); padding-bottom: clamp(120px, 18vw, 260px); border-top: 1px solid var(--line); position: relative; }
+        .statement-number { position: absolute; right: clamp(22px, 5vw, 80px); top: clamp(100px, 13vw, 190px); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; }
+        .statement-section h2 { max-width: 970px; font-size: clamp(43px, 7vw, 100px); margin-bottom: 80px; }
+        .statement-section h2 em { color: var(--lime); font-style: normal; font-weight: 400; }
+        
+        .statement-footer { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--line); padding-top: 20px; }
+        .statement-footer p { max-width: 290px; color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }
+        .statement-footer a { font-family: 'DM Mono', monospace; color: var(--lime); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; transition: color .25s ease;}
+        .statement-footer a span { font-size: 19px; margin-left: 5px; vertical-align: -2px; }
+
+        .contact-section { padding-top: clamp(65px, 8vw, 115px); padding-bottom: clamp(58px, 7vw, 100px); border-top: 1px solid var(--line); }
+        .contact-top { display: flex; justify-content: space-between; align-items: flex-start; }
+        .contact-top span { color: var(--muted); font-size: 9px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em;}
+        .contact-section h2 { font-size: clamp(46px, 7.5vw, 108px); margin: clamp(50px, 7vw, 100px) 0 75px; max-width: 1100px; }
+        .contact-section h2 em { color: var(--lime); font-style: normal; font-weight: 400; }
+        
+        .contact-link { display: inline-block; padding-bottom: 10px; border-bottom: 1px solid var(--lime); font-size: clamp(21px, 2.6vw, 37px); letter-spacing: -.05em; transition: color .25s ease; }
+        .contact-link:hover { color: var(--lime); }
+        .contact-link span { font-size: 19px; margin-left: 5px; vertical-align: 2px; }
+        
+        .contact-bottom { display: flex; justify-content: space-between; margin-top: clamp(90px, 13vw, 175px); color: var(--muted); font-family: 'DM Mono', monospace; font-size: 9px; text-transform: uppercase; letter-spacing: .08em; }
+        .contact-bottom a { transition: color .25s ease; }
+        .contact-bottom a:hover { color: var(--lime); }
+
         /* --- LIGHTBOX --- */
         .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(10, 10, 10, 0.98); z-index: 9999; justify-content: center; align-items: center; touch-action: none; }
         .lightbox.active { display: flex; animation: fadeIn 0.3s ease; }
@@ -134,8 +171,6 @@
         .lightbox-prev { left: 30px; top: 50%; transform: translateY(-50%); }
         .lightbox-next { right: 30px; top: 50%; transform: translateY(-50%); }
         
-        footer { border-top: 1px solid var(--line); display: flex; justify-content: space-between; padding: 30px clamp(22px, 5vw, 80px); color: var(--muted); font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
-
         /* --- ИДЕАЛЬНАЯ АДАПТАЦИЯ ДЛЯ ТЕЛЕФОНОВ --- */
         @media (max-width: 760px) {
             .site-header { padding: 0 20px; }
@@ -144,13 +179,10 @@
             .hero { padding: 100px 20px 40px 20px; }
             .hero h1 { font-size: clamp(48px, 13vw, 80px); margin-bottom: 30px; }
             
-            /* Перестроение нижнего блока для телефона */
-            .hero-bottom { 
-                grid-template-columns: 1fr auto; 
-                grid-template-rows: auto auto; 
-                row-gap: 30px; 
-                align-items: end;
-            }
+            /* Орбита на телефонах */
+            .hero-orbit { width: 90px; height: 90px; right: 2%; top: 27%; opacity: .45; }
+
+            .hero-bottom { grid-template-columns: 1fr auto; grid-template-rows: auto auto; row-gap: 30px; align-items: end; }
             .hero-intro { grid-column: 1 / -1; grid-row: 2; opacity: 0.7; font-size: 9px;}
             .scroll-cue { grid-column: 1; grid-row: 1; justify-self: start; text-align: left; justify-content: flex-start;}
             .hero-index { grid-column: 2; grid-row: 1; justify-self: end; }
@@ -164,16 +196,21 @@
             .lightbox-prev, .lightbox-next { display: none; }
             .lightbox-close { width: 45px; height: 45px; font-size: 25px; top: 15px; right: 15px; }
             
-            footer { flex-direction: column; gap: 15px; text-align: center; }
+            .statement-number { top: 110px; }
+            .statement-footer { align-items: flex-start; flex-direction: column; gap: 28px; }
+            .contact-section h2 { margin-bottom: 53px; }
+            .contact-bottom { flex-wrap: wrap; gap: 18px 30px; line-height: 1.5; }
         }
     </style>
 </head>
-<body>
+<body id="top">
 
     <header class="site-header">
-        <a href="#" aria-label="Sysart Portfolio"><img src="images/logo.png" alt="Система Арт"></a>
+        <a href="#top" aria-label="Sysart Portfolio"><img src="images/logo.png" alt="Система Арт"></a>
         <nav class="main-nav">
             <a href="#projects">Проекты</a>
+            <a href="#about">О компании</a>
+            <a href="#contact">Контакты</a>
         </nav>
     </header>
 
@@ -186,6 +223,8 @@
                 <a class="scroll-cue" href="#projects"><span class="scroll-arrow">↓</span><span>Смотреть<br>проекты</span></a>
                 <div class="hero-index"><strong>52</strong><span><br>проекта</span></div>
             </div>
+            <!-- ГЕОМЕТРИЧЕСКАЯ ОРБИТА -->
+            <div class="hero-orbit" aria-hidden="true"><span></span><i></i></div>
         </section>
 
         <section class="project-section" id="projects">
@@ -236,7 +275,7 @@
                     <article class="project-card"><div class="project-visual"><img src="images/min/MONO27.jpg" data-full="images/MONO27.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img src="images/min/MONO29.jpg" data-full="images/MONO29.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img src="images/min/MONO30.jpg" data-full="images/MONO30.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO31.jpg" data-full="images/MONO31.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO31.jpg" data-full="images/min/MONO31.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img src="images/min/MONO32.jpg" data-full="images/MONO32.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img src="images/min/MONO33.jpg" data-full="images/MONO33.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img src="images/min/MONO35.jpg" data-full="images/MONO35.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
@@ -265,13 +304,30 @@
                 </div>
             </div>
         </section>
-    </main>
 
-    <footer>
-        <span>SYSART / PORTFOLIO</span>
-        <span>Architectural lighting</span>
-        <span>© 2026 СИСТЕМА АРТ</span>
-    </footer>
+        <!-- БЛОК "О КОМПАНИИ" -->
+        <section class="statement-section" id="about">
+            <div class="statement-number">02</div>
+            <span class="eyebrow">About / Sysart</span>
+            <h2>Мы проектируем<br><em>состояние города</em><br>после заката.</h2>
+            <div class="statement-footer">
+                <p>Световые решения для фасадов, общественных пространств и архитектуры по всей России.</p>
+                <a href="https://sysart.ru/okompanii" target="_blank" rel="noreferrer">О компании <span>↗</span></a>
+            </div>
+        </section>
+
+        <!-- БЛОК "КОНТАКТЫ И ПОДВАЛ" -->
+        <section class="contact-section" id="contact">
+            <div class="contact-top"><span class="eyebrow" style="margin:0;">03 / Start a conversation</span><span>Владивосток · Россия</span></div>
+            <h2>Есть объект?<br><em>Давайте добавим ему света.</em></h2>
+            <a class="contact-link" href="tel:+79149704000">+7 914 970 40 00 <span>↗</span></a>
+            <div class="contact-bottom">
+                <a href="https://sysart.ru/" target="_blank" rel="noreferrer">sysart.ru</a>
+                <span>© ООО СТК «Система Арт»</span>
+                <a href="#top">Наверх ↑</a>
+            </div>
+        </section>
+    </main>
 
     <!-- ГАЛЕРЕЯ (LIGHTBOX) -->
     <div class="lightbox" id="lightbox">
