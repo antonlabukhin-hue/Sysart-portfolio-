@@ -25,6 +25,7 @@
             color: var(--paper); 
             font-family: 'Manrope', Arial, sans-serif; 
             -webkit-font-smoothing: antialiased; 
+            overflow-x: hidden;
         }
         a, button { color: inherit; text-decoration: none; font: inherit; background: none; border: none; cursor: pointer; }
         
@@ -47,6 +48,12 @@
         .main-nav { display: flex; gap: 34px; font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
         .main-nav a:hover { color: var(--lime); }
 
+        /* --- АНИМАЦИЯ ПОЯВЛЕНИЯ (КАСКАД) --- */
+        @keyframes slideUpFade {
+            0% { opacity: 0; transform: translateY(40px); }
+            100% { opacity: 1; transform: translateY(0); }
+        }
+
         /* --- ГЛАВНЫЙ ЭКРАН --- */
         .hero { 
             min-height: 100vh; 
@@ -55,18 +62,30 @@
             flex-direction: column; 
             justify-content: flex-end; 
             padding: clamp(100px, 15vw, 150px) clamp(22px, 8.2vw, 132px) clamp(40px, 6vw, 80px); 
-            /* Фон главного экрана грузит оригинал, чтобы не было пикселей */
             background: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%), linear-gradient(rgba(0,0,0,0.6), rgba(10,10,10,1)), url('images/MONO1.jpg') center/cover no-repeat;
         }
         .hero:after { 
             content: ''; position: absolute; right: 9%; top: 0; bottom: 0; width: 1px; 
             background: linear-gradient(180deg, transparent, var(--line) 23%, var(--line) 77%, transparent); opacity: .75; 
         }
-        .hero-kicker { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 13px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 20px;}
+        
+        /* Применяем анимацию с задержками к элементам героя */
+        .hero-kicker { 
+            font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 13px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 20px;
+            animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.2s both;
+        }
         .kicker-line { width: 45px; height: 1px; background: var(--lime); display: inline-block; }
-        .hero h1 { font-size: clamp(45px, 9vw, 130px); line-height: .88; letter-spacing: -.05em; font-weight: 700; max-width: 1000px; margin: 0 0 40px; position: relative; z-index: 1; }
+        
+        .hero h1 { 
+            font-size: clamp(45px, 9vw, 130px); line-height: .88; letter-spacing: -.05em; font-weight: 700; max-width: 1000px; margin: 0 0 40px; position: relative; z-index: 1; 
+            animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.4s both;
+        }
         .hero h1 em { color: var(--lime); font-style: normal; font-weight: 400; }
-        .hero-bottom { display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; position: relative; z-index: 1; }
+        
+        .hero-bottom { 
+            display: grid; grid-template-columns: 1fr 1fr 1fr; align-items: end; position: relative; z-index: 1; 
+            animation: slideUpFade 1s cubic-bezier(0.2, 0.8, 0.2, 1) 0.6s both;
+        }
         .hero-intro { font-family: 'DM Mono', monospace; color: var(--muted); font-size: 10px; line-height: 1.6; margin: 0; text-transform: uppercase; letter-spacing: .08em;}
         
         .scroll-cue { display: flex; justify-content: center; align-items: center; gap: 13px; font-size: 10px; line-height: 1.55; text-transform: uppercase; letter-spacing: .1em; transition: transform .25s ease; }
@@ -117,19 +136,34 @@
         
         footer { border-top: 1px solid var(--line); display: flex; justify-content: space-between; padding: 30px clamp(22px, 5vw, 80px); color: var(--muted); font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; }
 
+        /* --- ИДЕАЛЬНАЯ АДАПТАЦИЯ ДЛЯ ТЕЛЕФОНОВ --- */
         @media (max-width: 760px) {
-            .hero { padding-top: 120px; }
-            .hero h1 { font-size: clamp(40px, 12vw, 80px); }
-            .hero-bottom { grid-template-columns: 1fr auto; row-gap: 28px; }
-            .hero-intro { grid-column: 1; grid-row: 2; }
-            .hero-index { grid-column: 2; }
-            .scroll-cue { justify-self: end; }
+            .site-header { padding: 0 20px; }
+            .main-nav { display: none; }
+            
+            .hero { padding: 100px 20px 40px 20px; }
+            .hero h1 { font-size: clamp(48px, 13vw, 80px); margin-bottom: 30px; }
+            
+            /* Перестроение нижнего блока для телефона */
+            .hero-bottom { 
+                grid-template-columns: 1fr auto; 
+                grid-template-rows: auto auto; 
+                row-gap: 30px; 
+                align-items: end;
+            }
+            .hero-intro { grid-column: 1 / -1; grid-row: 2; opacity: 0.7; font-size: 9px;}
+            .scroll-cue { grid-column: 1; grid-row: 1; justify-self: start; text-align: left; justify-content: flex-start;}
+            .hero-index { grid-column: 2; grid-row: 1; justify-self: end; }
+            
             .category-switch { flex-direction: column; }
             .category-tab { width: 100%; border-right: 0; border-bottom: 1px solid var(--line); padding: 19px 10px; }
             .category-tab:last-child { border-bottom: 0; }
+            
+            .project-grid { gap: 20px; }
+            
             .lightbox-prev, .lightbox-next { display: none; }
             .lightbox-close { width: 45px; height: 45px; font-size: 25px; top: 15px; right: 15px; }
-            .main-nav { display: none; }
+            
             footer { flex-direction: column; gap: 15px; text-align: center; }
         }
     </style>
@@ -168,7 +202,6 @@
             </div>
 
             <!-- СТАТИЧЕСКИЕ ПРОЕКТЫ -->
-            <!-- src - грузит легкую картинку, data-full - хранит путь к тяжелому оригиналу -->
             <div class="project-panel is-visible" data-panel="static">
                 <div class="project-grid">
                     <article class="project-card"><div class="project-visual"><img src="images/min/MONO28.jpg" data-full="images/MONO28.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
@@ -245,7 +278,6 @@
         <div class="lightbox-btn lightbox-close" id="closeBtn">&times;</div>
         <div class="lightbox-btn lightbox-prev" id="prevBtn">&#10094;</div>
         <div class="lightbox-btn lightbox-next" id="nextBtn">&#10095;</div>
-        <!-- В этот тег скрипт будет подставлять тяжелое фото -->
         <img id="lightbox-img" src="" alt="Фото">
     </div>
 
@@ -284,7 +316,6 @@
             activeImages.forEach((img, index) => {
                 img.parentElement.onclick = () => {
                     currentIndex = index;
-                    // Подтягиваем тяжелое фото из data-full
                     lightboxImg.src = img.getAttribute('data-full');
                     lightbox.classList.add('active');
                 };
@@ -298,7 +329,6 @@
 
         function showNext() {
             currentIndex = (currentIndex < activeImages.length - 1) ? currentIndex + 1 : 0;
-            // При перелистывании тоже тянем оригинал
             lightboxImg.src = activeImages[currentIndex].getAttribute('data-full');
         }
         function showPrev() {
