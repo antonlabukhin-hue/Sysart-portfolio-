@@ -13,7 +13,7 @@
             --paper: #ffffff; 
             --muted: #8c8b86; 
             --line: rgba(255,255,255,.18); 
-            --lime: #ef3b36; /* Фирменный красный акцент[cite: 15] */
+            --lime: #ef3b36; 
             --max: 1440px; 
         }
         
@@ -55,6 +55,7 @@
             flex-direction: column; 
             justify-content: flex-end; 
             padding: clamp(100px, 15vw, 150px) clamp(22px, 8.2vw, 132px) clamp(40px, 6vw, 80px); 
+            /* Фон главного экрана грузит оригинал, чтобы не было пикселей */
             background: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%), linear-gradient(rgba(0,0,0,0.6), rgba(10,10,10,1)), url('images/MONO1.jpg') center/cover no-repeat;
         }
         .hero:after { 
@@ -167,66 +168,67 @@
             </div>
 
             <!-- СТАТИЧЕСКИЕ ПРОЕКТЫ -->
+            <!-- src - грузит легкую картинку, data-full - хранит путь к тяжелому оригиналу -->
             <div class="project-panel is-visible" data-panel="static">
                 <div class="project-grid">
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO28.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO34.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO7.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO25.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO20.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO1.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO2.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO3.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO4.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO5.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO6.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>  
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO8.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO9.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO10.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO11.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO12.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO13.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO14.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO15.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO16.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO17.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO18.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO19.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO21.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO22.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO23.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO24.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO26.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO27.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO29.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO30.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO31.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO32.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO33.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/MONO35.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO28.jpg" data-full="images/MONO28.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO34.jpg" data-full="images/MONO34.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO7.jpg" data-full="images/MONO7.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO25.jpg" data-full="images/MONO25.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO20.jpg" data-full="images/MONO20.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO.jpg" data-full="images/MONO.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO1.jpg" data-full="images/MONO1.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO2.jpg" data-full="images/MONO2.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO3.jpg" data-full="images/MONO3.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO4.jpg" data-full="images/MONO4.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO5.jpg" data-full="images/MONO5.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO6.jpg" data-full="images/MONO6.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>  
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO8.jpg" data-full="images/MONO8.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO9.jpg" data-full="images/MONO9.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO10.jpg" data-full="images/MONO10.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO11.jpg" data-full="images/MONO11.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO12.jpg" data-full="images/MONO12.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO13.jpg" data-full="images/MONO13.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO14.jpg" data-full="images/MONO14.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO15.jpg" data-full="images/MONO15.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO16.jpg" data-full="images/MONO16.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO17.jpg" data-full="images/MONO17.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO18.jpg" data-full="images/MONO18.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO19.jpg" data-full="images/MONO19.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO21.jpg" data-full="images/MONO21.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO22.jpg" data-full="images/MONO22.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO23.jpg" data-full="images/MONO23.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO24.jpg" data-full="images/MONO24.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO26.jpg" data-full="images/MONO26.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO27.jpg" data-full="images/MONO27.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO29.jpg" data-full="images/MONO29.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO30.jpg" data-full="images/MONO30.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO31.jpg" data-full="images/MONO31.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO32.jpg" data-full="images/MONO32.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO33.jpg" data-full="images/MONO33.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/MONO35.jpg" data-full="images/MONO35.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
                 </div>
             </div>
 
             <!-- УПРАВЛЯЕМЫЕ ПРОЕКТЫ -->
             <div class="project-panel" data-panel="managed">
                 <div class="project-grid">
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB10.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB17.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB15.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB14.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB13.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB1.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB2.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB3.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB4.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB5.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB6.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB8.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB9.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB11.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB12.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img src="images/RGB16.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB10.jpg" data-full="images/RGB10.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB17.jpg" data-full="images/RGB17.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB15.jpg" data-full="images/RGB15.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB14.jpg" data-full="images/RGB14.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB13.jpg" data-full="images/RGB13.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB1.jpg" data-full="images/RGB1.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB2.jpg" data-full="images/RGB2.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB3.jpg" data-full="images/RGB3.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB4.jpg" data-full="images/RGB4.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB5.jpg" data-full="images/RGB5.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB6.jpg" data-full="images/RGB6.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB8.jpg" data-full="images/RGB8.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB9.jpg" data-full="images/RGB9.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB11.jpg" data-full="images/RGB11.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB12.jpg" data-full="images/RGB12.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img src="images/min/RGB16.jpg" data-full="images/RGB16.jpg" alt="Проект"><span class="visual-caption">Смотреть</span><span class="visual-mark">↗</span></div></article>
                 </div>
             </div>
         </section>
@@ -243,11 +245,11 @@
         <div class="lightbox-btn lightbox-close" id="closeBtn">&times;</div>
         <div class="lightbox-btn lightbox-prev" id="prevBtn">&#10094;</div>
         <div class="lightbox-btn lightbox-next" id="nextBtn">&#10095;</div>
+        <!-- В этот тег скрипт будет подставлять тяжелое фото -->
         <img id="lightbox-img" src="" alt="Фото">
     </div>
 
     <script>
-        // Скрипт переключения вкладок[cite: 13]
         const tabs = document.querySelectorAll('.category-tab');
         const panels = document.querySelectorAll('.project-panel');
 
@@ -266,11 +268,10 @@
                     }
                 });
                 
-                updateLightboxImages(); // Обновляем массив картинок для галереи
+                updateLightboxImages(); 
             });
         });
 
-        // Скрипт галереи с поддержкой свайпов
         let activeImages = [];
         const lightbox = document.getElementById('lightbox');
         const lightboxImg = document.getElementById('lightbox-img');
@@ -283,24 +284,26 @@
             activeImages.forEach((img, index) => {
                 img.parentElement.onclick = () => {
                     currentIndex = index;
-                    lightboxImg.src = img.src;
+                    // Подтягиваем тяжелое фото из data-full
+                    lightboxImg.src = img.getAttribute('data-full');
                     lightbox.classList.add('active');
                 };
             });
         }
         
-        updateLightboxImages(); // Запуск при загрузке
+        updateLightboxImages(); 
 
         document.getElementById('closeBtn').addEventListener('click', () => lightbox.classList.remove('active'));
         lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); });
 
         function showNext() {
             currentIndex = (currentIndex < activeImages.length - 1) ? currentIndex + 1 : 0;
-            lightboxImg.src = activeImages[currentIndex].src;
+            // При перелистывании тоже тянем оригинал
+            lightboxImg.src = activeImages[currentIndex].getAttribute('data-full');
         }
         function showPrev() {
             currentIndex = (currentIndex > 0) ? currentIndex - 1 : activeImages.length - 1;
-            lightboxImg.src = activeImages[currentIndex].src;
+            lightboxImg.src = activeImages[currentIndex].getAttribute('data-full');
         }
 
         document.getElementById('nextBtn').addEventListener('click', showNext);
@@ -314,7 +317,6 @@
             }
         });
 
-        // Свайпы
         let touchstartX = 0;
         let touchendX = 0;
         lightbox.addEventListener('touchstart', e => { touchstartX = e.changedTouches[0].screenX; }, false);
