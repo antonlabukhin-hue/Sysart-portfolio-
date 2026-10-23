@@ -137,9 +137,9 @@
         .project-panel.is-visible { display: block; animation: slideUpFade 0.6s ease both; }
         .project-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 30px; }
         .project-card { cursor: pointer; }
-        .project-visual { position: relative; display: block; aspect-ratio: 1.15/1; overflow: hidden; background: #151515; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);}
-        .project-visual img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .7s cubic-bezier(.2,.8,.2,1), filter 0.5s ease; filter: brightness(0.85); }
-        .project-card:hover .project-visual img { transform: scale(1.05); filter: brightness(0.5); }
+        .project-visual { position: relative; display: block; aspect-ratio: 16/9; overflow: hidden; background: #151515; border-radius: 4px; border: 1px solid rgba(255,255,255,0.05);}
+        .project-visual img { width: 100%; height: 100%; object-fit: contain; display: block; transition: filter 0.5s ease; filter: brightness(0.85); }
+        .project-card:hover .project-visual img { filter: brightness(0.5); }
         .visual-mark { position: absolute; right: 18px; top: 12px; color: var(--lime); font-size: 25px; font-weight: 300; transition: transform .25s ease; z-index: 2; opacity: 0; }
         .project-card:hover .visual-mark { transform: translate(4px, -4px); opacity: 1; }
         .visual-caption { position: absolute; left: 18px; top: 17px; color: rgba(255,255,255,.9); font-size: 9px; font-family: 'DM Mono', monospace; z-index: 2; opacity: 0; transition: opacity 0.3s; text-transform: uppercase; letter-spacing: 0.1em;}
