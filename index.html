@@ -86,19 +86,21 @@
         .project-section h2 { font-size: clamp(32px, 6vw, 60px); line-height: .9; letter-spacing: -.05em; font-weight: 600; margin: 0 0 20px; }
         
         .category-portals { flex: 1; min-height: 0; display: flex; gap: 16px; width: 100%; }
-        .portal-card { flex: 1; min-width: 0; position: relative; background: #111; border-radius: 4px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: flex 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease; }
+        /* Текст карточки идёт в потоке (прижат к низу), поэтому карточка никогда не бывает ниже своего текста */
+        .portal-card { flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column; justify-content: flex-end; background: #111; border-radius: 4px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: flex 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease; }
         .portal-card:hover { box-shadow: 0 20px 50px rgba(0,0,0,0.5); border-color: rgba(255,255,255,0.15); }
-        
-        .portal-card img { width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.5s ease; filter: brightness(0.6); }
+
+        .portal-card img { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; transition: transform 1s cubic-bezier(0.2, 0.8, 0.2, 1), filter 0.5s ease; filter: brightness(0.6); }
         .portal-card:hover img { transform: scale(1.05); filter: brightness(0.9); }
-        
-        .portal-content { position: absolute; bottom: 0; left: 0; right: 0; padding: 50px 40px 30px; background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); display: flex; flex-direction: column; gap: 5px; pointer-events: none; }
+
+        .portal-content { position: relative; padding: 50px 40px 30px; background: linear-gradient(0deg, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 60%, transparent 100%); display: flex; flex-direction: column; gap: 5px; pointer-events: none; }
         .portal-num { font-family: 'DM Mono', monospace; color: var(--lime); font-size: 12px; margin-bottom: 5px; }
         .portal-content h3 { font-size: clamp(20px, 2.5vw, 36px); margin: 0; letter-spacing: -0.03em; font-weight: 600; color: var(--paper); }
         .portal-link { color: var(--paper); font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; display: flex; align-items: center; gap: 8px; margin-top: 10px; opacity: 0; transform: translateY(15px); transition: all 0.4s cubic-bezier(0.2, 0.8, 0.2, 1); }
         .portal-link span { color: var(--lime); font-size: 18px; }
         .portal-meta { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); transition: opacity 0.4s ease; }
         .portal-card .portal-cover-gobo { object-position: 28% center; }
+        .nowrap { white-space: nowrap; }
 
         /* Раскрывающиеся полосы: открыта карточка под курсором, по умолчанию — первая */
         @media (min-width: 761px) {
@@ -191,9 +193,14 @@
             .project-section { padding: 90px 20px 20px; }
             .project-section h2 { margin-bottom: 10px; font-size: 32px; }
             .category-portals { flex-direction: column; gap: 10px; margin-top: 10px; }
-            .portal-card.is-open { flex: 1.6; }
-            .portal-link { opacity: 1; transform: translateY(0); margin-top: 5px; }
-            .portal-content { padding: 30px 20px 20px; }
+            .portal-card { flex: 1 0 auto; min-height: 120px; }
+            .portal-card.is-open { flex-grow: 1.6; min-height: 170px; }
+            .portal-content { padding: 28px 68px 16px 18px; gap: 3px; }
+            .portal-num { margin-bottom: 2px; }
+            .portal-content h3 { font-size: 21px; line-height: 1.15; }
+            /* Вместо надписи «Открыть архив» — круглая кнопка со стрелкой */
+            .portal-link { position: absolute; right: 16px; bottom: 16px; margin: 0; width: 40px; height: 40px; justify-content: center; border: 1px solid rgba(239,59,54,.6); border-radius: 50%; background: rgba(10,10,10,.4); font-size: 0; opacity: 1; transform: none; }
+            .portal-link span { font-size: 20px; line-height: 1; }
             
             .statement-section { padding: 84px 20px 20px; }
             .statement-number { top: 10px; }
@@ -207,6 +214,24 @@
             .gallery-container { padding: 30px 20px 80px;}
             .lightbox-prev, .lightbox-next { display: none; }
             .lightbox-close { width: 45px; height: 45px; font-size: 25px; top: 15px; right: 15px; }
+        }
+
+        /* Телефоны и низкие экраны (в т.ч. горизонтально): блок минимум на экран, но может вырасти,
+           если текст не помещается (браузерные панели, крупный системный шрифт) */
+        @media (max-width: 760px), (max-height: 560px) {
+            .snap-container { scroll-snap-type: y proximity; }
+            .snap-section { height: auto; min-height: 100vh; min-height: 100svh; scroll-snap-stop: normal; }
+        }
+
+        /* Телефон горизонтально / очень низкий экран: отступ под шапку, три равные карточки без раскрытия */
+        @media (min-width: 761px) and (max-height: 560px) {
+            .hero { padding-top: 100px; }
+            .statement-section { padding-top: 100px; padding-bottom: 30px; }
+            .portal-card, .portal-card.is-open, .category-portals:hover .portal-card:hover, .category-portals:hover .portal-card.is-open:not(:hover) { flex: 1; }
+            .portal-content { padding: 40px 22px 20px; }
+            .portal-card .portal-content h3, .category-portals:hover .portal-card .portal-content h3 { font-size: 20px; }
+            .portal-card:not(.is-open) .portal-meta, .category-portals:hover .portal-card.is-open:not(:hover) .portal-meta { opacity: 1; }
+            .portal-card:not(.is-open) .portal-link, .category-portals:hover .portal-card.is-open:not(:hover) .portal-link { opacity: 1; transform: none; }
         }
     </style>
 </head>
@@ -248,7 +273,7 @@
                     <img src="images/min/MONO22.jpg" alt="Проекты от 2200K–6000K">
                     <div class="portal-content">
                         <span class="portal-num">01</span>
-                        <h3>Проекты от 2200K–6000K</h3>
+                        <h3>Проекты от <span class="nowrap">2200K–6000K</span></h3>
                         <span class="portal-meta" data-count="static"></span>
                         <span class="portal-link">Открыть архив <span>↗</span></span>
                     </div>
