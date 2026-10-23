@@ -125,6 +125,13 @@
 
         /* --- СЕКЦИЯ КОНТАКТОВ + ПОДВАЛ --- */
         .contact-section { max-width: var(--max); margin: 0 auto; padding: 84px clamp(22px, 5vw, 80px) 0; }
+
+        /* Фон как на первом экране (красное свечение), но без фото — на всю ширину окна */
+        .statement-section, .contact-section { isolation: isolate; }
+        .statement-section:before, .contact-section:before {
+            content: ''; position: absolute; top: 0; bottom: 0; left: 50%; width: 100vw; transform: translateX(-50%); z-index: -1; pointer-events: none;
+            background: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%), var(--ink);
+        }
         .contact-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .contact-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .contact-top span { color: var(--muted); font-size: 9px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em;}
@@ -237,21 +244,21 @@
             </div>
             
             <div class="category-portals">
-                <div class="portal-card is-open" onclick="openGallery('static', 'Статические проекты')">
-                    <img src="images/min/MONO22.jpg" alt="Статические проекты">
+                <div class="portal-card is-open" onclick="openGallery('static', 'Проекты от 2200K–6000K')">
+                    <img src="images/min/MONO22.jpg" alt="Проекты от 2200K–6000K">
                     <div class="portal-content">
                         <span class="portal-num">01</span>
-                        <h3>Статические проекты</h3>
+                        <h3>Проекты от 2200K–6000K</h3>
                         <span class="portal-meta" data-count="static"></span>
                         <span class="portal-link">Открыть архив <span>↗</span></span>
                     </div>
                 </div>
 
-                <div class="portal-card" onclick="openGallery('managed', 'Управляемые проекты')">
-                    <img src="images/min/RGB18.jpg" alt="Управляемые проекты" onerror="this.src='images/min/RGB17.jpg'">
+                <div class="portal-card" onclick="openGallery('managed', 'Цветные и управляемые проекты')">
+                    <img src="images/min/RGB18.jpg" alt="Цветные и управляемые проекты" onerror="this.src='images/min/RGB17.jpg'">
                     <div class="portal-content">
                         <span class="portal-num">02</span>
-                        <h3>Управляемые проекты</h3>
+                        <h3>Цветные и управляемые проекты</h3>
                         <span class="portal-meta" data-count="managed"></span>
                         <span class="portal-link">Открыть архив <span>↗</span></span>
                     </div>
