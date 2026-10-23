@@ -210,7 +210,7 @@
             <div class="hero-bottom">
                 <p class="hero-intro">Визуальный архив проектов<br>Система Арт</p>
                 <a class="scroll-cue" href="#projects" onclick="document.getElementById('projects').scrollIntoView(); return false;"><span class="scroll-arrow">↓</span><span>Смотреть<br>проекты</span></a>
-                <div class="hero-index"><strong>59</strong><span><br>проектов</span></div>
+                <div class="hero-index"><strong id="photo-count">60</strong><span><br>фото</span></div>
             </div>
             <div class="hero-orbit" aria-hidden="true"><span></span><i></i></div>
         </section>
@@ -290,7 +290,7 @@
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO35.jpg" data-full="images/MONO35.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO33.jpg" data-full="images/MONO33.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO32.jpg" data-full="images/MONO32.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO31.jpg" data-full="images/min/MONO31.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO31.jpg" data-full="images/MONO31.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO30.jpg" data-full="images/MONO30.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO21.jpg" data-full="images/MONO21.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO22.jpg" data-full="images/MONO22.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>  
@@ -347,6 +347,7 @@
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB11.jpg" data-full="images/RGB11.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB12.jpg" data-full="images/RGB12.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB16.jpg" data-full="images/RGB16.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB19.jpg" data-full="images/RGB19.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                 </div>
             </div>
         </div>
@@ -422,6 +423,12 @@
             currentIndex = (currentIndex > 0) ? currentIndex - 1 : activeImages.length - 1;
             lightboxImg.src = activeImages[currentIndex].getAttribute('data-full');
         }
+
+        document.getElementById('nextBtn').addEventListener('click', showNext);
+        document.getElementById('prevBtn').addEventListener('click', showPrev);
+
+        // Счётчик на главном экране считается по количеству фото в галереях
+        document.getElementById('photo-count').textContent = document.querySelectorAll('.project-visual img').length;
 
         document.addEventListener('keydown', (e) => {
             if (lightbox.classList.contains('active')) {
