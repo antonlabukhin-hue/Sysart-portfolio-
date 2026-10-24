@@ -19,6 +19,8 @@
             --line: rgba(255,255,255,.18); 
             --lime: #ef3b36; 
             --max: 1440px; 
+            /* Фирменное красное свечение — фон тёмных экранов */
+            --glow: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%);
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
@@ -29,9 +31,18 @@
         .site-header { 
             height: 84px; display: flex; align-items: center; justify-content: space-between; 
             padding: 0 clamp(22px, 4vw, 64px); border-bottom: 1px solid var(--line); 
-            position: fixed; width: 100%; top: 0; z-index: 50; 
+            position: fixed; width: 100%; top: 0; z-index: 60; 
             background: linear-gradient(180deg, rgba(10,10,10,0.9) 0%, transparent 100%);
+            transition: background .3s;
         }
+        /* На внутренних страницах шапка плотнее, чтобы контент под ней не просвечивал */
+        body.in-view .site-header { background: rgba(10,10,10,.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .header-back { display: none; align-items: center; gap: 8px; height: 42px; margin-left: clamp(16px, 2vw, 28px); padding: 0 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); color: #cfcbc3; font-size: 13px; font-weight: 500; white-space: nowrap; transition: color .25s, border-color .25s; }
+        .header-back span { color: var(--lime); font-size: 16px; }
+        .header-back b { font-weight: 500; }
+        .header-back:hover { color: var(--paper); border-color: var(--lime); }
+        body.in-view .header-back { display: inline-flex; }
+        body.in-view .main-nav { margin-left: 14px; }
         .site-header img { height: 40px; }
         /* Навигация: стеклянная «капсула» рядом с логотипом, активный раздел подсвечен */
         .main-nav { margin: 0 auto 0 clamp(24px, 3vw, 48px); display: flex; gap: 4px; padding: 5px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
@@ -215,8 +226,8 @@
         .cat-arrows button:hover { border-color: var(--lime); color: var(--lime); }
 
         /* --- КАТАЛОГ: ЭКРАН РАЗДЕЛА --- */
-        #catalog-view { display: none; height: 100dvh; width: 100%; overflow-y: auto; background: var(--ink); animation: fadeIn 0.4s ease; }
-        .cv-header { position: sticky; top: 0; z-index: 40; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
+        #catalog-view { display: none; height: 100dvh; width: 100%; overflow-y: auto; padding-top: 84px; background: var(--glow), var(--ink); animation: fadeIn 0.4s ease; }
+        .cv-header { position: sticky; top: 0; z-index: 40; background: rgba(10,10,10,0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); }
         .cv-row { padding: 26px clamp(22px, 5vw, 80px) 18px; display: flex; align-items: center; justify-content: space-between; gap: 20px; }
         .cv-tabs { display: flex; gap: 6px; overflow-x: auto; padding: 0 clamp(22px, 5vw, 80px) 14px; scrollbar-width: none; }
         .cv-tabs::-webkit-scrollbar { display: none; }
@@ -272,8 +283,8 @@
         .cb-fab { position: fixed; right: 24px; bottom: 24px; z-index: 900; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 22px 0 18px; border-radius: 999px; background: var(--lime); color: #fff; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; box-shadow: 0 10px 30px rgba(0,0,0,.45); transition: transform .25s ease, background .25s; }
         .cb-fab:hover { transform: translateY(-3px); background: #ff4a44; }
         .cb-fab svg { width: 18px; height: 18px; flex: none; }
-        /* На ПК на главной звонок уже есть в шапке («Связаться») — плавающую кнопку прячем */
-        @media (min-width: 761px) { body:has(#home-view:not([style*="none"])) .cb-fab { display: none; } }
+        /* На ПК звонок есть в шапке на всех страницах («Связаться») — плавающую кнопку прячем */
+        @media (min-width: 761px) { .cb-fab { display: none; } }
         .cb-modal { display: none; position: fixed; inset: 0; z-index: 9500; background: rgba(5,5,5,.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 20px; }
         .cb-modal.active { display: flex; animation: fadeIn .25s ease; }
         .cb-box { width: min(440px, 100%); background: #141416; border-radius: 8px; border-top: 3px solid var(--lime); padding: 36px 32px 30px; position: relative; display: flex; flex-direction: column; gap: 12px; }
@@ -293,16 +304,15 @@
         }
 
         /* --- СТРАНИЦА «О КОМПАНИИ» --- */
-        #about-view { display: none; height: 100dvh; width: 100%; overflow-y: auto; background: var(--ink); animation: fadeIn 0.4s ease; }
+        #about-view { display: none; height: 100dvh; width: 100%; overflow-y: auto; background: var(--glow), var(--ink); animation: fadeIn 0.4s ease; }
         .ab-wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 clamp(22px, 5vw, 80px); }
         .ab-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--lime); display: flex; align-items: center; gap: 13px; margin-bottom: 18px; }
         .ab-eyebrow:before { content: ''; width: 45px; height: 1px; background: var(--lime); }
         .ab-big { margin: 0; font-size: clamp(40px, 6.4vw, 92px); line-height: .92; font-weight: 700; letter-spacing: -.05em; max-width: 900px; }
         .ab-h2 { margin: 0; font-size: clamp(30px, 4vw, 56px); line-height: .95; font-weight: 600; letter-spacing: -.05em; }
         .ab-big em, .ab-h2 em { color: var(--lime); font-style: normal; font-weight: 400; }
-        .ab-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 84px; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(22px, 5vw, 80px); border-bottom: 1px solid var(--line); background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.6) 100%); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
         .ab-hero { justify-content: flex-end; padding: 120px 0 56px; background: linear-gradient(90deg, rgba(10,10,10,.95) 0%, rgba(10,10,10,.7) 50%, rgba(10,10,10,.25) 100%), url('images/min/MONO20.jpg') center/cover; }
-        .ab-screen { justify-content: center; padding: 104px 0 40px; }
+        .ab-screen { justify-content: center; padding: 104px 0 40px; background: var(--glow), var(--ink); }
         /* Хроника: четыре эпохи в одну полосу */
         .ab-chron-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; margin-bottom: clamp(24px, 4vh, 40px); }
         .ab-chron-head p { margin: 0; max-width: 360px; font-size: 15px; line-height: 1.55; color: #bdb9b1; }
@@ -376,12 +386,13 @@
         }
 
         /* --- ВНУТРЕННЯЯ ГАЛЕРЕЯ (ОБЫЧНЫЙ СКРОЛЛ) --- */
-        #gallery-view { display: none; height: 100dvh; width: 100%; overflow-y: auto; background: var(--ink); animation: fadeIn 0.4s ease; }
-        .gallery-header { position: sticky; top: 0; z-index: 40; background: rgba(10,10,10,0.95); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 30px clamp(22px, 5vw, 80px); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
+        #gallery-view { display: none; height: 100dvh; width: 100%; overflow-y: auto; padding-top: 84px; background: var(--glow), var(--ink); animation: fadeIn 0.4s ease; }
+        .gallery-header { position: sticky; top: 0; z-index: 40; background: rgba(10,10,10,0.7); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); padding: 18px clamp(22px, 5vw, 80px); border-bottom: 1px solid var(--line); display: flex; align-items: center; justify-content: space-between; }
         .back-btn { color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: 0.1em; transition: color 0.3s; display: flex; align-items: center; gap: 10px; }
         .back-btn span { font-size: 16px; color: var(--lime); }
         .back-btn:hover { color: var(--paper); }
         .gallery-title { font-size: clamp(16px, 2vw, 24px); margin: 0; font-weight: 500; letter-spacing: -0.02em; }
+        .gallery-count { font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); }
         .gallery-container { padding: 40px clamp(22px, 5vw, 80px) 120px; max-width: var(--max); margin: 0 auto; }
         
         .project-panel { display: none; }
@@ -423,6 +434,7 @@
         @media (max-width: 760px) {
             .site-header { padding: 0 20px; }
             .main-nav, .header-cta, .header-phone { display: none; }
+            .header-back { height: 40px; padding: 0 14px; margin: 0 auto 0 12px; }
             .burger { display: flex; }
             
             .hero { padding: 84px 20px 84px 20px; }
@@ -482,23 +494,27 @@
 </head>
 <body>
 
+    <!-- ШАПКА С НАВИГАЦИЕЙ — общая для всех страниц -->
+    <header class="site-header">
+        <a href="#" aria-label="Sysart Portfolio" onclick="navGo('top'); return false;"><img src="images/logo.png" alt="Система Арт"></a>
+        <button class="header-back" onclick="backFromView()" aria-label="Назад"><span>←</span> <b id="header-back-text">На главную</b></button>
+        <nav class="main-nav" aria-label="Разделы">
+            <a href="#projects" data-nav="projects" onclick="navGo('projects'); return false;">Проекты</a>
+            <a href="#catalog" data-nav="catalog" onclick="navGo('catalog'); return false;">Каталог</a>
+            <a href="#about" data-nav="about" onclick="openAbout(); return false;">О компании</a>
+            <a href="#contact" data-nav="contact" onclick="navGo('contact'); return false;">Контакты</a>
+        </nav>
+        <div class="header-actions">
+            <a class="header-phone" href="tel:+79149704000">+7 914 970 40 00</a>
+            <button class="header-cta" onclick="openCallback()">Связаться</button>
+            <button class="burger" onclick="toggleMenu(true)" aria-label="Открыть меню"><span></span><span></span></button>
+        </div>
+    </header>
+
     <!-- ГЛАВНАЯ СТРАНИЦА: СКРОЛЛ-СНАП КОНТЕЙНЕР -->
     <div id="home-view" class="snap-container">
         
-        <header class="site-header">
-            <a href="#" aria-label="Sysart Portfolio" onclick="document.getElementById('home-view').scrollTo(0,0); return false;"><img src="images/logo.png" alt="Система Арт"></a>
-            <nav class="main-nav" aria-label="Разделы">
-                <a href="#projects" data-nav="projects" onclick="navGo('projects'); return false;">Проекты</a>
-                <a href="#catalog" data-nav="catalog" onclick="navGo('catalog'); return false;">Каталог</a>
-                <a href="#about" data-nav="about" onclick="openAbout(); return false;">О компании</a>
-                <a href="#contact" data-nav="contact" onclick="navGo('contact'); return false;">Контакты</a>
-            </nav>
-            <div class="header-actions">
-                <a class="header-phone" href="tel:+79149704000">+7 914 970 40 00</a>
-                <button class="header-cta" onclick="openCallback()">Связаться</button>
-                <button class="burger" onclick="toggleMenu(true)" aria-label="Открыть меню"><span></span><span></span></button>
-            </div>
-        </header>
+
 
         <!-- ЭКРАН 1: ГЕРОЙ -->
         <section class="snap-section hero">
@@ -608,8 +624,8 @@
     <!-- ВНУТРЕННЯЯ СТРАНИЦА ГАЛЕРЕИ (ОБЫЧНЫЙ СКРОЛЛ) -->
     <div id="gallery-view">
         <header class="gallery-header">
-            <button class="back-btn" onclick="closeGallery()"><span>←</span> Назад в портфолио</button>
             <h2 class="gallery-title" id="gallery-title">Проекты</h2>
+            <span class="gallery-count" id="gallery-count"></span>
         </header>
 
         <div class="gallery-container">
@@ -710,10 +726,6 @@
 
     <!-- СТРАНИЦА «О КОМПАНИИ» (хроника собирается скриптом из aboutEras) -->
     <div id="about-view" class="snap-container">
-        <header class="ab-header">
-            <button class="back-btn" onclick="closeAbout()"><span>←</span> Назад в портфолио</button>
-            <h2 class="gallery-title">О компании</h2>
-        </header>
 
         <!-- 1: КТО МЫ -->
         <section class="snap-section ab-hero"><div class="ab-wrap" style="width:100%">
@@ -783,8 +795,8 @@
     <div id="catalog-view">
         <header class="cv-header">
             <div class="cv-row">
-                <button class="back-btn" onclick="closeCatalog()"><span>←</span> Каталог</button>
                 <h2 class="gallery-title">Каталог оборудования 2026</h2>
+                <a class="gallery-count" href="catalog/Sistema-Art-catalog-2026.pdf" download>PDF · 13 МБ ↓</a>
             </div>
             <nav class="cv-tabs" id="cv-tabs"></nav>
         </header>
@@ -836,13 +848,31 @@
 
     <script>
         const homeView = document.getElementById('home-view');
+        // --- ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ: главная и внутренние (галерея, каталог, о компании) ---
+        // view: 'home' | 'gallery' | 'catalog' | 'about'
+        const views = () => ({ gallery: galleryView, catalog: catalogView, about: aboutView });
+        let currentView = 'home';
+        const VIEW_NAV = { gallery: 'projects', catalog: 'catalog', about: 'about' };
+        function showView(view) {
+            currentView = view;
+            Object.entries(views()).forEach(([k, el]) => { el.style.display = k === view ? 'block' : 'none'; });
+            homeView.style.display = view === 'home' ? 'block' : 'none';
+            document.body.classList.toggle('in-view', view !== 'home');
+            document.getElementById('header-back-text').textContent = view === 'catalog' ? 'К каталогу' : 'На главную';
+            if (view !== 'home') navLinks.forEach(a => a.classList.toggle('active', a.dataset.nav === VIEW_NAV[view]));
+            toggleMenu(false);
+        }
+        // Кнопка «назад» в шапке: из каталога — к блоку каталога, из остальных — на первый экран
+        function backFromView() {
+            if (currentView === 'catalog') closeCatalog();
+            else navGo('top');
+        }
         const galleryView = document.getElementById('gallery-view');
         const galleryTitle = document.getElementById('gallery-title');
         const panels = document.querySelectorAll('.project-panel');
 
         function openGallery(category, title) {
-            homeView.style.display = 'none';
-            galleryView.style.display = 'block';
+            showView('gallery');
             galleryTitle.innerText = title;
             galleryView.scrollTop = 0;
 
@@ -853,12 +883,12 @@
                     panel.classList.remove('is-visible');
                 }
             });
+            document.getElementById('gallery-count').textContent = document.querySelectorAll(`[data-panel="${category}"] .project-card`).length + ' фото';
             updateLightboxImages(); 
         }
 
         function closeGallery() {
-            galleryView.style.display = 'none';
-            homeView.style.display = 'block';
+            showView('home');
             // Небольшая задержка, чтобы скролл успел примениться после изменения display
             setTimeout(() => {
                 homeView.scrollTo({ top: 0, behavior: 'instant' }); // «Назад в портфолио» — на первый экран
@@ -1070,14 +1100,12 @@
         }
 
         function openCatalog(index) {
-            homeView.style.display = 'none';
-            catalogView.style.display = 'block';
+            showView('catalog');
             showCatalogSection(index);
         }
 
         function closeCatalog() {
-            catalogView.style.display = 'none';
-            homeView.style.display = 'block';
+            showView('home');
             setTimeout(() => {
                 document.getElementById('catalog').scrollIntoView({behavior: 'instant'});
             }, 10);
@@ -1128,9 +1156,13 @@
         // --- НАВИГАЦИЯ ---
         const mnav = document.getElementById('mnav');
         function toggleMenu(open) { mnav.classList.toggle('active', open); }
+        // Переход к блоку главной; с внутренней страницы — сначала вернуться на главную
         function navGo(id) {
-            toggleMenu(false);
-            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+            const fromView = currentView !== 'home';
+            showView('home');
+            const go = () => id === 'top' ? homeView.scrollTo({ top: 0, behavior: fromView ? 'instant' : 'smooth' })
+                                         : document.getElementById(id).scrollIntoView({ behavior: fromView ? 'instant' : 'smooth' });
+            fromView ? setTimeout(go, 10) : go();
         }
         // Подсветка пункта меню того блока, который сейчас на экране
         const navLinks = document.querySelectorAll('.main-nav a[data-nav]');
@@ -1152,14 +1184,12 @@
         document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeCallback(); toggleMenu(false); } });
 
         function openAbout() {
-            homeView.style.display = 'none';
-            aboutView.style.display = 'block';
+            showView('about');
             aboutView.scrollTop = 0;
         }
 
         function closeAbout() {
-            aboutView.style.display = 'none';
-            homeView.style.display = 'block';
+            showView('home');
             setTimeout(() => {
                 homeView.scrollTo({ top: 0, behavior: 'instant' });
             }, 10);
