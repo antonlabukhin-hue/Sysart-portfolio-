@@ -636,6 +636,7 @@
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO40.jpg" data-full="images/MONO40.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO23.jpg" data-full="images/MONO23.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO26.jpg" data-full="images/MONO26.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO43.jpg" data-full="images/MONO43.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO27.jpg" data-full="images/MONO27.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO12.jpg" data-full="images/MONO12.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO13.jpg" data-full="images/MONO13.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
@@ -674,6 +675,8 @@
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB1.jpg" data-full="images/RGB1.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB2.jpg" data-full="images/RGB2.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB22.jpg" data-full="images/RGB22.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB24.jpg" data-full="images/RGB24.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
+                    <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB23.jpg" data-full="images/RGB23.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB3.jpg" data-full="images/RGB3.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB4.jpg" data-full="images/RGB4.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB5.jpg" data-full="images/RGB5.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
@@ -912,6 +915,7 @@
             MONO40: ['ЖК «Современник»', 'Чита', 2024],
             MONO41: ['ЖК «Полюса»', 'Хабаровск', 2022],
             MONO42: ['ЖК «Донской Арбат»', 'Ростов-на-Дону', 2025],
+            MONO43: ['ЖК «Орлиное гнездо»', 'Владивосток', 2009],
             RGB1:   ['ТЦ «Седьмое небо»', 'Воронеж', 2021],
             RGB2:   ['ЖК «Молодёжный»', 'Владивосток', 2023],
             RGB3:   ['ЖК «Акватория»', 'Владивосток', 2024],
@@ -932,8 +936,9 @@
             RGB20:  ['Здание на Дзержинского, 13', 'Находка', 2025],
             RGB21:  ['Аттракцион «Змей Горыныч»', 'Сочи Парк', 2023],
             RGB22:  ['Здание на пр. Мира, 71', 'Находка', 2026],
+            RGB23:  ['Международный аэропорт', 'Владивосток', 2012],
+            RGB24:  ['ТЦ «В-Лазер»', 'Владивосток', 2016],
             'tvtower':    ['Телевизионная башня', 'Владивосток', 2012],
-            'airport-vl': ['Международный аэропорт', 'Владивосток', 2012],
         };
         const captionFor = src => {
             const key = (src || '').split('/').pop().replace(/\.\w+$/, '');
@@ -1078,16 +1083,16 @@
 
         // --- О КОМПАНИИ: хроника объектов по эпохам ---
         // В эпохе — ключи фото; название, город и год берутся из photoCaptions
-        const ABOUT_ONLY = { 'tvtower': 'images/about/tvtower.jpg', 'airport-vl': 'images/about/airport-vl.jpg' };
+        const ABOUT_ONLY = { 'tvtower': 'images/about/tvtower.jpg' };
         const obj = key => {
             const c = photoCaptions[key], src = ABOUT_ONLY[key];
             return { img: src || `images/min/${key}.jpg`, full: src || `images/${key}.jpg`, name: c[0], place: `${c[1]}, ${c[2]}` };
         };
         const aboutEras = [
-            { years: '2011–2013', title: 'Первые знаковые объекты',
-              items: ['RGB10', 'tvtower', 'airport-vl', 'RGB19'].map(obj) },
+            { years: '2009–2013', title: 'Первые знаковые объекты',
+              items: ['MONO43', 'RGB10', 'tvtower', 'RGB23', 'RGB19'].map(obj) },
             { years: '2014–2018', title: 'Медиафасады и исторический центр',
-              items: ['MONO17', 'MONO16', 'RGB16'].map(obj) },
+              items: ['RGB24', 'MONO17', 'MONO16', 'RGB16'].map(obj) },
             { years: '2019–2022', title: 'Выход в регионы',
               items: ['MONO12', 'MONO24', 'MONO27', 'MONO30', 'RGB6', 'MONO3', 'MONO41', 'RGB14'].map(obj) },
             { years: '2023–2026', title: 'Управляемый свет и жилые комплексы',
@@ -1095,6 +1100,7 @@
         ];
 
         // Обложка эпохи — объект с индексом cover; в списке под ней — первые ERA_LIST объектов
+        aboutEras[0].cover = 1; // Парусник «Надежда»
         aboutEras[2].cover = 3; // ДК угольщиков
         aboutEras[3].cover = 1; // Музей Мирового океана
         const ERA_LIST = 3;
