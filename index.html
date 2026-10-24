@@ -22,7 +22,7 @@
         }
         
         * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
-        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--ink); color: var(--paper); font-family: 'Manrope', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+        html, body { margin: 0; padding: 0; width: 100%; height: 100%; overflow: hidden; background: var(--ink); color: var(--paper); font-family: 'Manrope', Arial, sans-serif; -webkit-font-smoothing: antialiased; font-variant-emoji: text; }
         a, button { color: inherit; text-decoration: none; font: inherit; background: none; border: none; cursor: pointer; }
         
         /* --- ШАПКА --- */
@@ -233,6 +233,28 @@
             .cv-next-arrow { width: 44px; height: 44px; }
         }
 
+        /* --- ЗАКАЗАТЬ ЗВОНОК: плавающая кнопка и окно --- */
+        .cb-fab { position: fixed; right: 24px; bottom: 24px; z-index: 900; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 22px 0 18px; border-radius: 999px; background: var(--lime); color: #fff; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; box-shadow: 0 10px 30px rgba(0,0,0,.45); transition: transform .25s ease, background .25s; }
+        .cb-fab:hover { transform: translateY(-3px); background: #ff4a44; }
+        .cb-fab svg { width: 18px; height: 18px; flex: none; }
+        .cb-modal { display: none; position: fixed; inset: 0; z-index: 9500; background: rgba(5,5,5,.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 20px; }
+        .cb-modal.active { display: flex; animation: fadeIn .25s ease; }
+        .cb-box { width: min(440px, 100%); background: #141416; border-radius: 8px; border-top: 3px solid var(--lime); padding: 36px 32px 30px; position: relative; display: flex; flex-direction: column; gap: 12px; }
+        .cb-box h3 { margin: 0; font-size: 30px; font-weight: 700; letter-spacing: -.04em; }
+        .cb-box p { margin: 0 0 12px; font-size: 15px; line-height: 1.5; color: #bdb9b1; }
+        .cb-opt { display: flex; justify-content: space-between; align-items: center; gap: 12px; height: 58px; padding: 0 20px; border-radius: 6px; border: 1px solid var(--line); font-size: 16px; transition: border-color .25s, background .25s; }
+        .cb-opt:hover { border-color: var(--lime); }
+        .cb-opt.main { background: var(--lime); border-color: var(--lime); color: #fff; }
+        .cb-opt.main:hover { background: #ff4a44; }
+        .cb-opt small { font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .06em; opacity: .8; }
+        .cb-close { position: absolute; top: 12px; right: 14px; font-size: 26px; color: var(--muted); background: none; border: none; cursor: pointer; line-height: 1; }
+        .cb-close:hover { color: var(--paper); }
+        @media (max-width: 760px) {
+            /* на телефоне — круглая кнопка с иконкой, чтобы не перекрывать текст */
+            .cb-fab { right: 14px; bottom: 14px; width: 52px; height: 52px; padding: 0; justify-content: center; font-size: 0; gap: 0; }
+            .cb-fab svg { width: 22px; height: 22px; }
+        }
+
         /* --- СТРАНИЦА «О КОМПАНИИ» --- */
         #about-view { display: none; height: 100dvh; width: 100%; overflow-y: auto; background: var(--ink); animation: fadeIn 0.4s ease; }
         .ab-wrap { max-width: 1240px; margin: 0 auto; padding: 0 clamp(22px, 5vw, 80px); }
@@ -256,7 +278,22 @@
         .ab-card h3 { margin: 0; font-size: clamp(26px, 2.6vw, 38px); font-weight: 700; letter-spacing: -.03em; }
         .ab-card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
         .ab-card li { font-size: 15px; line-height: 1.5; color: #d2cec6; padding-left: 22px; position: relative; }
-        .ab-card li:before { content: '↗'; position: absolute; left: 0; color: var(--lime); }
+        .ab-card li:before { content: ''; position: absolute; left: 0; top: .7em; width: 12px; height: 2px; background: var(--lime); }
+        /* Блок партнёров: список выгод + колонка с кнопками */
+        .ab-partner { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; margin-top: 36px; }
+        .ab-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
+        .ab-list li { position: relative; padding: 20px 0 20px 34px; border-bottom: 1px solid var(--line); font-size: 19px; line-height: 1.45; color: #c9c5bd; }
+        .ab-list li:before { content: ''; position: absolute; left: 0; top: 33px; width: 18px; height: 2px; background: var(--lime); }
+        .ab-list b { color: var(--paper); font-weight: 600; }
+        .ab-partner-side { background: #141416; border-radius: 6px; border-top: 3px solid var(--lime); padding: clamp(28px, 3vw, 40px); display: flex; flex-direction: column; gap: 14px; align-self: start; }
+        .ab-partner-side p { margin: 0 0 10px; font-size: 17px; line-height: 1.5; color: #d2cec6; }
+        .ab-partner-side .ab-btn { align-self: stretch; justify-content: center; height: 54px; font-size: 12px; }
+        .ab-btn-line { border: 1px solid var(--lime); color: var(--paper); transition: background .25s; }
+        .ab-btn-line:hover { background: var(--lime); }
+        .ab-btn-plain { border: 1px solid var(--line); color: var(--muted); background: none; cursor: pointer; transition: color .25s, border-color .25s; }
+        .ab-btn-plain:hover { color: var(--paper); border-color: var(--paper); }
+        .ab-btn-main { transition: background .25s, color .25s; }
+        .ab-btn-main:hover { background: #fff; color: var(--ink); }
         .ab-mono { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
         .ab-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
         .ab-btn-main { background: var(--lime); color: #fff; }
@@ -282,7 +319,9 @@
             .ab-nums { grid-template-columns: 1fr 1fr; }
             .ab-nums div { padding: 22px 14px 0 0; }
             .ab-nums div:nth-child(3) { border-left: none; padding-left: 0; }
-            .ab-split { grid-template-columns: 1fr; }
+            .ab-split, .ab-partner { grid-template-columns: 1fr; }
+            .ab-list li { font-size: 18px; padding: 18px 0 18px 30px; }
+            .ab-list li:before { top: 30px; }
             .ab-strip { grid-template-columns: 1fr 1fr; }
             .ab-strip div { padding: 18px; }
         }
@@ -307,6 +346,12 @@
         .project-card:hover .visual-mark { transform: translate(4px, -4px); opacity: 1; }
         .visual-caption { position: absolute; left: 18px; top: 17px; color: rgba(255,255,255,.9); font-size: 9px; font-family: 'DM Mono', monospace; z-index: 2; opacity: 0; transition: opacity 0.3s; text-transform: uppercase; letter-spacing: 0.1em;}
         .project-card:hover .visual-caption { opacity: 1; }
+        /* Подпись объекта под фото: название + город · год */
+        .card-cap { display: flex; flex-direction: column; gap: 6px; padding: 14px 2px 0; border-top: 1px solid transparent; }
+        .card-cap-name { font-size: 15px; font-weight: 600; letter-spacing: -0.01em; line-height: 1.3; color: var(--paper); }
+        .card-cap-meta { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .1em; color: var(--muted); display: flex; align-items: center; gap: 10px; }
+        .card-cap-meta:before { content: ''; width: 18px; height: 1px; background: var(--lime); }
+        .project-card:hover .card-cap-name { color: var(--lime); }
 
         /* --- LIGHTBOX (УВЕЛИЧЕНИЕ ФОТО) --- */
         .lightbox { display: none; position: fixed; top: 0; left: 0; width: 100%; height: 100%; background-color: rgba(5, 5, 5, 0.98); z-index: 9999; justify-content: center; align-items: center; touch-action: none; }
@@ -315,6 +360,10 @@
         .lightbox-btn { position: absolute; color: white; font-size: 35px; cursor: pointer; background: rgba(255,255,255,0.05); width: 60px; height: 60px; border-radius: 50%; display: flex; justify-content: center; align-items: center; transition: all 0.3s ease; z-index: 10000; border: 1px solid rgba(255,255,255,0.1); }
         .lightbox-btn:hover { background: var(--lime); border-color: var(--lime); }
         .lightbox-close { top: 30px; right: 30px; }
+        .lightbox-cap { position: absolute; left: 50%; bottom: 3vh; transform: translateX(-50%); width: min(90%, 900px); text-align: center; pointer-events: none; }
+        .lightbox-cap b { display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
+        .lightbox-cap span { display: block; margin-top: 6px; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--lime); }
+        .lightbox.has-cap img { max-height: 78vh; transform: translateY(-3vh); }
         /* Страницы каталога: крупнее и с возможностью приблизить пальцами */
         .lightbox.is-doc { touch-action: pinch-zoom; }
         .lightbox.is-doc img { max-width: 96%; max-height: 92vh; background: #fff; }
@@ -326,7 +375,7 @@
             .site-header { padding: 0 20px; }
             .main-nav { display: none; }
             
-            .hero { padding: 84px 20px 40px 20px; }
+            .hero { padding: 84px 20px 84px 20px; }
             .hero h1 { font-size: clamp(40px, 11vw, 80px); margin-bottom: 20px; }
             .hero-orbit { width: 90px; height: 90px; right: 2%; top: 20%; opacity: .45; }
             .hero-bottom { grid-template-columns: 1fr auto; grid-template-rows: auto auto; row-gap: 20px; align-items: end; }
@@ -620,29 +669,21 @@
         </div></section>
 
         <section class="ab-sec"><div class="ab-wrap">
-            <div class="ab-eyebrow">С кем работаем</div>
-            <h2 class="ab-h2">Выберите, <em>кто вы</em></h2>
-            <div class="ab-split">
-                <div class="ab-card">
-                    <span class="ab-mono" style="color:var(--lime)">Дальний Восток и Сибирь</span>
-                    <h3>Застройщикам и владельцам зданий</h3>
-                    <ul>
-                        <li>Полный цикл: визуализация, проект, оборудование, монтаж</li>
-                        <li>Визуализация и расчёт — за 1 рабочий день</li>
-                        <li>Стоимость проекта вычитаем из договора поставки</li>
-                    </ul>
-                    <a class="ab-btn ab-btn-main" href="mailto:info@sysart.ru?subject=Визуализация%20объекта">Получить визуализацию <span>↗</span></a>
-                </div>
-                <div class="ab-card alt">
-                    <span class="ab-mono">Урал, Центр, Юг, Северо-Запад</span>
-                    <h3>Светотехническим компаниям</h3>
-                    <ul>
-                        <li>Скидка до 40% от розничных цен</li>
-                        <li>Светильники под ваше ТЗ — собственное производство</li>
-                        <li>КП для ваших клиентов за 1 день, техподдержка 24 часа</li>
-                        <li>Образцы; постоянным партнёрам — бесплатная партия</li>
-                    </ul>
-                    <a class="ab-btn ab-btn-ghost" href="mailto:info@sysart.ru?subject=Оптовый%20прайс">Получить прайс <span>↗</span></a>
+            <div class="ab-eyebrow">Партнёрская программа</div>
+            <h2 class="ab-h2">Светотехническим <em>компаниям</em></h2>
+            <div class="ab-partner">
+                <ul class="ab-list">
+                    <li><b>Скидка до 40%</b> от розничных цен для партнёров</li>
+                    <li><b>Светильники под ваше ТЗ</b> — собственное производство</li>
+                    <li><b>КП и визуализация за 1 день</b> для вашего заказчика</li>
+                    <li><b>Техподдержка 24 часа</b> при монтаже и запуске</li>
+                    <li><b>Образцы</b>; постоянным партнёрам — бесплатная партия</li>
+                </ul>
+                <div class="ab-partner-side">
+                    <p>Пришлите объект или спецификацию — подготовим КП и визуализацию. Оптовый прайс и скидка — после заключения договора о партнёрстве.</p>
+                    <a class="ab-btn ab-btn-main" href="mailto:info@sysart.ru?subject=Визуализация%20объекта">Получить визуализацию</a>
+                    <a class="ab-btn ab-btn-line" href="mailto:info@sysart.ru?subject=Подбор%20оборудования">Получить подбор оборудования</a>
+                    <button class="ab-btn ab-btn-plain" onclick="openCallback()">Заказать звонок</button>
                 </div>
             </div>
         </div></section>
@@ -668,7 +709,7 @@
             <h2 class="ab-h2">Есть объект? <em>Покажем его ночью за 1 день.</em></h2>
             <div class="ab-contacts">
                 <a class="ab-btn ab-btn-main" href="tel:+79149704000">+7 914 970 40 00 <span>↗</span></a>
-                <a class="ab-btn ab-btn-ghost" href="mailto:info@sysart.ru">info@sysart.ru</a>
+                <a class="ab-btn ab-btn-line" href="mailto:info@sysart.ru">info@sysart.ru</a>
             </div>
         </div></section>
     </div>
@@ -685,12 +726,29 @@
         <main class="cv-reader" id="cv-reader"></main>
     </div>
 
+    <!-- ЗАКАЗАТЬ ЗВОНОК -->
+    <button class="cb-fab" onclick="openCallback()" aria-label="Заказать звонок">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M22 16.9v3a2 2 0 0 1-2.2 2 19.8 19.8 0 0 1-8.6-3.1 19.5 19.5 0 0 1-6-6A19.8 19.8 0 0 1 2.1 4.2 2 2 0 0 1 4.1 2h3a2 2 0 0 1 2 1.7c.1.9.4 1.8.7 2.7a2 2 0 0 1-.5 2.1L8 9.8a16 16 0 0 0 6 6l1.3-1.3a2 2 0 0 1 2.1-.4c.9.3 1.8.6 2.7.7a2 2 0 0 1 1.9 2z"/></svg>
+        Заказать звонок
+    </button>
+    <div class="cb-modal" id="cb-modal" onclick="if (event.target === this) closeCallback()">
+        <div class="cb-box" role="dialog" aria-labelledby="cb-title">
+            <button class="cb-close" onclick="closeCallback()" aria-label="Закрыть">&times;</button>
+            <h3 id="cb-title">Свяжемся с вами</h3>
+            <p>Напишите удобным способом — перезвоним, ответим на вопросы и подготовим КП по вашему объекту.</p>
+            <a class="cb-opt main" href="tel:+79149704000">Позвонить <small>+7 914 970 40 00</small></a>
+            <a class="cb-opt" href="https://wa.me/79149704000?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9F%D0%B5%D1%80%D0%B5%D0%B7%D0%B2%D0%BE%D0%BD%D0%B8%D1%82%D0%B5%20%D0%BC%D0%BD%D0%B5%2C%20%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D1%83%D0%B9%D1%81%D1%82%D0%B0" target="_blank" rel="noreferrer">WhatsApp <small>перезвоним</small></a>
+            <a class="cb-opt" href="mailto:info@sysart.ru?subject=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D1%8C%20%D0%B7%D0%B2%D0%BE%D0%BD%D0%BE%D0%BA&body=%D0%98%D0%BC%D1%8F%3A%20%0A%D0%A2%D0%B5%D0%BB%D0%B5%D1%84%D0%BE%D0%BD%3A%20%0A%D0%9E%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%3A%20">Почта <small>info@sysart.ru</small></a>
+        </div>
+    </div>
+
     <!-- ГАЛЕРЕЯ (LIGHTBOX - ПОВЕРХ ВСЕГО) -->
     <div class="lightbox" id="lightbox">
         <div class="lightbox-btn lightbox-close" id="closeBtn">&times;</div>
         <div class="lightbox-btn lightbox-prev" id="prevBtn">&#10094;</div>
         <div class="lightbox-btn lightbox-next" id="nextBtn">&#10095;</div>
         <img id="lightbox-img" src="" alt="Фото">
+        <p class="lightbox-cap" id="lightbox-cap"></p>
     </div>
 
     <script>
@@ -731,11 +789,67 @@
 
         // activeImages — список адресов картинок, которые листаются в lightbox
         // isDoc — страницы каталога: белый фон, на телефоне можно приближать пальцами
+        // Подписи объектов по имени файла фото. Источник — каталоги работ 2025–2026;
+        // фото без записи остаются без подписи (полный список пользователь пришлёт в подписать.xlsx)
+        const photoCaptions = {
+            MONO:   ['Банк «Стройинвест»', 'Калининград', 2025],
+            RGB10:  ['Парусник «Надежда»', 'Владивосток', 2011],
+            RGB19:  ['КСК «Фетисов Арена»', 'Владивосток', 2012],
+            RGB16:  ['БЦ «Дредноут»', 'Владивосток', 2018],
+            MONO16: ['Приморская сцена Мариинского театра', 'Владивосток', 2018],
+            MONO17: ['ТЦ «Центральный»', 'Владивосток', 2018],
+            MONO31: ['Жилой комплекс', 'Новосибирск', 2019],
+            MONO27: ['СПА-центр', 'Владивосток', 2020],
+            MONO25: ['Жилой комплекс', 'Пермь', 2021],
+            MONO30: ['Дворец культуры угольщиков', 'Артём', 2021],
+            MONO11: ['Жилой комплекс', 'Калининград', 2022],
+            RGB18:  ['Музей Мирового океана', 'Калининград', 2023],
+            MONO15: ['Гостиничный комплекс «Морской»', 'Сочи', 2023],
+            RGB17:  ['Grand Hotel Marine Garden', 'Сочи', 2023],
+            MONO14: ['Торговый комплекс', 'Геленджик', 2023],
+            MONO41: ['ЖК «Полюса»', 'Хабаровск', 2024],
+            MONO35: ['Бизнес-центр', 'Минск', 2024],
+            RGB14:  ['Колесо обозрения', 'Сулакский каньон', 2024],
+            RGB13:  ['ЦСИ им. Курёхина', 'Санкт-Петербург', 2025],
+            RGB11:  ['ЖК «Три богатыря»', 'Находка', 2026],
+            MONO32: ['ЖК «Зум на Неве»', 'Санкт-Петербург', 2026],
+            MONO33: ['Бизнес-центр', 'Калининград', 2026],
+            MONO18: ['Картинная галерея', 'Владивосток'],
+            MONO9:  ['БЦ «Промстройниипроект»', 'Владивосток'],
+            RGB15:  ['ТЦ «Brosko Mall»', 'Хабаровск'],
+            RGB9:   ['ТЦ «Галант Плаза»', 'Петропавловск-Камчатский'],
+            RGB5:   ['ЖК на Тополевой, 30', 'Владивосток'],
+            'tvtower':    ['Телевизионная башня', 'Владивосток', 2012],
+            'airport-vl': ['Международный аэропорт', 'Владивосток', 2012],
+        };
+        const captionFor = src => {
+            const key = (src || '').split('/').pop().replace(/\.\w+$/, '');
+            const c = photoCaptions[key];
+            return c ? { name: c[0], meta: c[2] ? `${c[1]} · ${c[2]}` : c[1] } : null;
+        };
+
+        // Подпись под карточкой в галерее
+        document.querySelectorAll('.project-card').forEach(card => {
+            const img = card.querySelector('.project-visual img');
+            const cap = captionFor(img.getAttribute('src'));
+            if (!cap) return;
+            img.alt = `${cap.name}, ${cap.meta}`;
+            card.insertAdjacentHTML('beforeend', `<div class="card-cap"><span class="card-cap-name">${cap.name}</span><span class="card-cap-meta">${cap.meta}</span></div>`);
+        });
+
+        const lightboxCap = document.getElementById('lightbox-cap');
+        function showLightboxPhoto() {
+            lightboxImg.src = activeImages[currentIndex];
+            const cap = lightbox.classList.contains('is-doc') ? null : captionFor(activeImages[currentIndex]);
+            lightboxCap.innerHTML = cap ? `<b>${cap.name}</b><span>${cap.meta}</span>` : '';
+            lightbox.classList.toggle('has-cap', !!cap);
+        }
+
         function openLightbox(list, index, isDoc) {
             activeImages = list;
             currentIndex = index;
-            lightboxImg.src = list[index];
             lightbox.classList.toggle('is-doc', !!isDoc);
+            showLightboxPhoto();
             lightbox.classList.add('active');
         }
 
@@ -756,11 +870,11 @@
 
         function showNext() {
             currentIndex = (currentIndex < activeImages.length - 1) ? currentIndex + 1 : 0;
-            lightboxImg.src = activeImages[currentIndex];
+            showLightboxPhoto();
         }
         function showPrev() {
             currentIndex = (currentIndex > 0) ? currentIndex - 1 : activeImages.length - 1;
-            lightboxImg.src = activeImages[currentIndex];
+            showLightboxPhoto();
         }
 
         document.getElementById('nextBtn').addEventListener('click', showNext);
@@ -894,6 +1008,11 @@
         const aboutPhotos = [...aboutView.querySelectorAll('.ab-obj')];
         const aboutUrls = aboutPhotos.map(el => el.dataset.full);
         aboutPhotos.forEach((el, i) => { el.onclick = () => openLightbox(aboutUrls, i, false); });
+
+        const cbModal = document.getElementById('cb-modal');
+        function openCallback() { cbModal.classList.add('active'); }
+        function closeCallback() { cbModal.classList.remove('active'); }
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCallback(); });
 
         function openAbout() {
             homeView.style.display = 'none';
