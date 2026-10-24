@@ -625,10 +625,8 @@
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO41.jpg" data-full="images/MONO41.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO33.jpg" data-full="images/MONO33.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO32.jpg" data-full="images/MONO32.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO31.jpg" data-full="images/MONO31.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO42.jpg" data-full="images/MONO42.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO30.jpg" data-full="images/MONO30.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO21.jpg" data-full="images/MONO21.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO22.jpg" data-full="images/MONO22.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>  
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO24.jpg" data-full="images/MONO24.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/MONO36.jpg" data-full="images/MONO36.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
@@ -681,7 +679,6 @@
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB5.jpg" data-full="images/RGB5.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB6.jpg" data-full="images/RGB6.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB8.jpg" data-full="images/RGB8.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
-                    <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB9.jpg" data-full="images/RGB9.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB11.jpg" data-full="images/RGB11.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB12.jpg" data-full="images/RGB12.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
                     <article class="project-card"><div class="project-visual"><img loading="lazy" src="images/min/RGB16.jpg" data-full="images/RGB16.jpg" alt="Проект"><span class="visual-caption">Увеличить</span><span class="visual-mark">↗</span></div></article>
@@ -871,36 +868,70 @@
 
         // activeImages — список адресов картинок, которые листаются в lightbox
         // isDoc — страницы каталога: белый фон, на телефоне можно приближать пальцами
-        // Подписи объектов по имени файла фото. Источник — каталоги работ 2025–2026;
-        // фото без записи остаются без подписи (полный список пользователь пришлёт в подписать.xlsx)
+        // Подписи объектов по имени файла фото — по таблице «подписать ред.xlsx»;
+        // фото без записи (гобо) остаются без подписи
         const photoCaptions = {
             MONO:   ['Банк «Стройинвест»', 'Калининград', 2025],
-            RGB10:  ['Парусник «Надежда»', 'Владивосток', 2011],
-            RGB19:  ['КСК «Фетисов Арена»', 'Владивосток', 2012],
-            RGB16:  ['БЦ «Дредноут»', 'Владивосток', 2018],
+            MONO1:  ['ЖК «Домино»', 'Красноярск', 2025],
+            MONO2:  ['ЖК «Лесная сказка»', 'Светлогорск', 2023],
+            MONO3:  ['Отель «АмстерДОМ»', 'Зеленоградск', 2022],
+            MONO4:  ['ТЦ «Вудглейд»', 'Каспийск', 2023],
+            MONO5:  ['ЖК «Хороший»', 'Чита', 2024],
+            MONO6:  ['Медицинский центр «Асклепий»', 'Владивосток', 2023],
+            MONO7:  ['ЖК «Академический»', 'Екатеринбург', 2026],
+            MONO8:  ['Часовня Св. Георгия', 'Горные Ключи', 2022],
+            MONO9:  ['БЦ «Промстройниипроект»', 'Владивосток', 2023],
+            MONO10: ['ЖК «Новое Исаково»', 'Калининград', 2025],
+            MONO11: ['ЖК «Горький»', 'Калининград', 2025],
+            MONO12: ['ЖК «Римский квартал»', 'Новосибирск', 2019],
+            MONO13: ['ЖК «More»', 'Владивосток', 2024],
+            MONO14: ['ТРЦ «Солнечный»', 'Геленджик', 2023],
+            MONO15: ['Отель Marine Garden Sochi', 'Сочи', 2023],
             MONO16: ['Приморская сцена Мариинского театра', 'Владивосток', 2018],
             MONO17: ['ТЦ «Центральный»', 'Владивосток', 2018],
-            MONO31: ['Жилой комплекс', 'Новосибирск', 2019],
-            MONO27: ['СПА-центр', 'Владивосток', 2020],
-            MONO25: ['Жилой комплекс', 'Пермь', 2021],
+            MONO18: ['Приморская картинная галерея', 'Владивосток', 2023],
+            MONO19: ['ЖК «Севен»', 'Калининград', 2025],
+            MONO20: ['ЖК «11 Мая»', 'Калининград', 2023],
+            MONO22: ['ЖК «Клён»', 'Калининград', 2023],
+            MONO23: ['Банк МТС', 'Владивосток', 2021],
+            MONO24: ['Grand Hotel Perm', 'Пермь', 2019],
+            MONO25: ['ЖК «Эволюция»', 'Пермь', 2023],
+            MONO26: ['ЖК «Пионерские огни»', 'Калининград', 2023],
+            MONO27: ['Водный комплекс «Акватория»', 'Владивосток', 2020],
+            MONO28: ['ЖК «Централ Парк»', 'Калининград', 2023],
+            MONO29: ['ЖК «Фридланд»', 'Калининград', 2024],
             MONO30: ['Дворец культуры угольщиков', 'Артём', 2021],
-            MONO11: ['Жилой комплекс', 'Калининград', 2022],
-            RGB18:  ['Музей Мирового океана', 'Калининград', 2023],
-            MONO15: ['Гостиничный комплекс «Морской»', 'Сочи', 2023],
-            RGB17:  ['Grand Hotel Marine Garden', 'Сочи', 2023],
-            MONO14: ['Торговый комплекс', 'Геленджик', 2023],
-            MONO41: ['ЖК «Полюса»', 'Хабаровск', 2024],
-            MONO35: ['Бизнес-центр', 'Минск', 2024],
-            RGB14:  ['Колесо обозрения', 'Сулакский каньон', 2024],
-            RGB13:  ['ЦСИ им. Курёхина', 'Санкт-Петербург', 2025],
+            MONO32: ['ЖК «Zoom на Неве»', 'Санкт-Петербург', 2025],
+            MONO33: ['Здание на Литовском Валу, 105', 'Калининград', 2025],
+            MONO34: ['Кино-концертный комплекс «Космос»', 'Екатеринбург', 2025],
+            MONO35: ['Здание на пр. Победителей, 63В', 'Минск', 2025],
+            MONO36: ['Камерный театр', 'Уссурийск', 2025],
+            MONO37: ['Управление епархии РПЦ', 'Хабаровск', 2024],
+            MONO38: ['ЖК «Горизонты»', 'Уссурийск', 2026],
+            MONO39: ['ТЦ «В-Лазер»', 'Уссурийск', 2026],
+            MONO40: ['ЖК «Современник»', 'Чита', 2024],
+            MONO41: ['ЖК «Полюса»', 'Хабаровск', 2022],
+            MONO42: ['ЖК «Донской Арбат»', 'Ростов-на-Дону', 2025],
+            RGB1:   ['ТЦ «Седьмое небо»', 'Воронеж', 2021],
+            RGB2:   ['ЖК «Молодёжный»', 'Владивосток', 2023],
+            RGB3:   ['ЖК «Акватория»', 'Владивосток', 2024],
+            RGB4:   ['ТЦ «Снежинка»', 'Кисловодск', 2024],
+            RGB5:   ['Здание на Тополевой, 30', 'Владивосток', 2024],
+            RGB6:   ['ТЦ «Галант Плаза»', 'Петропавловск-Камчатский', 2021],
+            RGB8:   ['Шлюзовый комплекс канала им. Октябрьской Революции', 'Кизилюрт', 2023],
+            RGB10:  ['Парусник «Надежда»', 'Владивосток', 2011],
             RGB11:  ['ЖК «Три богатыря»', 'Находка', 2026],
-            MONO32: ['ЖК «Зум на Неве»', 'Санкт-Петербург', 2026],
-            MONO33: ['Бизнес-центр', 'Калининград', 2026],
-            MONO18: ['Картинная галерея', 'Владивосток'],
-            MONO9:  ['БЦ «Промстройниипроект»', 'Владивосток'],
-            RGB15:  ['ТЦ «Brosko Mall»', 'Хабаровск'],
-            RGB9:   ['ТЦ «Галант Плаза»', 'Петропавловск-Камчатский'],
-            RGB5:   ['ЖК на Тополевой, 30', 'Владивосток'],
+            RGB12:  ['Торговый центр', 'Махачкала', 2022],
+            RGB13:  ['ЦСИ им. Курёхина', 'Санкт-Петербург', 2025],
+            RGB14:  ['Колесо обозрения «Главрыба»', 'Сулакский каньон', 2022],
+            RGB15:  ['ТРЦ «Brosko Mall»', 'Хабаровск', 2024],
+            RGB16:  ['БЦ «Дредноут»', 'Владивосток', 2018],
+            RGB17:  ['Отель Marine Garden Sochi', 'Сочи', 2023],
+            RGB18:  ['Музей Мирового океана', 'Калининград', 2024],
+            RGB19:  ['КСК «Фетисов Арена»', 'Владивосток', 2012],
+            RGB20:  ['Здание на Дзержинского, 13', 'Находка', 2025],
+            RGB21:  ['Аттракцион «Змей Горыныч»', 'Сочи Парк', 2023],
+            RGB22:  ['Здание на пр. Мира, 71', 'Находка', 2026],
             'tvtower':    ['Телевизионная башня', 'Владивосток', 2012],
             'airport-vl': ['Международный аэропорт', 'Владивосток', 2012],
         };
@@ -1046,44 +1077,28 @@
         }
 
         // --- О КОМПАНИИ: хроника объектов по эпохам ---
-        // img — превью, full — фото для увеличения. Подписи — по каталогам работ 2025–2026.
-        const P = n => ({ img: `images/min/${n}.jpg`, full: `images/${n}.jpg` });
+        // В эпохе — ключи фото; название, город и год берутся из photoCaptions
+        const ABOUT_ONLY = { 'tvtower': 'images/about/tvtower.jpg', 'airport-vl': 'images/about/airport-vl.jpg' };
+        const obj = key => {
+            const c = photoCaptions[key], src = ABOUT_ONLY[key];
+            return { img: src || `images/min/${key}.jpg`, full: src || `images/${key}.jpg`, name: c[0], place: `${c[1]}, ${c[2]}` };
+        };
         const aboutEras = [
-            { years: '2011–2013', title: 'Первые знаковые объекты', items: [
-                { ...P('RGB10'), name: 'Парусник «Надежда»', place: 'Владивосток, 2011' },
-                { img: 'images/about/tvtower.jpg', full: 'images/about/tvtower.jpg', name: 'Телевизионная башня', place: 'Владивосток, 2012' },
-                { img: 'images/about/airport-vl.jpg', full: 'images/about/airport-vl.jpg', name: 'Международный аэропорт', place: 'Владивосток, 2012' },
-                { ...P('RGB19'), name: 'КСК «Фетисов Арена»', place: 'Владивосток, 2012' },
-            ]},
-            { years: '2014–2018', title: 'Медиафасады и исторический центр', items: [
-                { ...P('MONO17'), name: 'ТЦ «Центральный»', place: 'Владивосток, 2018' },
-                { ...P('MONO16'), name: 'Приморская сцена Мариинского театра', place: 'Владивосток, 2018' },
-                { ...P('RGB16'), name: 'БЦ «Дредноут»', place: 'Владивосток, 2018' },
-            ]},
-            { years: '2019–2022', title: 'Выход в регионы', items: [
-                { ...P('MONO31'), name: 'Жилой комплекс', place: 'Новосибирск, 2019' },
-                { ...P('MONO27'), name: 'СПА-центр', place: 'Владивосток, 2020' },
-                { ...P('MONO25'), name: 'Жилой комплекс', place: 'Пермь, 2021' },
-                { ...P('MONO30'), name: 'Дворец культуры угольщиков', place: 'Артём, 2021' },
-                { ...P('MONO11'), name: 'Жилой комплекс', place: 'Калининград, 2022' },
-            ]},
-            { years: '2023–2026', title: 'Управляемый свет и жилые комплексы', items: [
-                { ...P('RGB18'), name: 'Музей Мирового океана', place: 'Калининград, 2023' },
-                { ...P('MONO15'), name: 'Гостиничный комплекс «Морской»', place: 'Сочи, 2023' },
-                { ...P('RGB17'), name: 'Grand Hotel Marine Garden', place: 'Сочи, 2023' },
-                { ...P('MONO14'), name: 'Торговый комплекс', place: 'Геленджик, 2023' },
-                { ...P('MONO41'), name: 'ЖК «Полюса»', place: 'Хабаровск, 2024' },
-                { ...P('MONO35'), name: 'Бизнес-центр', place: 'Минск, 2024' },
-                { ...P('RGB14'), name: 'Колесо обозрения', place: 'Сулакский каньон, 2024' },
-                { ...P('RGB13'), name: 'ЦСИ им. Курёхина', place: 'Санкт-Петербург, 2025' },
-                { ...P('RGB11'), name: 'ЖК «Три богатыря»', place: 'Находка, 2026' },
-                { ...P('MONO32'), name: 'ЖК «Зум на Неве»', place: 'Санкт-Петербург, 2026' },
-            ]},
+            { years: '2011–2013', title: 'Первые знаковые объекты',
+              items: ['RGB10', 'tvtower', 'airport-vl', 'RGB19'].map(obj) },
+            { years: '2014–2018', title: 'Медиафасады и исторический центр',
+              items: ['MONO17', 'MONO16', 'RGB16'].map(obj) },
+            { years: '2019–2022', title: 'Выход в регионы',
+              items: ['MONO12', 'MONO24', 'MONO27', 'MONO30', 'RGB6', 'MONO3', 'MONO41', 'RGB14'].map(obj) },
+            { years: '2023–2026', title: 'Управляемый свет и жилые комплексы',
+              items: ['MONO15', 'RGB18', 'MONO14', 'MONO18', 'MONO9', 'MONO34', 'RGB13', 'MONO32', 'RGB11', 'MONO7'].map(obj) },
         ];
 
         // Обложка эпохи — объект с индексом cover; в списке под ней — первые ERA_LIST объектов
-        aboutEras[2].cover = 3;
+        aboutEras[2].cover = 3; // ДК угольщиков
+        aboutEras[3].cover = 1; // Музей Мирового океана
         const ERA_LIST = 3;
+        const plural = (n, one, few, many) => (n % 10 === 1 && n % 100 !== 11) ? one : (n % 10 >= 2 && n % 10 <= 4 && (n % 100 < 12 || n % 100 > 14)) ? few : many;
         const aboutView = document.getElementById('about-view');
         const erasBox = document.getElementById('ab-eras');
         erasBox.innerHTML = aboutEras.map((era, ei) => {
@@ -1093,7 +1108,7 @@
             <div class="ab-e" data-era="${ei}">
                 <div class="ab-e-years">${era.years}</div>
                 <div class="ab-e-title">${era.title}</div>
-                <div class="ab-e-img"><img loading="lazy" src="${cover.img}" alt="${cover.name}, ${cover.place}"><span class="ab-e-count"><b>${era.items.length}</b> объектов ↗</span></div>
+                <div class="ab-e-img"><img loading="lazy" src="${cover.img}" alt="${cover.name}, ${cover.place}"><span class="ab-e-count"><b>${era.items.length}</b> ${plural(era.items.length, 'объект', 'объекта', 'объектов')} ↗</span></div>
                 <ul>${era.items.slice(0, ERA_LIST).map(o => `<li><b>${o.name}</b> · ${o.place}</li>`).join('')}${rest > 0 ? `<li>и ещё ${rest}</li>` : ''}</ul>
             </div>`;
         }).join('');
