@@ -33,8 +33,8 @@
             background: linear-gradient(180deg, rgba(10,10,10,0.9) 0%, transparent 100%);
         }
         .site-header img { height: 40px; }
-        /* Навигация: стеклянная «капсула» по центру, активный раздел подсвечен */
-        .main-nav { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; padding: 5px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+        /* Навигация: стеклянная «капсула» рядом с логотипом, активный раздел подсвечен */
+        .main-nav { margin: 0 auto 0 clamp(24px, 3vw, 48px); display: flex; gap: 4px; padding: 5px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
         .main-nav a { padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 500; color: #cfcbc3; transition: color .25s, background .25s; white-space: nowrap; }
         .main-nav a:hover { color: var(--paper); background: rgba(255,255,255,.07); }
         .main-nav a.active { color: var(--paper); background: rgba(239,59,54,.18); box-shadow: inset 0 0 0 1px rgba(239,59,54,.45); }
