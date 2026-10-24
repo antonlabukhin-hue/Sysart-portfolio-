@@ -141,6 +141,7 @@
         .contact-section h2 em { color: var(--lime); font-style: normal; font-weight: 400; }
         .contact-link { display: inline-block; padding-bottom: 10px; border-bottom: 1px solid var(--lime); font-size: clamp(21px, 2.6vw, 37px); letter-spacing: -.05em; transition: color .25s ease; }
         .contact-link:hover { color: var(--lime); }
+        .contact-links { display: flex; gap: 20px 48px; flex-wrap: wrap; }
         .contact-link span { font-size: 19px; margin-left: 5px; vertical-align: 2px; }
         
         footer { border-top: 1px solid var(--line); display: flex; justify-content: space-between; padding: 20px 0; color: var(--muted); font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; margin-top: auto; }
@@ -230,6 +231,60 @@
             .cv-zoom { opacity: 1; width: 30px; height: 30px; font-size: 13px; right: 8px; top: 8px; }
             .cv-page-num { left: 8px; top: 8px; }
             .cv-next-arrow { width: 44px; height: 44px; }
+        }
+
+        /* --- СТРАНИЦА «О КОМПАНИИ» --- */
+        #about-view { display: none; height: 100dvh; width: 100%; overflow-y: auto; background: var(--ink); animation: fadeIn 0.4s ease; }
+        .ab-wrap { max-width: 1240px; margin: 0 auto; padding: 0 clamp(22px, 5vw, 80px); }
+        .ab-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--lime); display: flex; align-items: center; gap: 13px; margin-bottom: 18px; }
+        .ab-eyebrow:before { content: ''; width: 45px; height: 1px; background: var(--lime); }
+        .ab-big { margin: 0; font-size: clamp(40px, 6.4vw, 92px); line-height: .92; font-weight: 700; letter-spacing: -.05em; max-width: 900px; }
+        .ab-h2 { margin: 0; font-size: clamp(30px, 4vw, 56px); line-height: .95; font-weight: 600; letter-spacing: -.05em; }
+        .ab-big em, .ab-h2 em { color: var(--lime); font-style: normal; font-weight: 400; }
+        .ab-sec { padding: clamp(56px, 8vw, 110px) 0; }
+        .ab-sec + .ab-sec { border-top: 1px solid var(--line); }
+        .ab-hero { min-height: 600px; display: flex; flex-direction: column; justify-content: flex-end; padding: 140px 0 56px; background: linear-gradient(90deg, rgba(10,10,10,.95) 0%, rgba(10,10,10,.7) 50%, rgba(10,10,10,.25) 100%), url('images/min/MONO32.jpg') center/cover; }
+        .ab-nums { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); margin-top: 48px; }
+        .ab-nums div { padding: 26px 22px 0 0; }
+        .ab-nums div + div { border-left: 1px solid var(--line); padding-left: 22px; }
+        .ab-nums strong { display: block; font-size: clamp(40px, 5vw, 72px); line-height: .9; font-weight: 600; letter-spacing: -.06em; }
+        .ab-nums strong.red { color: var(--lime); }
+        .ab-nums span { display: block; margin-top: 12px; font-size: 14px; line-height: 1.45; color: #bdb9b1; }
+        .ab-split { display: grid; grid-template-columns: 1fr 1fr; gap: 24px; margin-top: 36px; }
+        .ab-card { background: #141416; border-radius: 6px; padding: clamp(28px, 3vw, 44px); display: flex; flex-direction: column; gap: 22px; border-top: 3px solid var(--lime); }
+        .ab-card.alt { border-top-color: #f4f2ee; }
+        .ab-card h3 { margin: 0; font-size: clamp(26px, 2.6vw, 38px); font-weight: 700; letter-spacing: -.03em; }
+        .ab-card ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 12px; }
+        .ab-card li { font-size: 15px; line-height: 1.5; color: #d2cec6; padding-left: 22px; position: relative; }
+        .ab-card li:before { content: '↗'; position: absolute; left: 0; color: var(--lime); }
+        .ab-mono { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+        .ab-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
+        .ab-btn-main { background: var(--lime); color: #fff; }
+        .ab-btn-ghost { border: 1px solid var(--line); }
+        .ab-era { margin-top: 56px; }
+        .ab-era-head { display: flex; align-items: baseline; gap: 24px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
+        .ab-era-years { font-size: clamp(38px, 5vw, 68px); font-weight: 700; letter-spacing: -.06em; line-height: .9; color: var(--lime); }
+        .ab-era-title { font-size: clamp(18px, 1.8vw, 24px); font-weight: 600; letter-spacing: -.02em; }
+        .ab-era-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
+        .ab-obj { cursor: zoom-in; }
+        .ab-obj img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; display: block; background: #151515; }
+        .ab-obj p { margin: 10px 0 0; font-size: 14px; line-height: 1.4; color: #bdb9b1; }
+        .ab-obj b { color: var(--paper); font-weight: 600; }
+        .ab-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 28px; }
+        .ab-strip div { background: var(--ink); padding: 26px; }
+        .ab-strip b { display: block; font-size: 20px; margin-bottom: 6px; }
+        .ab-strip span { font-size: 14px; color: #bdb9b1; line-height: 1.45; }
+        .ab-cta { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex-wrap: wrap; }
+        .ab-contacts { display: flex; gap: 12px; flex-wrap: wrap; }
+
+        @media (max-width: 760px) {
+            .ab-hero { min-height: 540px; padding-top: 120px; }
+            .ab-nums { grid-template-columns: 1fr 1fr; }
+            .ab-nums div { padding: 22px 14px 0 0; }
+            .ab-nums div:nth-child(3) { border-left: none; padding-left: 0; }
+            .ab-split { grid-template-columns: 1fr; }
+            .ab-strip { grid-template-columns: 1fr 1fr; }
+            .ab-strip div { padding: 18px; }
         }
 
         /* --- ВНУТРЕННЯЯ ГАЛЕРЕЯ (ОБЫЧНЫЙ СКРОЛЛ) --- */
@@ -421,7 +476,7 @@
                 <h2>Мы проектируем<br><em>состояние города</em><br>после заката.</h2>
                 <div class="statement-footer">
                     <p>Световые решения для фасадов, общественных пространств и архитектуры по всей России.</p>
-                    <a href="https://sysart.ru/okompanii" target="_blank" rel="noreferrer">О компании <span>↗</span></a>
+                    <a href="#" onclick="openAbout(); return false;">О компании <span>↗</span></a>
                 </div>
             </div>
         </section>
@@ -431,7 +486,10 @@
             <div class="contact-content">
                 <div class="contact-top"><span class="eyebrow" style="margin:0;">04 / Start a conversation</span><span>Владивосток · Россия</span></div>
                 <h2>Есть объект?<br><em>Давайте добавим ему света.</em></h2>
-                <a class="contact-link" href="tel:+79149704000">+7 914 970 40 00 <span>↗</span></a>
+                <div class="contact-links">
+                    <a class="contact-link" href="tel:+79149704000">+7 914 970 40 00 <span>↗</span></a>
+                    <a class="contact-link" href="mailto:info@sysart.ru">info@sysart.ru <span>↗</span></a>
+                </div>
             </div>
             <footer>
                 <span><a href="https://sysart.ru/" target="_blank" rel="noreferrer">SYSART.RU</a></span>
@@ -541,6 +599,78 @@
                 </div>
             </div>
         </div>
+    </div>
+
+    <!-- СТРАНИЦА «О КОМПАНИИ» (хроника собирается скриптом из aboutEras) -->
+    <div id="about-view">
+        <header class="gallery-header">
+            <button class="back-btn" onclick="closeAbout()"><span>←</span> Назад в портфолио</button>
+            <h2 class="gallery-title">О компании</h2>
+        </header>
+
+        <section class="ab-hero"><div class="ab-wrap" style="width:100%">
+            <div class="ab-eyebrow">О компании</div>
+            <h1 class="ab-big">Свет, который <em>делает здание узнаваемым.</em></h1>
+            <div class="ab-nums">
+                <div><strong>17</strong><span>лет в архитектурном освещении, с 2009 года</span></div>
+                <div><strong>45+</strong><span>объектов в портфолио</span></div>
+                <div><strong>14</strong><span>городов и регионов — от Владивостока до Калининграда</span></div>
+                <div><strong class="red">1 день</strong><span>на визуализацию и расчёт</span></div>
+            </div>
+        </div></section>
+
+        <section class="ab-sec"><div class="ab-wrap">
+            <div class="ab-eyebrow">С кем работаем</div>
+            <h2 class="ab-h2">Выберите, <em>кто вы</em></h2>
+            <div class="ab-split">
+                <div class="ab-card">
+                    <span class="ab-mono" style="color:var(--lime)">Дальний Восток и Сибирь</span>
+                    <h3>Застройщикам и владельцам зданий</h3>
+                    <ul>
+                        <li>Полный цикл: визуализация, проект, оборудование, монтаж</li>
+                        <li>Визуализация и расчёт — за 1 рабочий день</li>
+                        <li>Стоимость проекта вычитаем из договора поставки</li>
+                    </ul>
+                    <a class="ab-btn ab-btn-main" href="mailto:info@sysart.ru?subject=Визуализация%20объекта">Получить визуализацию <span>↗</span></a>
+                </div>
+                <div class="ab-card alt">
+                    <span class="ab-mono">Урал, Центр, Юг, Северо-Запад</span>
+                    <h3>Светотехническим компаниям</h3>
+                    <ul>
+                        <li>Скидка до 40% от розничных цен</li>
+                        <li>Светильники под ваше ТЗ — собственное производство</li>
+                        <li>КП для ваших клиентов за 1 день, техподдержка 24 часа</li>
+                        <li>Образцы; постоянным партнёрам — бесплатная партия</li>
+                    </ul>
+                    <a class="ab-btn ab-btn-ghost" href="mailto:info@sysart.ru?subject=Оптовый%20прайс">Получить прайс <span>↗</span></a>
+                </div>
+            </div>
+        </div></section>
+
+        <section class="ab-sec"><div class="ab-wrap">
+            <div class="ab-eyebrow">Хроника</div>
+            <h2 class="ab-h2">От наружной рекламы <em>к свету городов</em></h2>
+            <p style="margin:20px 0 0;max-width:640px;font-size:16px;line-height:1.55;color:#bdb9b1">Компания на рынке с 1993 года, архитектурным освещением занимается с 2009-го. Ниже — избранные объекты по годам.</p>
+            <div id="ab-eras"></div>
+        </div></section>
+
+        <section class="ab-sec"><div class="ab-wrap">
+            <div class="ab-eyebrow">Почему нам доверяют</div>
+            <div class="ab-strip">
+                <div><b>С 1993 года</b><span>на рынке; с 2009 — архитектурный свет</span></div>
+                <div><b>Своё производство</b><span>работает только на нас, контроль на месте</span></div>
+                <div><b>3–5 лет гарантии</b><span>телевышка Владивостока светит с 2012</span></div>
+                <div><b>От 40 дней</b><span>поставка до склада во Владивостоке</span></div>
+            </div>
+        </div></section>
+
+        <section class="ab-sec"><div class="ab-wrap ab-cta">
+            <h2 class="ab-h2">Есть объект? <em>Покажем его ночью за 1 день.</em></h2>
+            <div class="ab-contacts">
+                <a class="ab-btn ab-btn-main" href="tel:+79149704000">+7 914 970 40 00 <span>↗</span></a>
+                <a class="ab-btn ab-btn-ghost" href="mailto:info@sysart.ru">info@sysart.ru</a>
+            </div>
+        </div></section>
     </div>
 
     <!-- КАТАЛОГ: ЭКРАН РАЗДЕЛА (вкладки и страницы собираются скриптом) -->
@@ -714,6 +844,68 @@
             homeView.style.display = 'block';
             setTimeout(() => {
                 document.getElementById('catalog').scrollIntoView({behavior: 'instant'});
+            }, 10);
+        }
+
+        // --- О КОМПАНИИ: хроника объектов по эпохам ---
+        // img — превью, full — фото для увеличения. Подписи — по каталогам работ 2025–2026.
+        const P = n => ({ img: `images/min/${n}.jpg`, full: `images/${n}.jpg` });
+        const aboutEras = [
+            { years: '2011–2013', title: 'Первые знаковые объекты', items: [
+                { ...P('RGB10'), name: 'Парусник «Надежда»', place: 'Владивосток, 2011' },
+                { img: 'images/about/tvtower.jpg', full: 'images/about/tvtower.jpg', name: 'Телевизионная башня', place: 'Владивосток, 2012' },
+                { img: 'images/about/airport-vl.jpg', full: 'images/about/airport-vl.jpg', name: 'Международный аэропорт', place: 'Владивосток, 2012' },
+                { ...P('RGB19'), name: 'КСК «Фетисов Арена»', place: 'Владивосток, 2012' },
+            ]},
+            { years: '2014–2018', title: 'Медиафасады и исторический центр', items: [
+                { ...P('MONO17'), name: 'ТЦ «Центральный»', place: 'Владивосток, 2018' },
+                { ...P('MONO16'), name: 'Приморская сцена Мариинского театра', place: 'Владивосток, 2018' },
+                { ...P('RGB16'), name: 'БЦ «Дредноут»', place: 'Владивосток, 2018' },
+            ]},
+            { years: '2019–2022', title: 'Выход в регионы', items: [
+                { ...P('MONO31'), name: 'Жилой комплекс', place: 'Новосибирск, 2019' },
+                { ...P('MONO27'), name: 'СПА-центр', place: 'Владивосток, 2020' },
+                { ...P('MONO25'), name: 'Жилой комплекс', place: 'Пермь, 2021' },
+                { ...P('MONO30'), name: 'Дворец культуры угольщиков', place: 'Артём, 2021' },
+                { ...P('MONO11'), name: 'Жилой комплекс', place: 'Калининград, 2022' },
+            ]},
+            { years: '2023–2026', title: 'Управляемый свет и жилые комплексы', items: [
+                { ...P('RGB18'), name: 'Музей Мирового океана', place: 'Калининград, 2023' },
+                { ...P('MONO15'), name: 'Гостиничный комплекс «Морской»', place: 'Сочи, 2023' },
+                { ...P('RGB17'), name: 'Grand Hotel Marine Garden', place: 'Сочи, 2023' },
+                { ...P('MONO14'), name: 'Торговый комплекс', place: 'Геленджик, 2023' },
+                { ...P('MONO41'), name: 'ЖК «Полюса»', place: 'Хабаровск, 2024' },
+                { ...P('MONO35'), name: 'Бизнес-центр', place: 'Минск, 2024' },
+                { ...P('RGB14'), name: 'Колесо обозрения', place: 'Сулакский каньон, 2024' },
+                { ...P('RGB13'), name: 'ЦСИ им. Курёхина', place: 'Санкт-Петербург, 2025' },
+                { ...P('RGB11'), name: 'ЖК «Три богатыря»', place: 'Находка, 2026' },
+                { ...P('MONO32'), name: 'ЖК «Зум на Неве»', place: 'Санкт-Петербург, 2026' },
+            ]},
+        ];
+
+        const aboutView = document.getElementById('about-view');
+        document.getElementById('ab-eras').innerHTML = aboutEras.map(era => `
+            <div class="ab-era">
+                <div class="ab-era-head"><span class="ab-era-years">${era.years}</span><span class="ab-era-title">${era.title}</span></div>
+                <div class="ab-era-grid">${era.items.map(o => `
+                    <div class="ab-obj" data-full="${o.full}"><img loading="lazy" src="${o.img}" alt="${o.name}, ${o.place}"><p><b>${o.name}</b> · ${o.place}</p></div>`).join('')}
+                </div>
+            </div>`).join('');
+        const aboutPhotos = [...aboutView.querySelectorAll('.ab-obj')];
+        const aboutUrls = aboutPhotos.map(el => el.dataset.full);
+        aboutPhotos.forEach((el, i) => { el.onclick = () => openLightbox(aboutUrls, i, false); });
+
+        function openAbout() {
+            homeView.style.display = 'none';
+            aboutView.style.display = 'block';
+            aboutView.scrollTop = 0;
+        }
+
+        function closeAbout() {
+            aboutView.style.display = 'none';
+            homeView.style.display = 'block';
+            setTimeout(() => {
+                document.getElementById('about').scrollIntoView({behavior: 'instant'});
             }, 10);
         }
 
