@@ -850,7 +850,7 @@
             homeView.style.display = 'block';
             // Небольшая задержка, чтобы скролл успел примениться после изменения display
             setTimeout(() => {
-                document.getElementById('projects').scrollIntoView({behavior: 'instant'});
+                homeView.scrollTo({ top: 0, behavior: 'instant' }); // «Назад в портфолио» — на первый экран
             }, 10);
         }
 
@@ -1126,7 +1126,7 @@
             aboutView.style.display = 'none';
             homeView.style.display = 'block';
             setTimeout(() => {
-                document.getElementById('about').scrollIntoView({behavior: 'instant'});
+                homeView.scrollTo({ top: 0, behavior: 'instant' });
             }, 10);
         }
 
