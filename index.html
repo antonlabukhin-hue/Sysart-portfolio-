@@ -33,8 +33,35 @@
             background: linear-gradient(180deg, rgba(10,10,10,0.9) 0%, transparent 100%);
         }
         .site-header img { height: 40px; }
-        .main-nav { display: flex; gap: 34px; font-size: 12px; color: var(--muted); letter-spacing: .08em; text-transform: uppercase; }
-        .main-nav a:hover { color: var(--lime); }
+        /* Навигация: стеклянная «капсула» по центру, активный раздел подсвечен */
+        .main-nav { position: absolute; left: 50%; transform: translateX(-50%); display: flex; gap: 4px; padding: 5px; border-radius: 999px; background: rgba(255,255,255,.06); border: 1px solid rgba(255,255,255,.1); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); }
+        .main-nav a { padding: 10px 18px; border-radius: 999px; font-size: 13px; font-weight: 500; color: #cfcbc3; transition: color .25s, background .25s; white-space: nowrap; }
+        .main-nav a:hover { color: var(--paper); background: rgba(255,255,255,.07); }
+        .main-nav a.active { color: var(--paper); background: rgba(239,59,54,.18); box-shadow: inset 0 0 0 1px rgba(239,59,54,.45); }
+        .header-actions { display: flex; align-items: center; gap: 22px; }
+        .header-phone { font-size: 14px; font-weight: 600; letter-spacing: -.01em; color: var(--paper); transition: color .25s; white-space: nowrap; }
+        .header-phone:hover { color: var(--lime); }
+        .header-cta { height: 42px; padding: 0 20px; border-radius: 999px; background: var(--lime); color: #fff; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; transition: background .25s, color .25s; }
+        .header-cta:hover { background: #fff; color: var(--ink); }
+        .burger { display: none; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); background: rgba(10,10,10,.4); flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
+        .burger span { width: 18px; height: 2px; background: var(--paper); border-radius: 2px; }
+        .burger span + span { width: 12px; margin-left: 6px; background: var(--lime); }
+        @media (max-width: 1180px) { .header-phone { display: none; } }
+
+        /* Мобильное меню на весь экран */
+        .mnav { display: none; position: fixed; inset: 0; z-index: 9400; background: radial-gradient(ellipse 70% 50% at 90% 10%, rgba(239,59,54,.18), transparent 70%), rgba(8,8,9,.97); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); flex-direction: column; padding: 22px 20px 32px; }
+        .mnav.active { display: flex; animation: fadeIn .25s ease; }
+        .mnav-top { display: flex; justify-content: space-between; align-items: center; height: 46px; }
+        .mnav-top img { height: 36px; }
+        .mnav-close { width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); font-size: 26px; line-height: 1; color: var(--paper); }
+        .mnav-links { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 4px; }
+        .mnav-links a { display: flex; align-items: baseline; gap: 16px; padding: 14px 0; border-bottom: 1px solid var(--line); font-size: clamp(34px, 10vw, 46px); font-weight: 600; letter-spacing: -.04em; line-height: 1.05; animation: slideUpFade .5s cubic-bezier(.2,.8,.2,1) both; }
+        .mnav-links a i { font-style: normal; font-family: 'DM Mono', monospace; font-size: 12px; letter-spacing: .08em; color: var(--lime); }
+        .mnav-links a:nth-child(2) { animation-delay: .05s; } .mnav-links a:nth-child(3) { animation-delay: .1s; } .mnav-links a:nth-child(4) { animation-delay: .15s; }
+        .mnav-bottom { display: flex; flex-direction: column; gap: 12px; }
+        .mnav-bottom a, .mnav-bottom button { display: flex; justify-content: center; align-items: center; height: 54px; border-radius: 999px; font-family: 'DM Mono', monospace; font-size: 12px; text-transform: uppercase; letter-spacing: .1em; }
+        .mnav-bottom .main { background: var(--lime); color: #fff; }
+        .mnav-bottom .line { border: 1px solid var(--line); color: var(--paper); }
 
         /* --- АНИМАЦИИ --- */
         @keyframes slideUpFade { 0% { opacity: 0; transform: translateY(40px); } 100% { opacity: 1; transform: translateY(0); } }
@@ -237,6 +264,8 @@
         .cb-fab { position: fixed; right: 24px; bottom: 24px; z-index: 900; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 22px 0 18px; border-radius: 999px; background: var(--lime); color: #fff; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; box-shadow: 0 10px 30px rgba(0,0,0,.45); transition: transform .25s ease, background .25s; }
         .cb-fab:hover { transform: translateY(-3px); background: #ff4a44; }
         .cb-fab svg { width: 18px; height: 18px; flex: none; }
+        /* На ПК на главной звонок уже есть в шапке («Связаться») — плавающую кнопку прячем */
+        @media (min-width: 761px) { body:has(#home-view:not([style*="none"])) .cb-fab { display: none; } }
         .cb-modal { display: none; position: fixed; inset: 0; z-index: 9500; background: rgba(5,5,5,.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 20px; }
         .cb-modal.active { display: flex; animation: fadeIn .25s ease; }
         .cb-box { width: min(440px, 100%); background: #141416; border-radius: 8px; border-top: 3px solid var(--lime); padding: 36px 32px 30px; position: relative; display: flex; flex-direction: column; gap: 12px; }
@@ -385,7 +414,8 @@
         /* --- ИДЕАЛЬНАЯ АДАПТАЦИЯ ДЛЯ ТЕЛЕФОНОВ --- */
         @media (max-width: 760px) {
             .site-header { padding: 0 20px; }
-            .main-nav { display: none; }
+            .main-nav, .header-cta, .header-phone { display: none; }
+            .burger { display: flex; }
             
             .hero { padding: 84px 20px 84px 20px; }
             .hero h1 { font-size: clamp(40px, 11vw, 80px); margin-bottom: 20px; }
@@ -447,12 +477,17 @@
         
         <header class="site-header">
             <a href="#" aria-label="Sysart Portfolio" onclick="document.getElementById('home-view').scrollTo(0,0); return false;"><img src="images/logo.png" alt="Система Арт"></a>
-            <nav class="main-nav">
-                <a href="#projects" onclick="document.getElementById('projects').scrollIntoView(); return false;">Проекты</a>
-                <a href="#catalog" onclick="document.getElementById('catalog').scrollIntoView(); return false;">Каталог</a>
-                <a href="#about" onclick="document.getElementById('about').scrollIntoView(); return false;">О компании</a>
-                <a href="#contact" onclick="document.getElementById('contact').scrollIntoView(); return false;">Контакты</a>
+            <nav class="main-nav" aria-label="Разделы">
+                <a href="#projects" data-nav="projects" onclick="navGo('projects'); return false;">Проекты</a>
+                <a href="#catalog" data-nav="catalog" onclick="navGo('catalog'); return false;">Каталог</a>
+                <a href="#about" data-nav="about" onclick="openAbout(); return false;">О компании</a>
+                <a href="#contact" data-nav="contact" onclick="navGo('contact'); return false;">Контакты</a>
             </nav>
+            <div class="header-actions">
+                <a class="header-phone" href="tel:+79149704000">+7 914 970 40 00</a>
+                <button class="header-cta" onclick="openCallback()">Связаться</button>
+                <button class="burger" onclick="toggleMenu(true)" aria-label="Открыть меню"><span></span><span></span></button>
+            </div>
         </header>
 
         <!-- ЭКРАН 1: ГЕРОЙ -->
@@ -743,6 +778,24 @@
             <nav class="cv-tabs" id="cv-tabs"></nav>
         </header>
         <main class="cv-reader" id="cv-reader"></main>
+    </div>
+
+    <!-- МОБИЛЬНОЕ МЕНЮ -->
+    <div class="mnav" id="mnav" role="dialog" aria-label="Меню">
+        <div class="mnav-top">
+            <img src="images/logo.png" alt="Система Арт">
+            <button class="mnav-close" onclick="toggleMenu(false)" aria-label="Закрыть меню">&times;</button>
+        </div>
+        <nav class="mnav-links">
+            <a href="#projects" onclick="navGo('projects'); return false;"><i>01</i>Проекты</a>
+            <a href="#catalog" onclick="navGo('catalog'); return false;"><i>02</i>Каталог</a>
+            <a href="#about" onclick="toggleMenu(false); openAbout(); return false;"><i>03</i>О компании</a>
+            <a href="#contact" onclick="navGo('contact'); return false;"><i>04</i>Контакты</a>
+        </nav>
+        <div class="mnav-bottom">
+            <button class="main" onclick="toggleMenu(false); openCallback();">Заказать звонок</button>
+            <a class="line" href="mailto:info@sysart.ru">info@sysart.ru</a>
+        </div>
     </div>
 
     <!-- ЗАКАЗАТЬ ЗВОНОК -->
@@ -1037,10 +1090,31 @@
             el.onclick = () => openLightbox(era.items.map(o => o.full), era.cover || 0, false);
         });
 
+        // --- НАВИГАЦИЯ ---
+        const mnav = document.getElementById('mnav');
+        function toggleMenu(open) { mnav.classList.toggle('active', open); }
+        function navGo(id) {
+            toggleMenu(false);
+            document.getElementById(id).scrollIntoView({ behavior: 'smooth' });
+        }
+        // Подсветка пункта меню того блока, который сейчас на экране
+        const navLinks = document.querySelectorAll('.main-nav a[data-nav]');
+        new IntersectionObserver(entries => {
+            entries.forEach(e => {
+                if (!e.isIntersecting) return;
+                navLinks.forEach(a => a.classList.toggle('active', a.dataset.nav === e.target.id));
+            });
+        }, { root: homeView, threshold: 0.55 }).observe(document.querySelector('.hero'));
+        ['projects', 'catalog', 'about', 'contact'].forEach(id => {
+            new IntersectionObserver(entries => entries.forEach(e => {
+                if (e.isIntersecting) navLinks.forEach(a => a.classList.toggle('active', a.dataset.nav === id));
+            }), { root: homeView, threshold: 0.55 }).observe(document.getElementById(id));
+        });
+
         const cbModal = document.getElementById('cb-modal');
         function openCallback() { cbModal.classList.add('active'); }
         function closeCallback() { cbModal.classList.remove('active'); }
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') closeCallback(); });
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeCallback(); toggleMenu(false); } });
 
         function openAbout() {
             homeView.style.display = 'none';
