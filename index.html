@@ -257,15 +257,31 @@
 
         /* --- СТРАНИЦА «О КОМПАНИИ» --- */
         #about-view { display: none; height: 100dvh; width: 100%; overflow-y: auto; background: var(--ink); animation: fadeIn 0.4s ease; }
-        .ab-wrap { max-width: 1240px; margin: 0 auto; padding: 0 clamp(22px, 5vw, 80px); }
+        .ab-wrap { width: 100%; max-width: 1240px; margin: 0 auto; padding: 0 clamp(22px, 5vw, 80px); }
         .ab-eyebrow { font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .08em; color: var(--lime); display: flex; align-items: center; gap: 13px; margin-bottom: 18px; }
         .ab-eyebrow:before { content: ''; width: 45px; height: 1px; background: var(--lime); }
         .ab-big { margin: 0; font-size: clamp(40px, 6.4vw, 92px); line-height: .92; font-weight: 700; letter-spacing: -.05em; max-width: 900px; }
         .ab-h2 { margin: 0; font-size: clamp(30px, 4vw, 56px); line-height: .95; font-weight: 600; letter-spacing: -.05em; }
         .ab-big em, .ab-h2 em { color: var(--lime); font-style: normal; font-weight: 400; }
-        .ab-sec { padding: clamp(56px, 8vw, 110px) 0; }
-        .ab-sec + .ab-sec { border-top: 1px solid var(--line); }
-        .ab-hero { min-height: 600px; display: flex; flex-direction: column; justify-content: flex-end; padding: 140px 0 56px; background: linear-gradient(90deg, rgba(10,10,10,.95) 0%, rgba(10,10,10,.7) 50%, rgba(10,10,10,.25) 100%), url('images/min/MONO32.jpg') center/cover; }
+        .ab-header { position: fixed; top: 0; left: 0; right: 0; z-index: 50; height: 84px; display: flex; align-items: center; justify-content: space-between; padding: 0 clamp(22px, 5vw, 80px); border-bottom: 1px solid var(--line); background: linear-gradient(180deg, rgba(10,10,10,0.95) 0%, rgba(10,10,10,0.6) 100%); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .ab-hero { justify-content: flex-end; padding: 120px 0 56px; background: linear-gradient(90deg, rgba(10,10,10,.95) 0%, rgba(10,10,10,.7) 50%, rgba(10,10,10,.25) 100%), url('images/min/MONO32.jpg') center/cover; }
+        .ab-screen { justify-content: center; padding: 104px 0 40px; }
+        /* Хроника: четыре эпохи в одну полосу */
+        .ab-chron-head { display: flex; justify-content: space-between; align-items: flex-end; gap: 40px; margin-bottom: clamp(24px, 4vh, 40px); }
+        .ab-chron-head p { margin: 0; max-width: 360px; font-size: 15px; line-height: 1.55; color: #bdb9b1; }
+        .ab-chron { display: grid; grid-template-columns: repeat(4, 1fr); gap: 20px; }
+        .ab-e { position: relative; padding-top: 22px; border-top: 1px solid var(--line); cursor: pointer; }
+        .ab-e:before { content: ''; position: absolute; top: -5px; left: 0; width: 9px; height: 9px; border-radius: 50%; background: var(--lime); box-shadow: 0 0 14px rgba(239,59,54,.7); }
+        .ab-e-years { font-size: clamp(28px, 3vw, 44px); font-weight: 700; letter-spacing: -.05em; line-height: .95; color: var(--lime); }
+        .ab-e-title { margin: 8px 0 14px; font-size: 15px; font-weight: 600; letter-spacing: -.01em; line-height: 1.3; min-height: 2.6em; }
+        .ab-e-img { position: relative; aspect-ratio: 16/10; border-radius: 4px; overflow: hidden; background: #151515; }
+        .ab-e-img img { width: 100%; height: 100%; object-fit: cover; display: block; filter: brightness(.8); transition: transform .8s cubic-bezier(.2,.8,.2,1), filter .4s; }
+        .ab-e:hover .ab-e-img img { transform: scale(1.05); filter: brightness(1); }
+        .ab-e-count { position: absolute; left: 10px; bottom: 10px; padding: 5px 9px; border-radius: 3px; background: rgba(10,10,10,.75); font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; }
+        .ab-e-count b { color: var(--lime); font-weight: 400; }
+        .ab-e ul { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
+        .ab-e li { font-size: 13px; line-height: 1.4; color: var(--muted); }
+        .ab-e li b { color: #e6e2da; font-weight: 500; }
         .ab-nums { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); margin-top: 48px; }
         .ab-nums div { padding: 26px 22px 0 0; }
         .ab-nums div + div { border-left: 1px solid var(--line); padding-left: 22px; }
@@ -298,24 +314,20 @@
         .ab-btn { align-self: flex-start; display: inline-flex; align-items: center; gap: 10px; height: 48px; padding: 0 22px; border-radius: 999px; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
         .ab-btn-main { background: var(--lime); color: #fff; }
         .ab-btn-ghost { border: 1px solid var(--line); }
-        .ab-era { margin-top: 56px; }
-        .ab-era-head { display: flex; align-items: baseline; gap: 24px; flex-wrap: wrap; padding-bottom: 18px; border-bottom: 1px solid var(--line); margin-bottom: 24px; }
-        .ab-era-years { font-size: clamp(38px, 5vw, 68px); font-weight: 700; letter-spacing: -.06em; line-height: .9; color: var(--lime); }
-        .ab-era-title { font-size: clamp(18px, 1.8vw, 24px); font-weight: 600; letter-spacing: -.02em; }
-        .ab-era-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 20px; }
-        .ab-obj { cursor: zoom-in; }
-        .ab-obj img { width: 100%; aspect-ratio: 16/9; object-fit: cover; border-radius: 4px; display: block; background: #151515; }
-        .ab-obj p { margin: 10px 0 0; font-size: 14px; line-height: 1.4; color: #bdb9b1; }
-        .ab-obj b { color: var(--paper); font-weight: 600; }
-        .ab-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); margin-top: 28px; }
+        .ab-strip { display: grid; grid-template-columns: repeat(4, 1fr); gap: 1px; background: var(--line); border: 1px solid var(--line); }
         .ab-strip div { background: var(--ink); padding: 26px; }
         .ab-strip b { display: block; font-size: 20px; margin-bottom: 6px; }
         .ab-strip span { font-size: 14px; color: #bdb9b1; line-height: 1.45; }
-        .ab-cta { display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex-wrap: wrap; }
+        .ab-cta { margin-top: clamp(40px, 9vh, 96px); display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex-wrap: wrap; }
         .ab-contacts { display: flex; gap: 12px; flex-wrap: wrap; }
 
         @media (max-width: 760px) {
-            .ab-hero { min-height: 540px; padding-top: 120px; }
+            .ab-hero { padding: 110px 0 84px; }
+            .ab-screen { padding: 104px 0 84px; }
+            .ab-chron-head { flex-direction: column; align-items: flex-start; gap: 14px; }
+            .ab-chron { display: flex; overflow-x: auto; scroll-snap-type: x mandatory; gap: 16px; margin-right: -22px; padding-right: 22px; scrollbar-width: none; }
+            .ab-chron::-webkit-scrollbar { display: none; }
+            .ab-e { flex: 0 0 80%; scroll-snap-align: start; }
             .ab-nums { grid-template-columns: 1fr 1fr; }
             .ab-nums div { padding: 22px 14px 0 0; }
             .ab-nums div:nth-child(3) { border-left: none; padding-left: 0; }
@@ -651,13 +663,14 @@
     </div>
 
     <!-- СТРАНИЦА «О КОМПАНИИ» (хроника собирается скриптом из aboutEras) -->
-    <div id="about-view">
-        <header class="gallery-header">
+    <div id="about-view" class="snap-container">
+        <header class="ab-header">
             <button class="back-btn" onclick="closeAbout()"><span>←</span> Назад в портфолио</button>
             <h2 class="gallery-title">О компании</h2>
         </header>
 
-        <section class="ab-hero"><div class="ab-wrap" style="width:100%">
+        <!-- 1: КТО МЫ -->
+        <section class="snap-section ab-hero"><div class="ab-wrap" style="width:100%">
             <div class="ab-eyebrow">О компании</div>
             <h1 class="ab-big">Свет, который <em>делает здание узнаваемым.</em></h1>
             <div class="ab-nums">
@@ -668,7 +681,8 @@
             </div>
         </div></section>
 
-        <section class="ab-sec"><div class="ab-wrap">
+        <!-- 2: ПАРТНЁРАМ -->
+        <section class="snap-section ab-screen"><div class="ab-wrap">
             <div class="ab-eyebrow">Партнёрская программа</div>
             <h2 class="ab-h2">Светотехническим <em>компаниям</em></h2>
             <div class="ab-partner">
@@ -688,14 +702,20 @@
             </div>
         </div></section>
 
-        <section class="ab-sec"><div class="ab-wrap">
-            <div class="ab-eyebrow">Хроника</div>
-            <h2 class="ab-h2">От наружной рекламы <em>к свету городов</em></h2>
-            <p style="margin:20px 0 0;max-width:640px;font-size:16px;line-height:1.55;color:#bdb9b1">Компания на рынке с 1993 года, архитектурным освещением занимается с 2009-го. Ниже — избранные объекты по годам.</p>
-            <div id="ab-eras"></div>
+        <!-- 3: ХРОНИКА — одна полоса из четырёх эпох -->
+        <section class="snap-section ab-screen"><div class="ab-wrap">
+            <div class="ab-chron-head">
+                <div>
+                    <div class="ab-eyebrow">Хроника · с 1993 года</div>
+                    <h2 class="ab-h2">От наружной рекламы <em>к свету городов</em></h2>
+                </div>
+                <p>С 1993 года на рынке, с 2009-го — архитектурное освещение. Нажмите на эпоху, чтобы посмотреть её объекты.</p>
+            </div>
+            <div class="ab-chron" id="ab-eras"></div>
         </div></section>
 
-        <section class="ab-sec"><div class="ab-wrap">
+        <!-- 4: ПОЧЕМУ МЫ + КОНТАКТЫ -->
+        <section class="snap-section ab-screen"><div class="ab-wrap">
             <div class="ab-eyebrow">Почему нам доверяют</div>
             <div class="ab-strip">
                 <div><b>С 1993 года</b><span>на рынке; с 2009 — архитектурный свет</span></div>
@@ -703,13 +723,12 @@
                 <div><b>3–5 лет гарантии</b><span>телевышка Владивостока светит с 2012</span></div>
                 <div><b>От 40 дней</b><span>поставка до склада во Владивостоке</span></div>
             </div>
-        </div></section>
-
-        <section class="ab-sec"><div class="ab-wrap ab-cta">
-            <h2 class="ab-h2">Есть объект? <em>Покажем его ночью за 1 день.</em></h2>
-            <div class="ab-contacts">
-                <a class="ab-btn ab-btn-main" href="tel:+79149704000">+7 914 970 40 00 <span>↗</span></a>
-                <a class="ab-btn ab-btn-line" href="mailto:info@sysart.ru">info@sysart.ru</a>
+            <div class="ab-cta">
+                <h2 class="ab-h2">Есть объект? <em>Покажем его ночью за 1 день.</em></h2>
+                <div class="ab-contacts">
+                    <a class="ab-btn ab-btn-main" href="tel:+79149704000">+7 914 970 40 00</a>
+                    <a class="ab-btn ab-btn-line" href="mailto:info@sysart.ru">info@sysart.ru</a>
+                </div>
             </div>
         </div></section>
     </div>
@@ -997,17 +1016,26 @@
             ]},
         ];
 
+        // Обложка эпохи — объект с индексом cover; в списке под ней — первые ERA_LIST объектов
+        aboutEras[2].cover = 3;
+        const ERA_LIST = 3;
         const aboutView = document.getElementById('about-view');
-        document.getElementById('ab-eras').innerHTML = aboutEras.map(era => `
-            <div class="ab-era">
-                <div class="ab-era-head"><span class="ab-era-years">${era.years}</span><span class="ab-era-title">${era.title}</span></div>
-                <div class="ab-era-grid">${era.items.map(o => `
-                    <div class="ab-obj" data-full="${o.full}"><img loading="lazy" src="${o.img}" alt="${o.name}, ${o.place}"><p><b>${o.name}</b> · ${o.place}</p></div>`).join('')}
-                </div>
-            </div>`).join('');
-        const aboutPhotos = [...aboutView.querySelectorAll('.ab-obj')];
-        const aboutUrls = aboutPhotos.map(el => el.dataset.full);
-        aboutPhotos.forEach((el, i) => { el.onclick = () => openLightbox(aboutUrls, i, false); });
+        const erasBox = document.getElementById('ab-eras');
+        erasBox.innerHTML = aboutEras.map((era, ei) => {
+            const cover = era.items[era.cover || 0];
+            const rest = era.items.length - ERA_LIST;
+            return `
+            <div class="ab-e" data-era="${ei}">
+                <div class="ab-e-years">${era.years}</div>
+                <div class="ab-e-title">${era.title}</div>
+                <div class="ab-e-img"><img loading="lazy" src="${cover.img}" alt="${cover.name}, ${cover.place}"><span class="ab-e-count"><b>${era.items.length}</b> объектов ↗</span></div>
+                <ul>${era.items.slice(0, ERA_LIST).map(o => `<li><b>${o.name}</b> · ${o.place}</li>`).join('')}${rest > 0 ? `<li>и ещё ${rest}</li>` : ''}</ul>
+            </div>`;
+        }).join('');
+        erasBox.querySelectorAll('.ab-e').forEach(el => {
+            const era = aboutEras[el.dataset.era];
+            el.onclick = () => openLightbox(era.items.map(o => o.full), era.cover || 0, false);
+        });
 
         const cbModal = document.getElementById('cb-modal');
         function openCallback() { cbModal.classList.add('active'); }
