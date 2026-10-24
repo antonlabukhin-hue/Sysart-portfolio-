@@ -720,7 +720,7 @@
             <h1 class="ab-big">Свет, который <em>делает здание узнаваемым.</em></h1>
             <div class="ab-nums">
                 <div><strong>17</strong><span>лет в архитектурном освещении, с 2009 года</span></div>
-                <div><strong>45+</strong><span>объектов в портфолио</span></div>
+                <div><strong id="ab-count">74+</strong><span>объектов в портфолио</span></div>
                 <div><strong>14</strong><span>городов и регионов — от Владивостока до Калининграда</span></div>
                 <div><strong class="red">1 день</strong><span>на визуализацию и расчёт</span></div>
             </div>
@@ -964,6 +964,8 @@
 
         // Счётчик на главном экране считается по количеству фото в галереях
         document.getElementById('photo-count').textContent = document.querySelectorAll('.project-visual img').length;
+        // ...и на странице «О компании» — то же число, со знаком «+»
+        document.getElementById('ab-count').textContent = document.querySelectorAll('.project-visual img').length + '+';
         // ...и на карточках разделов — по количеству фото в своей галерее
         document.querySelectorAll('[data-count]').forEach(el => {
             el.textContent = document.querySelectorAll(`[data-panel="${el.dataset.count}"] .project-visual img`).length + ' фото';
