@@ -199,7 +199,33 @@
         .statement-section .inner { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; }
         .statement-number { position: absolute; right: 0; top: 0; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; }
         .statement-section h2 { max-width: 970px; font-size: clamp(38px, 7vw, 100px); margin: 20px 0 60px; line-height: 0.9; font-weight: 600; letter-spacing: -.05em;}
+        @media (min-width: 761px) { .statement-section h2 { font-size: clamp(38px, min(5vw, 10vh), 88px); max-width: 50%; } }
         .statement-section h2 em { color: var(--lime); font-style: normal; font-weight: 400; }
+
+        /* Карта «География проектов»: точки городов берутся из подписей фото портфолио */
+        .statement-section h2, .statement-footer { position: relative; z-index: 1; }
+        .st-row { display: flex; align-items: center; gap: clamp(24px, 3vw, 56px); margin: 20px 0 clamp(28px, 6vh, 60px); }
+        .st-row h2 { margin: 0 !important; flex: 0 1 auto; }
+        .geo { position: relative; flex: 1 1 0; min-width: 0; max-width: calc((100vh - 330px) * 800 / 440); margin-left: auto; aspect-ratio: 800 / 440; }
+        .geo-dots { position: absolute; inset: 0; width: 100%; height: 100%; opacity: .09; pointer-events: none; }
+        .geo-pts { position: absolute; inset: 0; width: 100%; height: 100%; overflow: visible; }
+        .geo-pt { cursor: pointer; opacity: 0; transform-box: fill-box; transform-origin: center; transform: scale(.2); transition: opacity .5s ease, transform .6s cubic-bezier(.2,.8,.2,1.4); transition-delay: calc(var(--i) * 70ms + 150ms); }
+        .geo.on .geo-pt { opacity: 1; transform: none; }
+        .geo-pt .halo { fill: var(--lime); opacity: .18; transform-box: fill-box; transform-origin: center; animation: geoPulse 2.8s ease-out infinite; animation-delay: calc(var(--i) * -0.37s); }
+        .geo-pt .core { fill: var(--lime); stroke: #0a0a0a; stroke-width: 1.5; }
+        .geo-pt .hit { fill: transparent; }
+        .geo-pt text { fill: #d9d5ce; font: 600 13px 'Manrope', sans-serif; letter-spacing: -.01em; paint-order: stroke; stroke: #0a0a0a; stroke-width: 4px; stroke-linejoin: round; }
+        .geo-pt text tspan { fill: var(--lime); font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; }
+        .geo-pt:hover .core, .geo-pt.active .core { fill: #fff; }
+        @keyframes geoPulse { 0% { transform: scale(.6); opacity: .35; } 70%, 100% { transform: scale(1.9); opacity: 0; } }
+        .geo-cap { position: absolute; right: 2%; bottom: -6px; font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+        .geo-cap b { color: var(--paper); font-weight: 500; }
+        .geo-tip { position: absolute; z-index: 3; left: 0; top: 0; display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 8px; border-radius: 999px; border: 1px solid rgba(239,59,54,.5); background: rgba(14,12,12,.94); box-shadow: 0 14px 40px rgba(0,0,0,.5); pointer-events: none; opacity: 0; transform: translate(-50%, calc(-100% - 18px)) scale(.96); transition: opacity .2s, transform .2s; white-space: nowrap; }
+        .geo-tip.show { opacity: 1; transform: translate(-50%, calc(-100% - 18px)); }
+        .geo-tip img { width: 52px; height: 52px; border-radius: 50%; object-fit: cover; border: 1.5px solid var(--lime); flex: none; }
+        .geo-tip b { display: block; font-size: 15px; letter-spacing: -.02em; }
+        .geo-tip span { display: block; font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .06em; color: var(--muted); margin-top: 3px; }
+        @media (prefers-reduced-motion: reduce) { .geo-pt { transition: none; } .geo-pt .halo { animation: none; } }
         .statement-footer { display: flex; justify-content: space-between; align-items: flex-end; border-top: 1px solid var(--line); padding-top: 20px; }
         .statement-footer p { max-width: 290px; color: var(--muted); font-size: 13px; line-height: 1.5; margin: 0; }
         .statement-footer a { font-family: 'DM Mono', monospace; color: var(--lime); font-size: 10px; text-transform: uppercase; letter-spacing: .1em; transition: color .25s ease;}
@@ -544,6 +570,12 @@
             .portal-link span { font-size: 20px; line-height: 1; }
             
             .statement-section { padding: 84px 20px 20px; }
+            .statement-section h2 { margin-bottom: 18px; }
+            .st-row { flex-direction: column; align-items: stretch; gap: 22px; margin: 20px 0 34px; }
+            .geo { width: 108%; max-width: none; margin: 0 -4%; }
+            .geo-pt text { display: none; }
+            .geo-cap { bottom: -14px; right: 4%; }
+            .geo-tip img { width: 44px; height: 44px; }
             .statement-number { top: 10px; }
             .statement-footer { align-items: flex-start; flex-direction: column; gap: 28px; }
             .statement-footer a.about-btn { height: 60px; font-size: 16px; padding-left: 26px; gap: 14px; }
@@ -694,7 +726,15 @@
             <div class="inner">
                 <div class="statement-number">03</div>
                 <span class="eyebrow">About / Sysart</span>
+                <div class="st-row">
                 <h2>Мы проектируем<br><em>состояние города</em><br>после заката.</h2>
+                <div class="geo" id="geo" aria-label="Карта городов, где реализованы проекты">
+                    <img class="geo-dots" src="images/geo-dots.svg" alt="" loading="lazy">
+                    <svg class="geo-pts" viewBox="0 0 800 440" role="img" aria-label="Города с проектами «Система Арт»"></svg>
+                    <div class="geo-tip" role="tooltip"></div>
+                    <div class="geo-cap"></div>
+                </div>
+                </div>
                 <div class="statement-footer">
                     <p>Световые решения для фасадов, общественных пространств и архитектуры по всей России.</p>
                     <a class="about-btn" href="#" onclick="openAbout(); return false;">Узнать о компании <i>↗</i></a>
@@ -1099,6 +1139,93 @@
             RGB25:  ['Медиафасад «Mazda Sollers»', 'Владивосток', 2018],
             'tvtower':    ['Телевизионная башня', 'Владивосток', 2012],
         };
+        // --- КАРТА «ГЕОГРАФИЯ ПРОЕКТОВ» ---
+        // Точки строятся из photoCaptions: новый объект в портфолио сам попадает на карту.
+        // Новый город — добавить координаты в GEO_CITIES (иначе в консоли будет предупреждение).
+        // Проекция та же, что на карте каталога работ (коническая равновеликая, параллели 50/70, центр 100° в. д.).
+        const GEO_CITIES = {
+            'Калининград': [54.71, 20.51], 'Светлогорск': [54.94, 20.15], 'Зеленоградск': [54.96, 20.48],
+            'Санкт-Петербург': [59.94, 30.31], 'Москва': [55.75, 37.62], 'Минск': [53.90, 27.56],
+            'Воронеж': [51.67, 39.18], 'Ростов-на-Дону': [47.23, 39.72], 'Краснодар': [45.04, 38.98],
+            'Геленджик': [44.56, 38.08], 'Сочи': [43.60, 39.72], 'Сочи Парк': [43.40, 39.95, 'Сочи'],
+            'Кисловодск': [43.91, 42.72], 'Махачкала': [42.98, 47.50], 'Каспийск': [42.88, 47.64],
+            'Кизилюрт': [43.20, 46.87], 'Сулакский каньон': [43.02, 46.83, null],
+            'Казань': [55.79, 49.11], 'Нижний Новгород': [56.33, 44.00], 'Самара': [53.20, 50.15],
+            'Уфа': [54.73, 55.96], 'Пермь': [58.01, 56.25], 'Екатеринбург': [56.84, 60.60],
+            'Челябинск': [55.16, 61.40], 'Тюмень': [57.15, 65.53], 'Омск': [54.99, 73.37],
+            'Новосибирск': [55.03, 82.92], 'Томск': [56.48, 84.95], 'Барнаул': [53.35, 83.78],
+            'Красноярск': [56.01, 92.87], 'Иркутск': [52.29, 104.28], 'Чита': [52.03, 113.50],
+            'Якутск': [62.03, 129.73], 'Благовещенск': [50.27, 127.53], 'Хабаровск': [48.48, 135.07],
+            'Владивосток': [43.12, 131.89], 'Артём': [43.36, 132.19], 'Уссурийск': [43.80, 131.95],
+            'Находка': [42.82, 132.87], 'Горные Ключи': [44.63, 133.33], 'Южно-Сахалинск': [46.96, 142.73],
+            'Магадан': [59.56, 150.80], 'Петропавловск-Камчатский': [53.02, 158.65],
+        };
+        function geoProject(lat, lon) {
+            const rad = Math.PI / 180, n = 0.852869, c = 1.719846, r0 = 1.537669, k = 603.0205;
+            const x = (lon - 100) * rad * n, r = Math.sqrt(c - 2 * n * Math.sin(lat * rad)) / n;
+            return [441.355 + k * r * Math.sin(x), 875.397 - k * (r0 - r * Math.cos(x))];
+        }
+        function buildGeoMap() {
+            const box = document.getElementById('geo');
+            if (!box) return;
+            const thumbs = {};
+            document.querySelectorAll('.project-visual img').forEach(img => {
+                thumbs[img.getAttribute('src').split('/').pop().replace(/\.\w+$/, '')] = img.getAttribute('src');
+            });
+            // Города: объекты (уникальные «название + город»), годы, первое фото
+            const cities = {};
+            for (const [key, [name, city, year]] of Object.entries(photoCaptions)) {
+                const g = GEO_CITIES[city];
+                if (!g) { console.warn('Карта: нет координат для города', city); continue; }
+                // «Сочи Парк» считается Сочи; «Сулакский каньон» — место, а не город
+                const id = g[2] || city, at = GEO_CITIES[id] || g;
+                const c = cities[id] = cities[id] || { city: id, lat: at[0], lon: at[1], counts: g[2] === null ? null : id, objects: new Set(), years: [], photo: null };
+                c.objects.add(name);
+                if (year) c.years.push(+year);
+                if (!c.photo && thumbs[key]) c.photo = thumbs[key];
+            }
+            // Близкие города сливаются в одну точку (Приморье, Калининградская область, Дагестан)
+            const pts = [];
+            const MAIN = ['Владивосток', 'Калининград', 'Санкт-Петербург', 'Москва', 'Сочи', 'Махачкала'];
+            const rank = c => (MAIN.indexOf(c.city) + 1 || 99);
+            Object.values(cities).sort((a, b) => b.objects.size - a.objects.size || rank(a) - rank(b)).forEach(c => {
+                const [x, y] = geoProject(c.lat, c.lon);
+                const near = pts.find(p => Math.hypot(p.x - x, p.y - y) < 18);
+                if (near) { near.members.push(c); near.n += c.objects.size; near.years.push(...c.years); if (!near.photo) near.photo = c.photo; }
+                else pts.push({ x, y, members: [c], n: c.objects.size, years: [...c.years], photo: c.photo });
+            });
+            pts.sort((a, b) => a.x - b.x);
+            const svg = box.querySelector('.geo-pts');
+            const word = n => n % 10 === 1 && n % 100 !== 11 ? 'объект' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'объекта' : 'объектов';
+            svg.innerHTML = pts.map((p, i) => {
+                const r = 3.6 + Math.min(p.n, 20) / 4;
+                const name = p.members.some(m => ['Махачкала', 'Каспийск', 'Кизилюрт'].includes(m.city)) ? 'Дагестан' : p.members[0].city;
+                const right = p.x < 690;
+                const label = p.n >= 2 ? `<text x="${right ? p.x + r + 6 : p.x - r - 6}" y="${p.y + 4.5}" text-anchor="${right ? 'start' : 'end'}">${name} <tspan>${p.n}</tspan></text>` : '';
+                return `<g class="geo-pt" style="--i:${i}" data-i="${i}"><circle class="halo" cx="${p.x}" cy="${p.y}" r="${r * 2.4}"/><circle class="core" cx="${p.x}" cy="${p.y}" r="${r}"/><circle class="hit" cx="${p.x}" cy="${p.y}" r="${Math.max(r + 8, 14)}"/>${label}</g>`;
+            }).join('');
+            const cityCount = new Set(Object.values(cities).map(c => c.counts).filter(Boolean)).size;
+            box.querySelector('.geo-cap').innerHTML = `<b>${cityCount}</b> городов · от Калининграда до Камчатки`;
+
+            const tip = box.querySelector('.geo-tip');
+            const show = g => {
+                const p = pts[+g.dataset.i], names = p.members.map(m => m.city);
+                const yrs = p.years.length ? (Math.min(...p.years) === Math.max(...p.years) ? Math.min(...p.years) : `${Math.min(...p.years)}–${Math.max(...p.years)}`) : '';
+                tip.innerHTML = `${p.photo ? `<img src="${p.photo}" alt="">` : ''}<div><b>${names.length > 2 ? names.slice(0, 2).join(', ') + ' и др.' : names.join(', ')}</b><span>${p.n} ${word(p.n)}${yrs ? ' · ' + yrs : ''}</span></div>`;
+                const bw = box.clientWidth / 800;
+                tip.style.left = Math.min(Math.max(p.x * bw, 120), box.clientWidth - 120) + 'px';
+                tip.style.top = p.y * bw + 'px';
+                svg.querySelectorAll('.geo-pt.active').forEach(x => x.classList.remove('active'));
+                g.classList.add('active'); tip.classList.add('show');
+            };
+            const hide = () => { tip.classList.remove('show'); svg.querySelectorAll('.geo-pt.active').forEach(x => x.classList.remove('active')); };
+            svg.addEventListener('mouseover', e => { const g = e.target.closest('.geo-pt'); if (g) show(g); });
+            svg.addEventListener('mouseleave', hide);
+            svg.addEventListener('click', e => { const g = e.target.closest('.geo-pt'); g ? show(g) : hide(); });
+            // Точки «зажигаются» с запада на восток, когда блок появляется на экране
+            new IntersectionObserver(([en], io) => { if (en.isIntersecting) { box.classList.add('on'); io.disconnect(); } }, { threshold: 0.3 }).observe(box);
+        }
+
         const captionFor = src => {
             const key = (src || '').split('/').pop().replace(/\.\w+$/, '');
             const c = photoCaptions[key];
@@ -1355,6 +1482,8 @@
 
         // На блоке с формой плавающая кнопка звонка не нужна и закрывала бы галочку согласия
         new IntersectionObserver(([en]) => document.querySelector('.cb-fab').classList.toggle('away', en.isIntersecting), { threshold: 0.05 }).observe(cfForm);
+
+        buildGeoMap();
 
         const cbModal = document.getElementById('cb-modal');
         function openCallback() { cbModal.classList.add('active'); goal('callback_open'); }
