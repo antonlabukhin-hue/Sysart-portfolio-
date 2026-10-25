@@ -1319,9 +1319,9 @@
         });
 
         // --- ФОРМА ЗАЯВКИ: отправка через Web3Forms на почту (оттуда Bitrix24 делает лид) ---
-        // Ключи доступа Web3Forms не секретные: один ключ — один ящик-получатель (Gmail, info@sysart.ru).
+        // Ключи доступа Web3Forms не секретные: один ключ — один ящик-получатель (Gmail, info@sysart.ru, zayavki@sysartspb.com → Bitrix24).
         // Без ключей заявка открывается письмом в почтовой программе.
-        const FORM_KEYS = ['77dab5cc-b9f0-42d1-8365-e3fca0012b0c', 'bc2f0043-368f-439b-8681-7884b82a4c61'];
+        const FORM_KEYS = ['77dab5cc-b9f0-42d1-8365-e3fca0012b0c', 'bc2f0043-368f-439b-8681-7884b82a4c61', '4c69e854-49f3-4761-a254-8a636e86b742'];
         const cfForm = document.getElementById('cf-form');
         cfForm.consent.addEventListener('change', e => e.target.closest('.cf-consent').classList.remove('invalid'));
         cfForm.addEventListener('submit', async e => {
