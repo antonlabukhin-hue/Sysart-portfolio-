@@ -1211,7 +1211,7 @@
                 const right = p.x < 690;
                 const label = p.n >= 2 ? `<text x="${right ? p.x + r + 6 : p.x - r - 6}" y="${p.y + 4.5}" text-anchor="${right ? 'start' : 'end'}">${name} <tspan>${p.n}</tspan></text>` : '';
                 const dot = big
-                    ? `<clipPath id="geo-c${i}"><circle cx="${p.x}" cy="${p.y}" r="${r}"/></clipPath><image href="${p.photo}" x="${p.x - r}" y="${p.y - r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" clip-path="url(#geo-c${i})"/><circle class="ring" cx="${p.x}" cy="${p.y}" r="${r}"/>`
+                    ? `<clipPath id="geo-c${i}"><circle cx="${p.x}" cy="${p.y}" r="${r}"/></clipPath><image data-href="${p.photo}" x="${p.x - r}" y="${p.y - r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" clip-path="url(#geo-c${i})"/><circle class="ring" cx="${p.x}" cy="${p.y}" r="${r}"/>`
                     : `<circle class="core" cx="${p.x}" cy="${p.y}" r="${r}"/>`;
                 return `<g class="geo-pt${big ? ' big' : ''}" style="--i:${i}" data-i="${i}"><circle class="halo" cx="${p.x}" cy="${p.y}" r="${big ? r * 1.6 : r * 2.4}"/>${dot}<circle class="hit" cx="${p.x}" cy="${p.y}" r="${Math.max(r + 8, 14)}"/>${label}</g>`;
             }).join('');
@@ -1235,7 +1235,8 @@
             svg.addEventListener('mouseleave', hide);
             svg.addEventListener('click', e => { const g = e.target.closest('.geo-pt'); g ? show(g) : hide(); });
             // Точки «зажигаются» с запада на восток, когда блок появляется на экране
-            new IntersectionObserver(([en], io) => { if (en.isIntersecting) { box.classList.add('on'); io.disconnect(); } }, { threshold: 0.3 }).observe(box);
+            // Фото городов грузятся только когда карта на экране, а не вместе со всей страницей
+            new IntersectionObserver(([en], io) => { if (en.isIntersecting) { box.querySelectorAll('image[data-href]').forEach(im => im.setAttribute('href', im.dataset.href)); box.classList.add('on'); io.disconnect(); } }, { threshold: 0.3 }).observe(box);
         }
 
         const captionFor = src => {
