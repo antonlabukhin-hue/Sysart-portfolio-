@@ -245,7 +245,16 @@
         .cf-btn i { width: 46px; height: 46px; border-radius: 50%; background: #fff; color: var(--lime); display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 20px; }
         .cf-btn:hover { background: #ff4a44; }
         .cf-btn[disabled] { opacity: .6; cursor: wait; }
-        .cf-consent { font-size: 11px; line-height: 1.5; color: var(--muted); }
+        /* Согласие на обработку ПДн: отдельная галочка, по умолчанию не отмечена */
+        .cf-consent { display: flex; align-items: flex-start; gap: 10px; font-size: 12px; line-height: 1.5; color: var(--muted); cursor: pointer; }
+        .cf-consent input { position: absolute; opacity: 0; width: 1px; height: 1px; }
+        .cf-consent .box { flex: none; width: 20px; height: 20px; margin-top: 1px; border-radius: 6px; border: 1px solid rgba(255,255,255,.35); display: flex; align-items: center; justify-content: center; transition: background .2s, border-color .2s; }
+        .cf-consent .box:after { content: ''; width: 9px; height: 5px; border: 2px solid #fff; border-top: 0; border-right: 0; transform: rotate(-45deg) translate(1px, -1px); opacity: 0; transition: opacity .15s; }
+        .cf-consent input:checked + .box { background: var(--lime); border-color: var(--lime); }
+        .cf-consent input:checked + .box:after { opacity: 1; }
+        .cf-consent input:focus-visible + .box { box-shadow: 0 0 0 3px rgba(239,59,54,.35); }
+        .cf-consent.invalid .box { border-color: var(--lime); box-shadow: 0 0 0 3px rgba(239,59,54,.25); }
+        .cf-consent.invalid { color: #e8a3a0; }
         .cf-consent a { color: #bdb9b1; border-bottom: 1px solid var(--line); }
         .cf-trap { position: absolute; left: -9999px; }
         .cf-done { display: none; padding: 22px 24px; border-radius: 18px; border: 1px solid rgba(239,59,54,.45); background: rgba(239,59,54,.08); font-size: 16px; line-height: 1.5; }
@@ -358,6 +367,8 @@
         .cb-fab { position: fixed; right: 24px; bottom: 24px; z-index: 900; display: flex; align-items: center; gap: 10px; height: 52px; padding: 0 22px 0 18px; border-radius: 999px; background: var(--lime); color: #fff; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; box-shadow: 0 10px 30px rgba(0,0,0,.45); transition: transform .25s ease, background .25s; }
         .cb-fab:hover { transform: translateY(-3px); background: #ff4a44; }
         .cb-fab svg { width: 18px; height: 18px; flex: none; }
+        .cb-fab { transition: transform .25s, background .25s, opacity .25s; }
+        .cb-fab.away { opacity: 0; pointer-events: none; transform: scale(.8); }
         /* На ПК звонок есть в шапке на всех страницах («Связаться») — плавающую кнопку прячем */
         @media (min-width: 761px) { .cb-fab { display: none; } }
         .cb-modal { display: none; position: fixed; inset: 0; z-index: 9500; background: rgba(5,5,5,.85); backdrop-filter: blur(6px); -webkit-backdrop-filter: blur(6px); align-items: center; justify-content: center; padding: 20px; }
@@ -706,7 +717,7 @@
                             <input class="cf-trap" type="checkbox" name="botcheck" tabindex="-1" aria-hidden="true">
                             <div class="cf-end">
                                 <button class="cf-btn" type="submit">Оставить заявку <i>↗</i></button>
-                                <span class="cf-consent">Нажимая кнопку, вы соглашаетесь на&nbsp;<a href="privacy.html" target="_blank">обработку персональных данных</a></span>
+                                <label class="cf-consent"><input type="checkbox" name="consent"><span class="box"></span><span>Даю <a href="consent.html" target="_blank">согласие на обработку персональных данных</a> и ознакомлен с <a href="privacy.html" target="_blank">политикой</a></span></label>
                             </div>
                             <div class="cf-done" role="status"><b>Спасибо, заявка у меня.</b>Свяжусь с вами в ближайшее рабочее время.</div>
                         </form>
@@ -1309,12 +1320,14 @@
         // Без ключей заявка открывается письмом в почтовой программе.
         const FORM_KEYS = ['77dab5cc-b9f0-42d1-8365-e3fca0012b0c', 'bc2f0043-368f-439b-8681-7884b82a4c61'];
         const cfForm = document.getElementById('cf-form');
+        cfForm.consent.addEventListener('change', e => e.target.closest('.cf-consent').classList.remove('invalid'));
         cfForm.addEventListener('submit', async e => {
             e.preventDefault();
             const f = cfForm.elements;
             const name = f.name.value.trim(), phone = f.phone.value.trim(), object = f.object.value.trim();
             f.name.parentNode.classList.toggle('invalid', !name);
             f.phone.parentNode.classList.toggle('invalid', phone.replace(/\D/g, '').length < 10);
+            f.consent.closest('.cf-consent').classList.toggle('invalid', !f.consent.checked);
             if (cfForm.querySelector('.invalid')) { cfForm.querySelector('.invalid input').focus(); return; }
             if (f.botcheck.checked) return;
             const text = `Имя: ${name}\nТелефон: ${phone}\nОбъект: ${object || '—'}`;
@@ -1328,7 +1341,7 @@
             try {
                 const results = await Promise.allSettled(FORM_KEYS.map(key => fetch('https://api.web3forms.com/submit', {
                     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                    body: JSON.stringify({ access_key: key, subject: 'Заявка с сайта sysartspb.com: ' + name, from_name: 'Сайт sysartspb.com', name, phone, object: object || '—', message: text })
+                    body: JSON.stringify({ access_key: key, subject: 'Заявка с сайта sysartspb.com: ' + name, from_name: 'Сайт sysartspb.com', name, phone, object: object || '—', consent: 'дано ' + new Date().toLocaleString('ru-RU'), message: text })
                 }).then(r => r.json())));
                 if (!results.some(x => x.status === 'fulfilled' && x.value.success)) throw new Error('form');
                 cfForm.classList.add('sent');
@@ -1336,6 +1349,9 @@
                 alert('Не получилось отправить заявку. Позвоните нам: +7 914 970-40-00 или напишите на info@sysart.ru');
             } finally { btn.disabled = false; }
         });
+
+        // На блоке с формой плавающая кнопка звонка не нужна и закрывала бы галочку согласия
+        new IntersectionObserver(([en]) => document.querySelector('.cb-fab').classList.toggle('away', en.isIntersecting), { threshold: 0.05 }).observe(cfForm);
 
         const cbModal = document.getElementById('cb-modal');
         function openCallback() { cbModal.classList.add('active'); goal('callback_open'); }
