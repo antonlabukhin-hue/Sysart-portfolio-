@@ -34,6 +34,19 @@
     <link rel="icon" type="image/png" sizes="512x512" href="images/favicon-512.png">
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=113787422', 'ym');
+
+        ym(113787422, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <noscript><div><img src="https://mc.yandex.ru/watch/113787422" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
+    <!-- /Yandex.Metrika counter -->
     <link rel="preload" as="image" href="images/logo.png">
     <link rel="preload" as="image" href="images/min/MONO28.jpg">
 
@@ -899,6 +912,7 @@
         const panels = document.querySelectorAll('.project-panel');
 
         function openGallery(category, title) {
+            goal('gallery_open');
             showView('gallery');
             galleryTitle.innerText = title;
             galleryView.scrollTop = 0;
@@ -1126,6 +1140,7 @@
         }
 
         function openCatalog(index) {
+            goal('catalog_open');
             showView('catalog');
             showCatalogSection(index);
         }
@@ -1204,12 +1219,25 @@
             }), { root: homeView, threshold: 0.55 }).observe(document.getElementById(id));
         });
 
+        // --- ЦЕЛИ ЯНДЕКС МЕТРИКИ: звонок, почта, WhatsApp, скачивание каталога и открытие разделов ---
+        function goal(name) { try { ym(113787422, 'reachGoal', name); } catch (e) {} }
+        document.addEventListener('click', e => {
+            const a = e.target.closest('a[href]');
+            if (!a) return;
+            const href = a.getAttribute('href');
+            if (href.startsWith('tel:')) goal('phone');
+            else if (href.startsWith('mailto:')) goal('email');
+            else if (href.includes('wa.me/')) goal('whatsapp');
+            else if (href.endsWith('.pdf')) goal('catalog_pdf');
+        });
+
         const cbModal = document.getElementById('cb-modal');
-        function openCallback() { cbModal.classList.add('active'); }
+        function openCallback() { cbModal.classList.add('active'); goal('callback_open'); }
         function closeCallback() { cbModal.classList.remove('active'); }
         document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeCallback(); toggleMenu(false); } });
 
         function openAbout() {
+            goal('about_open');
             showView('about');
             aboutView.scrollTop = 0;
         }
