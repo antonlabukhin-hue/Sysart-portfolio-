@@ -199,7 +199,7 @@
         .statement-section .inner { flex: 1; display: flex; flex-direction: column; justify-content: center; position: relative; }
         .statement-number { position: absolute; right: 0; top: 0; color: var(--muted); font-family: 'DM Mono', monospace; font-size: 11px; }
         .statement-section h2 { max-width: 970px; font-size: clamp(38px, 7vw, 100px); margin: 20px 0 60px; line-height: 0.9; font-weight: 600; letter-spacing: -.05em;}
-        @media (min-width: 761px) { .statement-section h2 { font-size: clamp(38px, min(5vw, 10vh), 88px); max-width: 50%; } }
+        @media (min-width: 761px) { .statement-section h2 { font-size: clamp(38px, min(5vw, 10vh), 80px); max-width: none; white-space: nowrap; } }
         .statement-section h2 em { color: var(--lime); font-style: normal; font-weight: 400; }
 
         /* Карта «География проектов»: точки городов берутся из подписей фото портфолио */
@@ -214,11 +214,14 @@
         .geo-pt .halo { fill: var(--lime); opacity: .18; transform-box: fill-box; transform-origin: center; animation: geoPulse 2.8s ease-out infinite; animation-delay: calc(var(--i) * -0.37s); }
         .geo-pt .core { fill: var(--lime); stroke: #0a0a0a; stroke-width: 1.5; }
         .geo-pt .hit { fill: transparent; }
+        .geo-pt .ring { fill: none; stroke: var(--lime); stroke-width: 2; }
+        .geo-pt.big:hover .ring, .geo-pt.big.active .ring { stroke: #fff; }
+        .geo-pt.big .halo { opacity: .14; }
         .geo-pt text { fill: #d9d5ce; font: 600 13px 'Manrope', sans-serif; letter-spacing: -.01em; paint-order: stroke; stroke: #0a0a0a; stroke-width: 4px; stroke-linejoin: round; }
         .geo-pt text tspan { fill: var(--lime); font-family: 'DM Mono', monospace; font-size: 11px; font-weight: 500; }
         .geo-pt:hover .core, .geo-pt.active .core { fill: #fff; }
         @keyframes geoPulse { 0% { transform: scale(.6); opacity: .35; } 70%, 100% { transform: scale(1.9); opacity: 0; } }
-        .geo-cap { position: absolute; right: 2%; bottom: -6px; font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+        .geo-cap { position: absolute; right: 2%; top: -14px; white-space: nowrap; font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
         .geo-cap b { color: var(--paper); font-weight: 500; }
         .geo-tip { position: absolute; z-index: 3; left: 0; top: 0; display: flex; align-items: center; gap: 12px; padding: 8px 16px 8px 8px; border-radius: 999px; border: 1px solid rgba(239,59,54,.5); background: rgba(14,12,12,.94); box-shadow: 0 14px 40px rgba(0,0,0,.5); pointer-events: none; opacity: 0; transform: translate(-50%, calc(-100% - 18px)) scale(.96); transition: opacity .2s, transform .2s; white-space: nowrap; }
         .geo-tip.show { opacity: 1; transform: translate(-50%, calc(-100% - 18px)); }
@@ -574,7 +577,7 @@
             .st-row { flex-direction: column; align-items: stretch; gap: 22px; margin: 20px 0 34px; }
             .geo { width: 108%; max-width: none; margin: 0 -4%; }
             .geo-pt text { display: none; }
-            .geo-cap { bottom: -14px; right: 4%; }
+            .geo-cap { top: auto; bottom: -18px; right: 4%; }
             .geo-tip img { width: 44px; height: 44px; }
             .statement-number { top: 10px; }
             .statement-footer { align-items: flex-start; flex-direction: column; gap: 28px; }
@@ -615,6 +618,7 @@
             .hero { padding-top: 100px; }
             .statement-section { padding-top: 100px; padding-bottom: 30px; }
             .cf-lead, .cf-quote { display: none; }
+            .geo { display: none; }
             .portal-card, .portal-card.is-open, .category-portals:hover .portal-card:hover, .category-portals:hover .portal-card.is-open:not(:hover) { flex: 1; }
             .portal-content { padding: 40px 22px 20px; }
             .portal-card .portal-content h3, .category-portals:hover .portal-card .portal-content h3 { font-size: 20px; }
@@ -1190,7 +1194,7 @@
             const rank = c => (MAIN.indexOf(c.city) + 1 || 99);
             Object.values(cities).sort((a, b) => b.objects.size - a.objects.size || rank(a) - rank(b)).forEach(c => {
                 const [x, y] = geoProject(c.lat, c.lon);
-                const near = pts.find(p => Math.hypot(p.x - x, p.y - y) < 18);
+                const near = pts.find(p => Math.hypot(p.x - x, p.y - y) < 24);
                 if (near) { near.members.push(c); near.n += c.objects.size; near.years.push(...c.years); if (!near.photo) near.photo = c.photo; }
                 else pts.push({ x, y, members: [c], n: c.objects.size, years: [...c.years], photo: c.photo });
             });
@@ -1198,14 +1202,20 @@
             const svg = box.querySelector('.geo-pts');
             const word = n => n % 10 === 1 && n % 100 !== 11 ? 'объект' : [2, 3, 4].includes(n % 10) && ![12, 13, 14].includes(n % 100) ? 'объекта' : 'объектов';
             svg.innerHTML = pts.map((p, i) => {
-                const r = 3.6 + Math.min(p.n, 20) / 4;
+                // Города с 3+ объектами — круглое фото в красной обводке, как на карте альбома
+                const big = p.n >= 3 && p.photo;
+                const r = big ? 14 + Math.min(p.n, 26) * 0.5 : 3.6 + Math.min(p.n, 20) / 4;
                 const name = p.members.some(m => ['Махачкала', 'Каспийск', 'Кизилюрт'].includes(m.city)) ? 'Дагестан' : p.members[0].city;
                 const right = p.x < 690;
                 const label = p.n >= 2 ? `<text x="${right ? p.x + r + 6 : p.x - r - 6}" y="${p.y + 4.5}" text-anchor="${right ? 'start' : 'end'}">${name} <tspan>${p.n}</tspan></text>` : '';
-                return `<g class="geo-pt" style="--i:${i}" data-i="${i}"><circle class="halo" cx="${p.x}" cy="${p.y}" r="${r * 2.4}"/><circle class="core" cx="${p.x}" cy="${p.y}" r="${r}"/><circle class="hit" cx="${p.x}" cy="${p.y}" r="${Math.max(r + 8, 14)}"/>${label}</g>`;
+                const dot = big
+                    ? `<clipPath id="geo-c${i}"><circle cx="${p.x}" cy="${p.y}" r="${r}"/></clipPath><image href="${p.photo}" x="${p.x - r}" y="${p.y - r}" width="${2 * r}" height="${2 * r}" preserveAspectRatio="xMidYMid slice" clip-path="url(#geo-c${i})"/><circle class="ring" cx="${p.x}" cy="${p.y}" r="${r}"/>`
+                    : `<circle class="core" cx="${p.x}" cy="${p.y}" r="${r}"/>`;
+                return `<g class="geo-pt${big ? ' big' : ''}" style="--i:${i}" data-i="${i}"><circle class="halo" cx="${p.x}" cy="${p.y}" r="${big ? r * 1.6 : r * 2.4}"/>${dot}<circle class="hit" cx="${p.x}" cy="${p.y}" r="${Math.max(r + 8, 14)}"/>${label}</g>`;
             }).join('');
             const cityCount = new Set(Object.values(cities).map(c => c.counts).filter(Boolean)).size;
-            box.querySelector('.geo-cap').innerHTML = `<b>${cityCount}</b> городов · от Калининграда до Камчатки`;
+            const objCount = pts.reduce((s, p) => s + p.n, 0);
+            box.querySelector('.geo-cap').innerHTML = `<b>${objCount}</b> ${word(objCount)} · <b>${cityCount}</b> городов · от Калининграда до Камчатки`;
 
             const tip = box.querySelector('.geo-tip');
             const show = g => {
