@@ -225,12 +225,42 @@
         .contact-content { flex: 1; display: flex; flex-direction: column; justify-content: center; }
         .contact-top { display: flex; justify-content: space-between; align-items: flex-start; }
         .contact-top span { color: var(--muted); font-size: 9px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em;}
-        .contact-section h2 { font-size: clamp(38px, 7.5vw, 108px); margin: 40px 0 60px; max-width: 1100px; line-height: 0.9; font-weight: 600; letter-spacing: -.05em;}
+        .contact-section h2 { font-size: clamp(36px, min(5.2vw, 8.6vh), 82px); margin: 0; line-height: 0.9; font-weight: 600; letter-spacing: -.05em;}
         .contact-section h2 em { color: var(--lime); font-style: normal; font-weight: 400; }
-        .contact-link { display: inline-block; padding-bottom: 10px; border-bottom: 1px solid var(--lime); font-size: clamp(21px, 2.6vw, 37px); letter-spacing: -.05em; transition: color .25s ease; }
-        .contact-link:hover { color: var(--lime); }
-        .contact-links { display: flex; gap: 20px 48px; flex-wrap: wrap; }
-        .contact-link span { font-size: 19px; margin-left: 5px; vertical-align: 2px; }
+
+        /* Форма заявки слева, карточка директора по развитию справа */
+        .cf-grid { display: flex; align-items: center; gap: clamp(32px, 6vw, 96px); margin-top: clamp(14px, 3vh, 34px); }
+        .cf-main { flex: 1.25; max-width: 640px; }
+        .cf-lead { color: #bdb9b1; font-size: 16px; line-height: 1.55; margin: clamp(12px, 2.4vh, 22px) 0 0; max-width: 470px; }
+        .cf-form { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; margin-top: clamp(16px, 3.4vh, 32px); }
+        .cf-field { display: flex; flex-direction: column; gap: 7px; }
+        .cf-field.wide, .cf-end, .cf-done { grid-column: 1 / -1; }
+        .cf-field label { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
+        .cf-field input { width: 100%; height: clamp(48px, 6.6vh, 56px); padding: 0 20px; border-radius: 14px; border: 1px solid var(--line); background: rgba(255,255,255,.04); color: var(--paper); font: 500 16px 'Manrope', sans-serif; outline: none; transition: border-color .25s, background .25s; }
+        .cf-field input:focus { border-color: var(--lime); background: rgba(255,255,255,.07); }
+        .cf-field input::placeholder { color: #6f6e6a; }
+        .cf-field.invalid input { border-color: var(--lime); }
+        .cf-end { display: flex; align-items: center; gap: 22px; margin-top: 4px; }
+        .cf-btn { display: inline-flex; align-items: center; justify-content: space-between; gap: 18px; flex: none; height: clamp(54px, 7.4vh, 62px); padding: 0 8px 0 28px; border: 0; border-radius: 999px; background: var(--lime); color: #fff; font: 600 17px 'Manrope', sans-serif; white-space: nowrap; cursor: pointer; transition: background .25s, opacity .25s; }
+        .cf-btn i { width: 46px; height: 46px; border-radius: 50%; background: #fff; color: var(--lime); display: flex; align-items: center; justify-content: center; font-style: normal; font-size: 20px; }
+        .cf-btn:hover { background: #ff4a44; }
+        .cf-btn[disabled] { opacity: .6; cursor: wait; }
+        .cf-consent { font-size: 11px; line-height: 1.5; color: var(--muted); }
+        .cf-consent a { color: #bdb9b1; border-bottom: 1px solid var(--line); }
+        .cf-trap { position: absolute; left: -9999px; }
+        .cf-done { display: none; padding: 22px 24px; border-radius: 18px; border: 1px solid rgba(239,59,54,.45); background: rgba(239,59,54,.08); font-size: 16px; line-height: 1.5; }
+        .cf-done b { display: block; font-size: 20px; letter-spacing: -.02em; margin-bottom: 4px; }
+        .cf-form.sent .cf-field, .cf-form.sent .cf-end { display: none; }
+        .cf-form.sent .cf-done { display: block; }
+        .cf-card { flex: 1; max-width: 400px; border: 1px solid var(--line); border-radius: 28px; overflow: hidden; background: rgba(255,255,255,.03); }
+        .cf-photo { display: block; width: 100%; height: clamp(150px, 31vh, 320px); object-fit: cover; object-position: center 22%; background: linear-gradient(160deg, #2a2624, #141212); }
+        .cf-info { padding: clamp(16px, 2.6vh, 24px) 26px clamp(18px, 2.8vh, 26px); }
+        .cf-name { font-size: 22px; font-weight: 700; letter-spacing: -.03em; }
+        .cf-role { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; line-height: 1.6; color: var(--muted); margin-top: 6px; }
+        .cf-quote { margin: clamp(10px, 1.8vh, 16px) 0 clamp(14px, 2.2vh, 20px); color: #d9d5ce; font-size: 15px; line-height: 1.5; }
+        .cf-direct { display: flex; flex-wrap: wrap; gap: 8px; }
+        .cf-chip { display: inline-flex; align-items: center; height: 40px; padding: 0 16px; border-radius: 999px; border: 1px solid var(--line); font-size: 14px; font-weight: 600; white-space: nowrap; transition: border-color .25s, color .25s; }
+        .cf-chip:hover { border-color: var(--lime); color: var(--lime); }
         
         footer { border-top: 1px solid var(--line); display: flex; justify-content: space-between; padding: 20px 0; color: var(--muted); font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; margin-top: auto; }
         footer a:hover { color: var(--lime); }
@@ -506,7 +536,18 @@
             .about-btn i { width: 44px; height: 44px; }
             
             .contact-section { padding: 84px 20px 0; }
-            .contact-section h2 { margin: 30px 0 40px; }
+            .contact-section h2 { font-size: clamp(36px, 10.5vw, 48px); }
+            .cf-grid { flex-direction: column; align-items: stretch; gap: 28px; margin: 26px 0 30px; }
+            .cf-form { grid-template-columns: 1fr; }
+            .cf-end { flex-direction: column; align-items: stretch; gap: 14px; }
+            .cf-btn { width: 100%; }
+            .cf-card { max-width: none; display: grid; grid-template-columns: 112px 1fr; border-radius: 22px; }
+            .cf-card:not(:has(.cf-photo)) { display: block; }
+            .cf-photo { height: 100%; min-height: 150px; }
+            .cf-info { padding: 16px 16px 18px; }
+            .cf-name { font-size: 19px; }
+            .cf-quote { font-size: 14px; margin: 8px 0 12px; }
+            .cf-chip { height: 36px; padding: 0 13px; font-size: 13px; }
             footer { flex-wrap: wrap; gap: 15px; flex-direction: column; text-align: center;}
             
             .project-grid { gap: 15px; grid-template-columns: 1fr;}
@@ -526,6 +567,7 @@
         @media (min-width: 761px) and (max-height: 560px) {
             .hero { padding-top: 100px; }
             .statement-section { padding-top: 100px; padding-bottom: 30px; }
+            .cf-lead, .cf-quote { display: none; }
             .portal-card, .portal-card.is-open, .category-portals:hover .portal-card:hover, .category-portals:hover .portal-card.is-open:not(:hover) { flex: 1; }
             .portal-content { padding: 40px 22px 20px; }
             .portal-card .portal-content h3, .category-portals:hover .portal-card .portal-content h3 { font-size: 20px; }
@@ -648,11 +690,36 @@
         <!-- ЭКРАН 4: КОНТАКТЫ + ПОДВАЛ -->
         <section class="snap-section contact-section" id="contact">
             <div class="contact-content">
-                <div class="contact-top"><span class="eyebrow" style="margin:0;">04 / Start a conversation</span><span>Санкт-Петербург · Россия</span></div>
-                <h2>Есть объект?<br><em>Давайте добавим ему света.</em></h2>
-                <div class="contact-links">
-                    <a class="contact-link" href="tel:+79149704000">+7 914 970 40 00 <span>↗</span></a>
-                    <a class="contact-link" href="mailto:info@sysart.ru">info@sysart.ru <span>↗</span></a>
+                <div class="contact-top"><span class="eyebrow" style="margin:0;">04 / Оставить заявку</span><span>Санкт-Петербург · Россия</span></div>
+                <div class="cf-grid">
+                    <div class="cf-main">
+                        <h2>Есть объект?<br><em>Давайте добавим ему света.</em></h2>
+                        <p class="cf-lead">Оставьте контакты — подберу оборудование и подготовлю визуализацию вашего объекта.</p>
+                        <form class="cf-form" id="cf-form" novalidate>
+                            <div class="cf-field"><label for="cf-name">Имя</label><input id="cf-name" name="name" autocomplete="name" placeholder="Как к вам обращаться" required></div>
+                            <div class="cf-field"><label for="cf-phone">Телефон</label><input id="cf-phone" name="phone" type="tel" inputmode="tel" autocomplete="tel" placeholder="+7 ___ ___-__-__" required></div>
+                            <div class="cf-field wide"><label for="cf-object">Объект</label><input id="cf-object" name="object" placeholder="Например: фасад ЖК, 16 этажей, Новосибирск"></div>
+                            <input class="cf-trap" type="checkbox" name="botcheck" tabindex="-1" aria-hidden="true">
+                            <div class="cf-end">
+                                <button class="cf-btn" type="submit">Оставить заявку <i>↗</i></button>
+                                <span class="cf-consent">Нажимая кнопку, вы соглашаетесь на&nbsp;<a href="privacy.html" target="_blank">обработку персональных данных</a></span>
+                            </div>
+                            <div class="cf-done" role="status"><b>Спасибо, заявка у меня.</b>Свяжусь с вами в ближайшее рабочее время.</div>
+                        </form>
+                    </div>
+                    <aside class="cf-card">
+                        <img class="cf-photo" src="images/anton.jpg" alt="Антон Лабухин, директор по развитию «Система Арт»" loading="lazy" onerror="this.remove()">
+                        <div class="cf-info">
+                            <div class="cf-name">Антон Лабухин</div>
+                            <div class="cf-role">Директор по развитию<br>«Система Арт»</div>
+                            <p class="cf-quote">«Отвечу лично: посчитаем ваш объект и подберём оборудование под задачу».</p>
+                            <div class="cf-direct">
+                                <a class="cf-chip" href="tel:+79149704000">+7 914 970-40-00</a>
+                                <a class="cf-chip" href="https://wa.me/79149704000" target="_blank" rel="noreferrer">WhatsApp</a>
+                                <a class="cf-chip" href="mailto:info@sysart.ru">info@sysart.ru</a>
+                            </div>
+                        </div>
+                    </aside>
                 </div>
             </div>
             <footer>
@@ -1231,6 +1298,38 @@
             else if (href.startsWith('mailto:')) goal('email');
             else if (href.includes('wa.me/')) goal('whatsapp');
             else if (href.endsWith('.pdf')) goal('catalog_pdf');
+        });
+
+        // --- ФОРМА ЗАЯВКИ: отправка через Web3Forms на почту (оттуда Bitrix24 делает лид) ---
+        // Ключ доступа Web3Forms не секретный. Без ключа заявка открывается письмом в почтовой программе.
+        const FORM_KEY = '77dab5cc-b9f0-42d1-8365-e3fca0012b0c';
+        const cfForm = document.getElementById('cf-form');
+        cfForm.addEventListener('submit', async e => {
+            e.preventDefault();
+            const f = cfForm.elements;
+            const name = f.name.value.trim(), phone = f.phone.value.trim(), object = f.object.value.trim();
+            f.name.parentNode.classList.toggle('invalid', !name);
+            f.phone.parentNode.classList.toggle('invalid', phone.replace(/\D/g, '').length < 10);
+            if (cfForm.querySelector('.invalid')) { cfForm.querySelector('.invalid input').focus(); return; }
+            if (f.botcheck.checked) return;
+            const text = `Имя: ${name}\nТелефон: ${phone}\nОбъект: ${object || '—'}`;
+            goal('lead_form');
+            if (!FORM_KEY) {
+                location.href = 'mailto:info@sysart.ru?subject=' + encodeURIComponent('Заявка с сайта sysartspb.com') + '&body=' + encodeURIComponent(text);
+                return;
+            }
+            const btn = cfForm.querySelector('.cf-btn');
+            btn.disabled = true;
+            try {
+                const r = await fetch('https://api.web3forms.com/submit', {
+                    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify({ access_key: FORM_KEY, subject: 'Заявка с сайта sysartspb.com: ' + name, from_name: 'Сайт sysartspb.com', name, phone, object: object || '—', message: text })
+                });
+                if (!(await r.json()).success) throw new Error('form');
+                cfForm.classList.add('sent');
+            } catch (err) {
+                alert('Не получилось отправить заявку. Позвоните нам: +7 914 970-40-00 или напишите на info@sysart.ru');
+            } finally { btn.disabled = false; }
         });
 
         const cbModal = document.getElementById('cb-modal');
