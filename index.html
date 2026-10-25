@@ -731,6 +731,7 @@
                             <div class="cf-direct">
                                 <a class="cf-chip" href="tel:+79149704000">+7 914 970-40-00</a>
                                 <a class="cf-chip" href="https://wa.me/79149704000" target="_blank" rel="noreferrer">WhatsApp</a>
+                                <a class="cf-chip" href="https://max.ru/u/f9LHodD0cOLr_KwM9JFjLjTdPAuVpfX2ZXPgcNwvEDw0YXDkrdh1VbpWxlA" target="_blank" rel="noreferrer">MAX</a>
                                 <a class="cf-chip" href="mailto:info@sysart.ru">info@sysart.ru</a>
                             </div>
                         </div>
@@ -957,6 +958,7 @@
             <p>Напишите удобным способом — перезвоним, ответим на вопросы и подготовим КП по вашему объекту.</p>
             <a class="cb-opt main" href="tel:+79149704000">Позвонить <small>+7 914 970 40 00</small></a>
             <a class="cb-opt" href="https://wa.me/79149704000?text=%D0%97%D0%B4%D1%80%D0%B0%D0%B2%D1%81%D1%82%D0%B2%D1%83%D0%B9%D1%82%D0%B5!%20%D0%9F%D0%B5%D1%80%D0%B5%D0%B7%D0%B2%D0%BE%D0%BD%D0%B8%D1%82%D0%B5%20%D0%BC%D0%BD%D0%B5%2C%20%D0%BF%D0%BE%D0%B6%D0%B0%D0%BB%D1%83%D0%B9%D1%81%D1%82%D0%B0" target="_blank" rel="noreferrer">WhatsApp <small>перезвоним</small></a>
+            <a class="cb-opt" href="https://max.ru/u/f9LHodD0cOLr_KwM9JFjLjTdPAuVpfX2ZXPgcNwvEDw0YXDkrdh1VbpWxlA" target="_blank" rel="noreferrer">MAX <small>напишите</small></a>
             <a class="cb-opt" href="mailto:info@sysart.ru?subject=%D0%97%D0%B0%D0%BA%D0%B0%D0%B7%D0%B0%D1%82%D1%8C%20%D0%B7%D0%B2%D0%BE%D0%BD%D0%BE%D0%BA&body=%D0%98%D0%BC%D1%8F%3A%20%0A%D0%A2%D0%B5%D0%BB%D0%B5%D1%84%D0%BE%D0%BD%3A%20%0A%D0%9E%D0%B1%D1%8A%D0%B5%D0%BA%D1%82%3A%20">Почта <small>info@sysart.ru</small></a>
         </div>
     </div>
@@ -1312,6 +1314,7 @@
             if (href.startsWith('tel:')) goal('phone');
             else if (href.startsWith('mailto:')) goal('email');
             else if (href.includes('wa.me/')) goal('whatsapp');
+            else if (href.includes('max.ru/')) goal('max');
             else if (href.endsWith('.pdf')) goal('catalog_pdf');
         });
 
