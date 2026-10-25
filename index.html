@@ -1307,7 +1307,7 @@
         // --- ФОРМА ЗАЯВКИ: отправка через Web3Forms на почту (оттуда Bitrix24 делает лид) ---
         // Ключи доступа Web3Forms не секретные: один ключ — один ящик-получатель (Gmail, info@sysart.ru).
         // Без ключей заявка открывается письмом в почтовой программе.
-        const FORM_KEYS = ['77dab5cc-b9f0-42d1-8365-e3fca0012b0c'];
+        const FORM_KEYS = ['77dab5cc-b9f0-42d1-8365-e3fca0012b0c', 'bc2f0043-368f-439b-8681-7884b82a4c61'];
         const cfForm = document.getElementById('cf-form');
         cfForm.addEventListener('submit', async e => {
             e.preventDefault();
