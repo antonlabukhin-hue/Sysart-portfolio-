@@ -253,7 +253,10 @@
         .cf-form.sent .cf-field, .cf-form.sent .cf-end { display: none; }
         .cf-form.sent .cf-done { display: block; }
         .cf-card { flex: 1; max-width: 400px; border: 1px solid var(--line); border-radius: 28px; overflow: hidden; background: rgba(255,255,255,.03); }
-        .cf-photo { display: block; width: 100%; height: clamp(150px, 31vh, 320px); object-fit: cover; object-position: 62% 6%; background: linear-gradient(160deg, #2a2624, #141212); }
+        /* Фото мягче: чуть приглушено и плавно уходит в фон карточки */
+        .cf-ph { position: relative; }
+        .cf-ph:after { content: ''; position: absolute; inset: 0; pointer-events: none; background: linear-gradient(180deg, rgba(18,16,15,0) 42%, rgba(18,16,15,.55) 78%, #121010 100%), radial-gradient(ellipse 90% 80% at 60% 35%, transparent 55%, rgba(10,10,10,.35) 100%); }
+        .cf-photo { display: block; width: 100%; height: clamp(150px, 31vh, 320px); object-fit: cover; object-position: 62% 6%; filter: brightness(.84) saturate(.85) contrast(1.04); background: linear-gradient(160deg, #2a2624, #141212); }
         .cf-info { padding: clamp(16px, 2.6vh, 24px) 26px clamp(18px, 2.8vh, 26px); }
         .cf-name { font-size: 22px; font-weight: 700; letter-spacing: -.03em; }
         .cf-role { font-family: 'DM Mono', monospace; font-size: 10px; text-transform: uppercase; letter-spacing: .08em; line-height: 1.6; color: var(--muted); margin-top: 6px; }
@@ -544,6 +547,7 @@
             .cf-card { max-width: none; display: grid; grid-template-columns: 112px 1fr; border-radius: 22px; }
             .cf-card:not(:has(.cf-photo)) { display: block; }
             .cf-photo { height: 100%; min-height: 150px; }
+            .cf-ph:after { background: linear-gradient(90deg, rgba(18,16,15,0) 55%, #121010 100%), linear-gradient(180deg, rgba(18,16,15,0) 60%, rgba(18,16,15,.6) 100%); }
             .cf-info { padding: 16px 16px 18px; }
             .cf-name { font-size: 19px; }
             .cf-quote { font-size: 14px; margin: 8px 0 12px; }
@@ -708,7 +712,7 @@
                         </form>
                     </div>
                     <aside class="cf-card">
-                        <img class="cf-photo" src="images/anton.jpg" alt="Антон Лабухин, директор по развитию «Система Арт»" loading="lazy" onerror="this.remove()">
+                        <div class="cf-ph"><img class="cf-photo" src="images/anton.jpg" alt="Антон Лабухин, директор по развитию «Система Арт»" loading="lazy" onerror="this.parentNode.remove()"></div>
                         <div class="cf-info">
                             <div class="cf-name">Антон Лабухин</div>
                             <div class="cf-role">Директор по развитию<br>«Система Арт»</div>
@@ -1301,8 +1305,9 @@
         });
 
         // --- ФОРМА ЗАЯВКИ: отправка через Web3Forms на почту (оттуда Bitrix24 делает лид) ---
-        // Ключ доступа Web3Forms не секретный. Без ключа заявка открывается письмом в почтовой программе.
-        const FORM_KEY = '77dab5cc-b9f0-42d1-8365-e3fca0012b0c';
+        // Ключи доступа Web3Forms не секретные: один ключ — один ящик-получатель (Gmail, info@sysart.ru).
+        // Без ключей заявка открывается письмом в почтовой программе.
+        const FORM_KEYS = ['77dab5cc-b9f0-42d1-8365-e3fca0012b0c'];
         const cfForm = document.getElementById('cf-form');
         cfForm.addEventListener('submit', async e => {
             e.preventDefault();
@@ -1314,18 +1319,18 @@
             if (f.botcheck.checked) return;
             const text = `Имя: ${name}\nТелефон: ${phone}\nОбъект: ${object || '—'}`;
             goal('lead_form');
-            if (!FORM_KEY) {
+            if (!FORM_KEYS.length) {
                 location.href = 'mailto:info@sysart.ru?subject=' + encodeURIComponent('Заявка с сайта sysartspb.com') + '&body=' + encodeURIComponent(text);
                 return;
             }
             const btn = cfForm.querySelector('.cf-btn');
             btn.disabled = true;
             try {
-                const r = await fetch('https://api.web3forms.com/submit', {
+                const results = await Promise.allSettled(FORM_KEYS.map(key => fetch('https://api.web3forms.com/submit', {
                     method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                    body: JSON.stringify({ access_key: FORM_KEY, subject: 'Заявка с сайта sysartspb.com: ' + name, from_name: 'Сайт sysartspb.com', name, phone, object: object || '—', message: text })
-                });
-                if (!(await r.json()).success) throw new Error('form');
+                    body: JSON.stringify({ access_key: key, subject: 'Заявка с сайта sysartspb.com: ' + name, from_name: 'Сайт sysartspb.com', name, phone, object: object || '—', message: text })
+                }).then(r => r.json())));
+                if (!results.some(x => x.status === 'fulfilled' && x.value.success)) throw new Error('form');
                 cfForm.classList.add('sent');
             } catch (err) {
                 alert('Не получилось отправить заявку. Позвоните нам: +7 914 970-40-00 или напишите на info@sysart.ru');
