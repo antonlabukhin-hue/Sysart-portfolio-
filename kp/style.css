@@ -313,3 +313,8 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
 .doc-sign p { margin: 0; line-height: 1.6; }
 .doc-sign b { font-size: 10.5pt; }
 .doc-sign .site { font-family: 'DM Mono', monospace; font-size: 7.5pt; color: #ef3b36; letter-spacing: .06em; text-transform: uppercase; }
+
+/* Длина по таблице производства: выпадающий список */
+.len-pick { display: flex; flex-direction: column; gap: 6px; }
+.len-pick select { width: 100%; max-width: 340px; height: 44px; border-radius: 999px; padding: 0 16px; font-size: 15px; cursor: pointer; }
+.len-pick small { font-size: 11px; }

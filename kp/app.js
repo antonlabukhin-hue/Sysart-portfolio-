@@ -112,9 +112,35 @@
     return c.dmx ? 'dmx' : (p.usd.mono != null ? 'mono' : 'dmx');
   }
 
+  // Допустимые длины жёстких линейных светильников, мм — таблица производства (26.10.2026).
+  // Контурные — все жёсткие, кроме гибкого неона и ленты; заливающие — все жёсткие.
+  const LENGTHS = {
+    contour: {
+      24: [143, 163.5, 184, 204.5, 225, 245.5, 266, 286.5, 307, 327.5, 348, 368.5, 389, 409.5, 430, 450.5, 471, 491.5, 512, 532.5,
+        553, 573.5, 594, 614.5, 635, 655.5, 676, 696.5, 717, 737.5, 758, 778.5, 799, 819.5, 840, 860.5, 881, 901.5, 922, 942.5,
+        963, 983.5, 1004, 1024.5, 1045, 1065.5, 1086, 1106.5, 1127, 1147.5, 1168, 1188.5, 1209, 1229.5, 1250, 1270.5, 1291, 1311.5,
+        1332, 1352.5, 1373, 1393.5, 1414, 1434.5, 1455, 1475.5, 1496],
+      48: [143, 184, 225, 266, 307, 348, 389, 430, 471, 512, 553, 594, 635, 676, 717, 758, 799, 840, 881, 922, 963, 1004, 1045,
+        1086, 1127, 1168, 1209, 1250, 1291, 1332, 1373, 1414, 1455, 1496],
+    },
+    washer: {
+      24: [188.1, 215.5, 242.8, 270.2, 297.5, 324.9, 352.2, 379.6, 406.9, 434.3, 461.6, 489, 516.3, 543.7, 571, 598.4, 625.7, 653.1,
+        680.4, 707.8, 735.1, 762.5, 789.8, 817.2, 844.5, 871.9, 899.2, 926.6, 953.9, 981.3, 1008.6, 1036, 1063.3, 1090.7, 1118,
+        1145.4, 1172.7, 1200.1, 1227.4, 1254.8, 1282.1, 1309.5, 1336.8, 1364.2, 1391.5, 1418.9, 1446.2, 1473.6, 1500.9],
+      48: [188.1, 242.8, 297.5, 352.2, 406.9, 461.6, 516.3, 571, 625.7, 680.4, 735.1, 789.8, 844.5, 899.2, 953.9, 1008.6, 1063.3,
+        1118, 1172.7, 1227.4, 1282.1, 1336.8, 1391.5, 1446.2, 1500.9],
+    },
+  };
+  // Список длин для выбранного напряжения или null — тогда длины из прайса и «другая»
+  const lengthTable = (p, v) => (isRigid(p) && LENGTHS[p.cat] && LENGTHS[p.cat][v]) || null;
+  const nearest = (list, x) => list.reduce((a, b) => Math.abs(b - x) < Math.abs(a - x) ? b : a);
+  const fmtLen = l => String(l).replace('.', ',');
+
   function voltagesOf(p) {
     if (p.markups.v220 === 'only220') return [220];
     const v = [...(p.voltages || [])];
+    // По таблице длин у жёстких контурных и заливающих есть исполнение 48 В
+    if (lengthTable(p, 48) && v.includes(24) && !v.includes(48)) v.splice(v.indexOf(24) + 1, 0, 48);
     if (typeof p.markups.v220 === 'number' && !v.includes(220)) v.push(220);
     return v;
   }
@@ -142,8 +168,9 @@
     const cat = catOf(p);
     const col = colorsOf(p);
     const v = voltagesOf(p);
+    const tbl = lengthTable(p, v[0]);
     return {
-      length: isRigid(p) ? (cat.lengths?.includes(1000) ? 1000 : cat.lengths?.[0] || 1000) : null,
+      length: !isRigid(p) ? null : tbl ? nearest(tbl, 1000) : (cat.lengths?.includes(1000) ? 1000 : cat.lengths?.[0] || 1000),
       color: col.temps.includes(3000) ? 3000 : (col.temps[0] ?? col.rgb[0] ?? null),
       dmx: p.usd.mono == null && p.usd.dmx != null,
       angle: p.angles?.[0] ?? null,
@@ -179,7 +206,7 @@
     const col = priceCol(p, c);
     if (col !== 'mono') parts.push(/PWM/i.test(p.sku) ? 'PWM' : 'DMX');
     if (c.voltage) parts.push(`${c.voltage}В`);
-    if (isRigid(p) && c.length) parts.push(`${c.length}мм`);
+    if (isRigid(p) && c.length) parts.push(`${fmtLen(c.length)}мм`);
     if (p.ip) parts.push(p.ip);
     if (c.paint) parts.push(`окраска RAL ${c.ral || '(по согласованию)'}`);
     if (c.visor) parts.push('с козырьком');
@@ -383,10 +410,22 @@
     const cols = colorsOf(p);
     const rows = [];
 
+    // У жёстких линейных напряжение идёт перед длиной: от него зависит список длин
+    const vs = voltagesOf(p);
+    const voltageRow = ['Напряжение', `<div class="chips">${vs.map(v => chip('voltage', v, v + ' В', c.voltage === v,
+      v === 220 && typeof p.markups.v220 === 'number' ? '+' + fmt(p.markups.v220) + ' ₽' : '')).join('')}</div>`];
     if (isRigid(p)) {
-      const lens = cat.lengths || [];
-      rows.push(['Длина, мм', `<div class="chips">${lens.map(l => chip('length', l, l, c.length === l, '×' + fmtK(lengthFactor(l)))).join('')}
-        <span class="chip-sep"></span><input type="number" data-in="length" min="50" max="3000" step="1" placeholder="другая" value="${lens.includes(c.length) ? '' : c.length}"></div>`]);
+      if (vs.length) rows.push(voltageRow);
+      const tbl = lengthTable(p, c.voltage);
+      if (tbl) {
+        rows.push(['Длина, мм', `<div class="len-pick"><select data-sel="length" aria-label="Длина светильника">${tbl.map(l =>
+          `<option value="${l}" ${l === c.length ? 'selected' : ''}>${fmtLen(l)} мм · ×${fmtK(lengthFactor(l))}</option>`).join('')}</select>
+          <small class="muted">${tbl.length} вариантов для ${c.voltage} В, от ${fmtLen(tbl[0])} до ${fmtLen(tbl[tbl.length - 1])} мм</small></div>`]);
+      } else {
+        const lens = cat.lengths || [];
+        rows.push(['Длина, мм', `<div class="chips">${lens.map(l => chip('length', l, l, c.length === l, '×' + fmtK(lengthFactor(l)))).join('')}
+          <span class="chip-sep"></span><input type="number" data-in="length" min="50" max="3000" step="1" placeholder="другая" value="${lens.includes(c.length) ? '' : c.length}"></div>`]);
+      }
     }
     if (cols.temps.length || cols.mono.length || cols.rgb.length) {
       rows.push(['Цвет свечения', `<div class="chips">${cols.temps.map(t => chip('color', t, t + 'K', c.color === t)).join('')}
@@ -403,11 +442,7 @@
       rows.push([`Мощность, ${p.powerUnit}`, `<div class="chips">${pw.map(w => chip('power', w, 'до ' + w, c.power === w,
         isRigid(p) && c.length ? `≈${Math.round(w * c.length / 1000)} Вт` : '')).join('')}</div>`]);
     }
-    const vs = voltagesOf(p);
-    if (vs.length) {
-      rows.push(['Напряжение', `<div class="chips">${vs.map(v => chip('voltage', v, v + ' В', c.voltage === v,
-        v === 220 && typeof p.markups.v220 === 'number' ? '+' + fmt(p.markups.v220) + ' ₽' : '')).join('')}</div>`]);
-    }
+    if (vs.length && !isRigid(p)) rows.push(voltageRow);
     if (typeof p.markups.paint === 'number') {
       rows.push(['Окраска', `<div class="chips">${chip('paint', false, 'Стандартная', !c.paint)}${chip('paint', true, 'RAL', c.paint, '+' + fmt(p.markups.paint) + ' ₽')}
         ${c.paint ? `<input type="text" data-in="ral" placeholder="№ RAL" value="${esc(c.ral)}">` : ''}</div>`]);
@@ -421,7 +456,7 @@
     const base = basePrice(p, c);
     const unit = base == null ? null : adjusted(base);
     const unitName = isFlex(p) ? 'м' : 'шт.';
-    const lenNote = isRigid(p) && c.length ? `<div class="cfg-note muted">Длина ${c.length} мм → ×${fmtK(lengthFactor(c.length))} от цены 1 м</div>` : '';
+    const lenNote = isRigid(p) && c.length ? `<div class="cfg-note muted">Длина ${fmtLen(c.length)} мм → ×${fmtK(lengthFactor(c.length))} от цены 1 м</div>` : '';
     const minNote = isFlex(p) ? '<div class="cfg-note">Гибкие светильники — заказ от 100 метров.</div>' : '';
 
     $('#cfgBody').innerHTML = `
@@ -454,6 +489,15 @@
       const v = JSON.parse(b.dataset.v);
       CFG.c[k] = v;
       if (k === 'color' && (v === 'RGB' || v === 'RGBW')) CFG.c.dmx = true;
+      // Сменили напряжение — длину переводим на ближайшую допустимую для него
+      if (k === 'voltage') {
+        const tbl = lengthTable(CFG.p, v);
+        if (tbl && !tbl.includes(CFG.c.length)) {
+          const was = CFG.c.length;
+          CFG.c.length = nearest(tbl, was || 1000);
+          if (was) toast(`Для ${v} В длина ${fmtLen(was)} мм недоступна — выбрана ${fmtLen(CFG.c.length)} мм`);
+        }
+      }
       renderCfg();
       return;
     }
@@ -473,6 +517,9 @@
     const k = e.target.dataset.in;
     if (!k) return;
     if (k === 'length') { const v = Math.round(+e.target.value); if (v > 0) CFG.c.length = v; renderCfg(); }
+  });
+  $('#cfgBody').addEventListener('change', e => {
+    if (e.target.dataset.sel === 'length') { CFG.c.length = +e.target.value; renderCfg(); }
     if (k === 'ral') { CFG.c.ral = e.target.value.trim(); renderCfg(); }
     if (k === 'qty') CFG.qty = Math.max(1, +e.target.value || 1);
   });
