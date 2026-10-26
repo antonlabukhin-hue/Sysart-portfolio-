@@ -27,12 +27,14 @@
     <label class="check"><input id="lockRemember" type="checkbox"> Запомнить на этом устройстве</label>
     <button class="btn btn-main" type="submit">Открыть</button>
     <p id="lockErr" class="lock-err" hidden>Неверный пароль</p>
+    <a href="../" class="back-link lock-back"><span>←</span> <b>Вернуться на сайт</b></a>
   </form>
 </section>
 
 <div id="app" class="app" hidden>
   <header class="top">
-    <img src="logo.png" alt="Система Арт" class="top-logo">
+    <a href="../" class="top-home" aria-label="На сайт sysartspb.com"><img src="logo.png" alt="Система Арт" class="top-logo"></a>
+    <a href="../" class="back-link"><span>←</span> <b>На сайт</b></a>
     <div class="top-title"><span class="eyebrow">Конфигуратор КП</span><b id="priceDate"></b></div>
     <div class="top-settings">
       <label title="Курс продажи доллара">$ <input id="setRate" type="number" step="0.1" min="1"></label>
