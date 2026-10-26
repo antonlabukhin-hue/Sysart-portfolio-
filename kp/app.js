@@ -138,9 +138,14 @@
   const nearest = (list, x) => list.reduce((a, b) => Math.abs(b - x) < Math.abs(a - x) ? b : a);
   const fmtLen = l => String(l).replace('.', ',');
 
+  // Текст «Параметры» из прайса без 36 В в строке «Напряжение питания 24/36/48/220 В»
+  const paramsText = p => String(p.params || '').replace(/(Напряжение питания[:\s]*)([\d\/\s,DCВ]+)/i, (m, a, b) =>
+    a + b.replace(/(^|\/)\s*36\s*(?=\/|\s|В|$)/g, '$1').replace(/\/{2,}/g, '/').replace(/^\//, '').replace(/\/(\s*В)/, '$1'));
+
   function voltagesOf(p) {
     if (p.markups.v220 === 'only220') return [220];
-    const v = [...(p.voltages || [])];
+    // 36 В не предлагаем (решение 26.10.2026) — ни в выборе, ни в тексте характеристик (paramsText)
+    const v = (p.voltages || []).filter(x => x !== 36);
     // По таблице длин у жёстких контурных и заливающих есть исполнение 48 В
     if (lengthTable(p, 48) && v.includes(24) && !v.includes(48)) v.splice(v.indexOf(24) + 1, 0, 48);
     if (typeof p.markups.v220 === 'number' && !v.includes(220)) v.push(220);
@@ -469,7 +474,7 @@
           <h2>${esc(p.sku)}</h2>
           <div class="muted">${esc(p.type)}</div>
           ${p.note ? `<div class="cfg-note">${esc(p.note)}</div>` : ''}
-          <details class="cfg-params" ${innerWidth > 600 ? 'open' : ''}><summary>Характеристики</summary>${esc(p.params)}</details>
+          <details class="cfg-params" ${innerWidth > 600 ? 'open' : ''}><summary>Характеристики</summary>${esc(paramsText(p))}</details>
         </div>
       </div>
       ${rows.map(([t, h]) => `<div class="opt"><b>${t}</b>${h}</div>`).join('')}
