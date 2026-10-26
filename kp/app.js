@@ -95,10 +95,16 @@
   const roundTo = n => { const r = +S.round || 1; return Math.round(n / r) * r; };
   const adjusted = n => roundTo(n * (1 + (+S.adjust || 0) / 100));
 
+  // Коэффициент к цене 1 м для линейных (правило от 26.10.2026):
+  // до 300 мм ×0,55; 301–512 мм ×0,75; 513–1000 мм ×1;
+  // длиннее 1000 мм — длина в метрах с округлением вверх до 0,1 (1100 → 1,1; 1120 → 1,2; 1220 → 1,3)
   function lengthFactor(mm) {
-    for (const [lim, f] of DATA.general.lengthRule) if (mm <= lim) return f;
-    return mm / 1000; // длиннее 1,5 м правила в прайсе нет — считаем пропорционально
+    if (mm <= 300) return 0.55;
+    if (mm <= 512) return 0.75;
+    if (mm <= 1000) return 1;
+    return Math.ceil(Math.round(mm) / 100) / 10;
   }
+  const fmtK = f => String(f).replace('.', ',');
 
   function priceCol(p, c) {
     if (c.color === 'RGB') return 'dmx';
@@ -358,7 +364,7 @@
 
     if (isRigid(p)) {
       const lens = cat.lengths || [];
-      rows.push(['Длина, мм', `<div class="chips">${lens.map(l => chip('length', l, l, c.length === l, '×' + lengthFactor(l))).join('')}
+      rows.push(['Длина, мм', `<div class="chips">${lens.map(l => chip('length', l, l, c.length === l, '×' + fmtK(lengthFactor(l)))).join('')}
         <span class="chip-sep"></span><input type="number" data-in="length" min="50" max="3000" step="1" placeholder="другая" value="${lens.includes(c.length) ? '' : c.length}"></div>`]);
     }
     if (cols.temps.length || cols.mono.length || cols.rgb.length) {
@@ -394,7 +400,7 @@
     const base = basePrice(p, c);
     const unit = base == null ? null : adjusted(base);
     const unitName = isFlex(p) ? 'м' : 'шт.';
-    const longNote = isRigid(p) && c.length > 1500 ? '<div class="cfg-note">Длина больше 1,5 м: в прайсе нет правила, цена посчитана пропорционально — уточните у производства.</div>' : '';
+    const lenNote = isRigid(p) && c.length ? `<div class="cfg-note muted">Длина ${c.length} мм → ×${fmtK(lengthFactor(c.length))} от цены 1 м</div>` : '';
     const minNote = isFlex(p) ? '<div class="cfg-note">Гибкие светильники — заказ от 100 метров.</div>' : '';
 
     $('#cfgBody').innerHTML = `
@@ -409,7 +415,7 @@
         </div>
       </div>
       ${rows.map(([t, h]) => `<div class="opt"><b>${t}</b>${h}</div>`).join('')}
-      ${longNote}${minNote}
+      ${lenNote}${minNote}
       <div class="cfg-sum">
         <div class="cfg-name">${esc(lineName(p, c))}</div>
         <div class="cfg-price"><b>${unit == null ? 'нет цены' : fmt(unit) + ' ₽'}</b><small>за ${unitName} · ${S.vat ? 'с НДС' : 'без НДС'}${S.adjust ? ` · ${S.adjust > 0 ? '+' : ''}${S.adjust} %` : ''}</small></div>
