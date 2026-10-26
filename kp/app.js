@@ -314,6 +314,7 @@
   $('#setAdjust').addEventListener('change', e => { S.adjust = +e.target.value || 0; saveSettings(); refreshPrices(); });
   function refreshPrices() {
     renderGrid();
+    updateCount();
     if (!$('#kp').hidden) renderKp();
     if (!$('#cfg').hidden) renderCfg();
     toast(`Курс ${S.rate} · ${S.vat ? 'с НДС' : 'без НДС'} · ${S.adjust > 0 ? '+' : ''}${S.adjust} %`);
@@ -404,7 +405,7 @@
           <h2>${esc(p.sku)}</h2>
           <div class="muted">${esc(p.type)}</div>
           ${p.note ? `<div class="cfg-note">${esc(p.note)}</div>` : ''}
-          <div class="cfg-params">${esc(p.params)}</div>
+          <details class="cfg-params" ${innerWidth > 600 ? 'open' : ''}><summary>Характеристики</summary>${esc(p.params)}</details>
         </div>
       </div>
       ${rows.map(([t, h]) => `<div class="opt"><b>${t}</b>${h}</div>`).join('')}
@@ -413,7 +414,7 @@
         <div class="cfg-name">${esc(lineName(p, c))}</div>
         <div class="cfg-price"><b>${unit == null ? 'нет цены' : fmt(unit) + ' ₽'}</b><small>за ${unitName} · ${S.vat ? 'с НДС' : 'без НДС'}${S.adjust ? ` · ${S.adjust > 0 ? '+' : ''}${S.adjust} %` : ''}</small></div>
         <div class="cfg-buy">
-          <input type="number" data-in="qty" min="1" step="1" value="${CFG.qty}" aria-label="Количество">
+          <div class="qty"><button data-step="-1" aria-label="Меньше">−</button><input type="number" inputmode="numeric" data-in="qty" min="1" step="1" value="${CFG.qty}" aria-label="Количество"><button data-step="1" aria-label="Больше">+</button></div>
           <button class="btn btn-main" id="cfgAdd" ${unit == null ? 'disabled' : ''}>${CFG.editIndex != null ? 'Сохранить' : 'В КП'}</button>
         </div>
       </div>`;
@@ -429,7 +430,17 @@
       renderCfg();
       return;
     }
+    const st = e.target.closest('[data-step]');
+    if (st) {
+      const q = $('#cfgBody [data-in="qty"]');
+      CFG.qty = Math.max(1, (+q.value || 0) + +st.dataset.step * (isFlex(CFG.p) && CFG.qty >= 100 ? 10 : 1));
+      q.value = CFG.qty;
+      return;
+    }
     if (e.target.id === 'cfgAdd') addToKp();
+  });
+  $('#cfgBody').addEventListener('input', e => {
+    if (e.target.dataset.in === 'qty') CFG.qty = Math.max(1, +e.target.value || 1);
   });
   $('#cfgBody').addEventListener('change', e => {
     const k = e.target.dataset.in;
@@ -462,7 +473,18 @@
     updateCount();
   }
 
-  function updateCount() { $('#kpCount').textContent = KP.lines.length; }
+  function updateCount() {
+    $('#kpCount').textContent = KP.lines.length;
+    // Панель КП внизу (на телефоне)
+    const n = KP.lines.length;
+    $('#dock').hidden = !n;
+    document.body.classList.toggle('has-dock', !!n);
+    if (n) {
+      $('#dockSum').textContent = fmt(kpTotal()) + ' ₽';
+      $('#dockInfo').textContent = `позиций: ${n} · ${S.vat ? 'с НДС' : 'без НДС'}`;
+    }
+  }
+  $('#dock').addEventListener('click', e => { if (e.target.closest('button')) { renderKp(); openSheet('#kp'); } });
 
   // ---------- Экран КП ----------
   $('#openKp').addEventListener('click', () => { renderKp(); openSheet('#kp'); });
@@ -512,6 +534,7 @@
   }
 
   function renderTotal() {
+    updateCount();
     const t = kpTotal();
     const w = kpWeight();
     $('#kpTotal').innerHTML = `<div class="big">${fmt(t)} ₽</div>
