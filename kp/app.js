@@ -694,6 +694,174 @@
     location.reload();
   });
 
+  // ---------- Excel ----------
+  // ExcelJS грузим только по нажатию: библиотека ~1 МБ
+  function loadExcelJS() {
+    if (window.ExcelJS) return Promise.resolve();
+    return new Promise((res, rej) => {
+      const s = document.createElement('script');
+      s.src = 'https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.4.0/exceljs.min.js';
+      s.onload = res;
+      s.onerror = rej;
+      document.head.appendChild(s);
+    });
+  }
+
+  // Excel не читает webp — перерисовываем фото в png через canvas
+  function photoPng(file, size = 160) {
+    return new Promise(res => {
+      const img = new Image();
+      img.onload = () => {
+        const c = document.createElement('canvas');
+        c.width = c.height = size;
+        c.getContext('2d').drawImage(img, 0, 0, size, size);
+        res(c.toDataURL('image/png'));
+      };
+      img.onerror = () => res(null);
+      img.src = 'img/' + file;
+    });
+  }
+
+  function kpFileName(ext) {
+    const m = KP.meta;
+    return ['КП Система Арт', m.client, m.object, fmtDate(m.date)].filter(Boolean).join(' — ').replace(/[\\/:*?"<>|]/g, '') + ext;
+  }
+
+  async function buildXlsx() {
+    await loadExcelJS();
+    const m = KP.meta;
+    const mg = S.manager;
+    const wb = new ExcelJS.Workbook();
+    const ws = wb.addWorksheet('КП', { pageSetup: { paperSize: 9, orientation: 'portrait', fitToPage: true, fitToWidth: 1, fitToHeight: 0, margins: { left: 0.4, right: 0.4, top: 0.5, bottom: 0.5, header: 0.2, footer: 0.2 } } });
+    ws.columns = [{ width: 5 }, { width: 11 }, { width: 58 }, { width: 8 }, { width: 9 }, { width: 13 }, { width: 15 }];
+    const font = { name: 'Arial', size: 10 };
+    const red = 'FFEF3B36', ink = 'FF0A0A0A', grey = 'FF8C8B86', line = 'FFE6E4DF';
+    const money = '#,##0';
+
+    // Шапка: тёмная полоса с логотипом и контактами
+    ws.mergeCells('A1:G1');
+    ws.getRow(1).height = 46;
+    ws.getCell('A1').fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ink } };
+    ws.getCell('A1').value = [mg.phone, mg.email, 'sysartspb.com'].filter(Boolean).join('   ·   ');
+    ws.getCell('A1').font = { ...font, size: 9, color: { argb: 'FFCFCBC3' } };
+    ws.getCell('A1').alignment = { horizontal: 'right', vertical: 'middle', indent: 1 };
+    const logo = await fetch('logo.png').then(r => r.arrayBuffer()).catch(() => null);
+    if (logo) ws.addImage(wb.addImage({ buffer: logo, extension: 'png' }), { tl: { col: 0.15, row: 0.12 }, ext: { width: 120, height: 54 } });
+    ws.getRow(1).height = 48;
+
+    ws.mergeCells('A2:G2');
+    ws.getCell('A2').value = 'Коммерческое предложение';
+    ws.getCell('A2').font = { ...font, size: 18, bold: true };
+    ws.getRow(2).height = 34;
+    ws.getCell('A2').alignment = { vertical: 'middle' };
+
+    let r = 3;
+    const info = [['Заказчик', m.client || '—'], ['Объект', m.object || '—'], ['№ КП', m.number], ['Дата', fmtDate(m.date)]];
+    for (const [k, v] of info) {
+      ws.mergeCells(`A${r}:B${r}`);
+      ws.mergeCells(`C${r}:G${r}`);
+      ws.getCell(`A${r}`).value = k;
+      ws.getCell(`A${r}`).font = { ...font, size: 9, color: { argb: grey } };
+      ws.getCell(`C${r}`).value = v;
+      ws.getCell(`C${r}`).font = { ...font, bold: true };
+      r++;
+    }
+    r++;
+
+    // Таблица позиций
+    const head = ['№', '', 'Наименование', 'Ед.', 'Кол-во', 'Цена, ₽', S.vat ? 'Стоимость, ₽ с НДС' : 'Стоимость, ₽'];
+    ws.getRow(r).values = head;
+    ws.getRow(r).height = 28;
+    ws.getRow(r).eachCell(c => {
+      c.font = { ...font, size: 9, bold: true, color: { argb: 'FFFFFFFF' } };
+      c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: ink } };
+      c.alignment = { vertical: 'middle', horizontal: c.col >= 4 ? 'center' : 'left', wrapText: true };
+    });
+    const first = r + 1;
+    for (let i = 0; i < KP.lines.length; i++) {
+      const l = KP.lines[i];
+      r++;
+      const row = ws.getRow(r);
+      row.values = [i + 1, '', lineTitle(l), l.unit, +l.qty || 0, lineUnitPrice(l), { formula: `E${r}*F${r}`, result: lineSum(l) }];
+      row.height = 50;
+      row.eachCell({ includeEmpty: true }, c => {
+        c.font = font;
+        c.alignment = { vertical: 'middle', wrapText: c.col === 3, horizontal: c.col === 1 || c.col === 4 ? 'center' : undefined };
+        c.border = { bottom: { style: 'thin', color: { argb: line } } };
+      });
+      row.getCell(6).numFmt = money;
+      row.getCell(7).numFmt = money;
+      row.getCell(7).font = { ...font, bold: true };
+      const p = PROD[l.pid];
+      const png = p?.photo ? await photoPng(p.photo) : null;
+      if (png) ws.addImage(wb.addImage({ base64: png, extension: 'png' }), { tl: { col: 1.08, row: r - 1 + 0.06 }, ext: { width: 60, height: 60 } });
+    }
+    const last = r;
+    r += 2;
+    const total = kpTotal();
+    if (S.vat) {
+      ws.mergeCells(`C${r}:F${r}`);
+      ws.getCell(`C${r}`).value = 'В том числе НДС 22 %';
+      ws.getCell(`C${r}`).alignment = { horizontal: 'right' };
+      ws.getCell(`C${r}`).font = font;
+      ws.getCell(`G${r}`).value = { formula: `ROUND(G${r + 1}*22/122,0)`, result: Math.round(total * 22 / 122) };
+      ws.getCell(`G${r}`).numFmt = money;
+      ws.getCell(`G${r}`).font = font;
+      r++;
+    }
+    ws.mergeCells(`C${r}:F${r}`);
+    ws.getCell(`C${r}`).value = 'ИТОГО';
+    ws.getCell(`C${r}`).alignment = { horizontal: 'right' };
+    ws.getCell(`C${r}`).font = { ...font, size: 13, bold: true };
+    ws.getCell(`G${r}`).value = { formula: `SUM(G${first}:G${last})`, result: total };
+    ws.getCell(`G${r}`).numFmt = money;
+    ws.getCell(`G${r}`).font = { ...font, size: 13, bold: true, color: { argb: red } };
+    ws.getCell(`G${r}`).border = { top: { style: 'medium', color: { argb: ink } } };
+
+    // Условия, примечание, подпись
+    r += 2;
+    const block = (title, rows) => {
+      ws.getCell(`A${r}`).value = title;
+      ws.getCell(`A${r}`).font = { ...font, size: 9, bold: true, color: { argb: red } };
+      r++;
+      for (const t of rows) {
+        ws.mergeCells(`A${r}:G${r}`);
+        ws.getCell(`A${r}`).value = t;
+        ws.getCell(`A${r}`).font = font;
+        ws.getCell(`A${r}`).alignment = { wrapText: true, vertical: 'top' };
+        r++;
+      }
+      r++;
+    };
+    block('УСЛОВИЯ', docTerms().map(t => '• ' + t));
+    if (m.note) block('ПРИМЕЧАНИЕ', [m.note]);
+    block('С УВАЖЕНИЕМ', [mg.name, mg.title, S.company, [mg.phone, mg.email].filter(Boolean).join(' · ')].filter(Boolean));
+
+    const buf = await wb.xlsx.writeBuffer();
+    const a = document.createElement('a');
+    a.href = URL.createObjectURL(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
+    a.download = kpFileName('.xlsx');
+    document.body.appendChild(a);
+    a.click();
+    setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
+  }
+
+  $('#kpXlsx').addEventListener('click', async e => {
+    if (!KP.lines.length) { toast('В КП нет позиций'); return; }
+    const b = e.currentTarget;
+    b.disabled = true;
+    b.textContent = 'Готовлю…';
+    sendKpMail();
+    try {
+      await buildXlsx();
+    } catch (err) {
+      console.error(err);
+      toast('Не удалось собрать Excel, проверьте интернет');
+    }
+    b.disabled = false;
+    b.textContent = 'Скачать Excel';
+  });
+
   // ---------- PDF ----------
   $('#kpPdf').addEventListener('click', async () => {
     if (!KP.lines.length) { toast('В КП нет позиций'); return; }
@@ -767,15 +935,20 @@
     }
   }
 
-  function buildDoc() {
+  function docTerms() {
     const m = KP.meta;
-    const t = kpTotal();
-    const terms = [
+    return [
       m.delivery && `Срок поставки: ${m.delivery}`,
       m.warranty && `Гарантия: ${m.warranty}`,
       m.payment && `Оплата: ${m.payment}`,
       ...String(m.terms || '').split('\n').map(s => s.trim()).filter(Boolean),
     ].filter(Boolean);
+  }
+
+  function buildDoc() {
+    const m = KP.meta;
+    const t = kpTotal();
+    const terms = docTerms();
     const mg = S.manager;
     $('#print').innerHTML = `<div class="doc">
       <div class="doc-head">
