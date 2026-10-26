@@ -99,7 +99,16 @@
         .burger { display: none; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); background: rgba(10,10,10,.4); flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
         .burger span { width: 18px; height: 2px; background: var(--paper); border-radius: 2px; }
         .burger span + span { width: 12px; margin-left: 6px; background: var(--lime); }
-        @media (max-width: 1180px) { .header-phone { display: none; } }
+        /* Вход для партнёров: конфигуратор КП по паролю (/kp/) */
+        .header-partner { height: 42px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22); display: inline-flex; align-items: center; gap: 8px; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #cfcbc3; white-space: nowrap; transition: color .25s, border-color .25s; }
+        .header-partner svg { width: 14px; height: 14px; color: var(--lime); flex: none; }
+        .header-partner:hover { color: var(--paper); border-color: var(--lime); }
+        .mnav-bottom .line svg { width: 15px; height: 15px; color: var(--lime); margin-right: 8px; }
+        @media (max-width: 1180px) {
+            .header-phone { display: none; }
+            .header-partner { width: 42px; padding: 0; justify-content: center; }
+            .header-partner span { display: none; }
+        }
 
         /* Мобильное меню на весь экран */
         .mnav { display: none; position: fixed; inset: 0; z-index: 9400; background: radial-gradient(ellipse 70% 50% at 90% 10%, rgba(239,59,54,.18), transparent 70%), rgba(8,8,9,.97); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); flex-direction: column; padding: 22px 20px 32px; }
@@ -548,7 +557,7 @@
         /* --- ИДЕАЛЬНАЯ АДАПТАЦИЯ ДЛЯ ТЕЛЕФОНОВ --- */
         @media (max-width: 760px) {
             .site-header { padding: 0 20px; }
-            .main-nav, .header-cta, .header-phone { display: none; }
+            .main-nav, .header-cta, .header-phone, .header-partner { display: none; }
             .header-back { height: 40px; padding: 0 14px; margin: 0 auto 0 12px; }
             .burger { display: flex; }
             
@@ -641,6 +650,7 @@
         </nav>
         <div class="header-actions">
             <a class="header-phone" href="tel:+79149704000">+7 914 970 40 00</a>
+            <a class="header-partner" href="kp/" target="_blank" rel="noopener" title="Оптовый прайс и расчёт КП — вход по паролю"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Партнёрам</span></a>
             <button class="header-cta" onclick="openCallback()">Связаться</button>
             <button class="burger" onclick="toggleMenu(true)" aria-label="Открыть меню"><span></span><span></span></button>
         </div>
@@ -988,6 +998,7 @@
         </nav>
         <div class="mnav-bottom">
             <button class="main" onclick="toggleMenu(false); openCallback();">Заказать звонок</button>
+            <a class="line" href="kp/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Вход для партнёров</a>
             <a class="line" href="mailto:info@sysart.ru">info@sysart.ru</a>
         </div>
     </div>
