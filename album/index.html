@@ -53,19 +53,25 @@
         .kicker i { width: 32px; height: 1px; background: var(--lime); }
         h1 { font-size: clamp(40px, 6.4vw, 92px); line-height: .9; letter-spacing: -.05em; font-weight: 700; margin: 0; }
         h1 em { color: var(--lime); font-style: normal; font-weight: 400; }
-        .intro p { max-width: 430px; margin: 0; color: #cfcbc3; font-size: 15px; line-height: 1.55; }
+        /* Как собрать альбом: три шага */
+        .steps { list-style: none; margin: 0; padding: 0; display: grid; grid-template-columns: repeat(3, minmax(0, 210px)); gap: 12px; counter-reset: s; }
+        .steps li { counter-increment: s; padding: 16px 16px 18px; border-radius: 12px; border: 1px solid rgba(255,255,255,.1); background: rgba(255,255,255,.03); font-size: 13px; line-height: 1.45; color: #cfcbc3; }
+        .steps li::before { content: '0' counter(s); display: block; margin-bottom: 10px; font-family: 'DM Mono', monospace; font-size: 11px; letter-spacing: .1em; color: var(--lime); }
+        .steps b { display: block; margin-bottom: 4px; color: var(--paper); font-size: 15px; font-weight: 600; letter-spacing: -.01em; }
 
-        /* --- Панель фильтров --- */
-        .toolbar { position: sticky; top: 84px; z-index: 20; display: flex; align-items: center; gap: 8px; padding: 14px clamp(16px, 5vw, 80px); background: rgba(10,10,10,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
-        .toolbar::-webkit-scrollbar { display: none; }
-        .chip { flex: none; height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); color: #cfcbc3; white-space: nowrap; transition: color .2s, border-color .2s, background .2s; }
+        /* --- Фильтры: категории переносятся на новую строку, всё видно без прокрутки --- */
+        .toolbar { display: flex; align-items: flex-start; justify-content: space-between; gap: 12px 24px; padding: 16px clamp(16px, 5vw, 80px); border-bottom: 1px solid var(--line); }
+        .chips { display: flex; flex-wrap: wrap; gap: 8px; min-width: 0; }
+        .chip { flex: none; height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); color: #cfcbc3; font-size: 14px; white-space: nowrap; transition: color .2s, border-color .2s, background .2s; }
         .chip b { color: var(--muted); font-weight: 400; margin-left: 4px; }
         .chip:hover { color: var(--paper); border-color: rgba(255,255,255,.4); }
         .chip.on { color: var(--paper); background: rgba(239,59,54,.18); border-color: rgba(239,59,54,.55); }
-        .toolbar .sep { flex: none; width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
-        .toolbar .act { flex: none; height: 36px; padding: 0 10px; color: var(--muted); white-space: nowrap; }
-        .toolbar .act:hover { color: var(--paper); }
-
+        .chip.on b { color: #f3a5a2; }
+        .acts { flex: none; display: flex; gap: 4px; }
+        .toolbar .act { height: 36px; padding: 0 12px; border-radius: 999px; color: var(--muted); white-space: nowrap; transition: color .2s, background .2s; }
+        .toolbar .act:hover { color: var(--paper); background: rgba(255,255,255,.06); }
+        .cat-select { display: none; flex: 1; min-width: 0; height: 40px; padding: 0 36px 0 14px; border-radius: 999px; border: 1px solid rgba(239,59,54,.55); background: rgba(239,59,54,.12) url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24' fill='none' stroke='%23ef3b36' stroke-width='2.5'%3E%3Cpath d='M6 9l6 6 6-6'/%3E%3C/svg%3E") right 12px center / 16px no-repeat; color: var(--paper); font: inherit; font-size: 14px; -webkit-appearance: none; appearance: none; }
+        .cat-select option { background: #141414; color: #fff; }
         /* --- Сетка объектов --- */
         .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; padding: 24px clamp(16px, 5vw, 80px); }
         .obj { position: relative; text-align: left; display: block; border-radius: 6px; overflow: hidden; background: #141414; outline: 1px solid rgba(255,255,255,.06); transition: outline-color .2s, transform .2s; }
@@ -126,8 +132,16 @@
         @media (max-width: 760px) {
             .site-header { height: 68px; }
             .site-header img { height: 32px; }
-            .toolbar { top: 68px; }
             .header-back b { display: none; }
+            .steps { grid-template-columns: 1fr; gap: 8px; width: 100%; }
+            .steps li { position: relative; padding: 12px 14px 13px 46px; }
+            .steps li::before { position: absolute; left: 15px; top: 15px; margin: 0; }
+            .steps b { font-size: 14px; }
+            /* На телефоне категории — выпадающим списком, кнопки выбора — рядом */
+            .toolbar { align-items: center; gap: 8px; }
+            .chips { display: none; }
+            .cat-select { display: block; }
+            .toolbar .act { padding: 0 10px; font-size: 10px; }
             .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
             .obj .cap { padding: 10px 10px 12px; }
             .obj .cap b { font-size: 13px; }
@@ -155,7 +169,11 @@
             <div class="kicker mono"><i></i> Конструктор альбома</div>
             <h1>Соберите<br><em>свой</em> альбом.</h1>
         </div>
-        <p>Отметьте объекты и нажмите «Создать альбом» — получится PDF в нашем фирменном стиле: обложка, о компании, выбранные проекты по годам с описаниями, услуги, карта всех городов и контакты.</p>
+        <ol class="steps" aria-label="Как собрать альбом">
+            <li><b>Отметьте объекты</b> Нажмите на карточки нужных проектов — появится красная галочка.</li>
+            <li><b>Логотип</b> Оставьте галочку «С логотипом» или снимите её, чтобы указать свою компанию.</li>
+            <li><b>Создать альбом</b> Получите PDF: обложка, проекты по годам с описаниями, карта и контакты.</li>
+        </ol>
     </section>
 
     <nav class="toolbar" id="toolbar" aria-label="Фильтр объектов"></nav>
@@ -293,8 +311,10 @@
             const cats = {};
             objects.forEach(o => { cats[o.category] = (cats[o.category] || 0) + 1; });
             const list = [['Все', objects.length], ...Object.entries(cats).filter(([c]) => c).sort((a, b) => b[1] - a[1])];
-            $('toolbar').innerHTML = list.map(([c, n]) => `<button class="chip${c === filter ? ' on' : ''}" data-cat="${c}">${c}<b>${n}</b></button>`).join('')
-                + `<span class="sep"></span><button class="act mono" data-act="all">Выбрать видимые</button><button class="act mono" data-act="none">Снять всё</button>`;
+            $('toolbar').innerHTML =
+                `<div class="chips">${list.map(([c, n]) => `<button class="chip${c === filter ? ' on' : ''}" data-cat="${c}">${c}<b>${n}</b></button>`).join('')}</div>`
+                + `<select class="cat-select" aria-label="Категория">${list.map(([c, n]) => `<option value="${c}"${c === filter ? ' selected' : ''}>${c === 'Все' ? 'Все категории' : c} · ${n}</option>`).join('')}</select>`
+                + `<div class="acts"><button class="act mono" data-act="all">Выбрать все</button><button class="act mono" data-act="none">Снять</button></div>`;
         }
         function renderGrid() {
             const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
@@ -313,7 +333,7 @@
         function updateDock() {
             const n = selected.size;
             $('sel-count').textContent = n;
-            $('sel-word').textContent = `${albumPlural(n, 'объект', 'объекта', 'объектов')} выбрано`;
+            $('sel-word').textContent = n ? `${albumPlural(n, 'объект', 'объекта', 'объектов')} выбрано` : 'нажмите на карточки';
             $('go').disabled = !n;
         }
 
@@ -328,6 +348,10 @@
             });
             if (b.dataset.act === 'none') { selected.clear(); document.querySelectorAll('.obj').forEach(el => el.classList.remove('sel')); }
             updateDock();
+        });
+        $('toolbar').addEventListener('change', e => {
+            if (!e.target.matches('.cat-select')) return;
+            filter = e.target.value; renderToolbar(); applyFilter();
         });
         $('grid').addEventListener('click', e => {
             const el = e.target.closest('.obj'); if (!el) return;
