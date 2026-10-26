@@ -461,6 +461,14 @@
         .ab-e ul { margin: 14px 0 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 6px; }
         .ab-e li { font-size: 13px; line-height: 1.4; color: var(--muted); }
         .ab-e li b { color: #e6e2da; font-weight: 500; }
+        .ab-e-note { min-height: 2.8em; }
+        /* Невысокие экраны компьютера: хроника целиком помещается в экран */
+        @media (min-width: 761px) and (max-height: 860px) {
+            .ab-e-img { aspect-ratio: 16/7; }
+            .ab-e-title { min-height: 0; margin-bottom: 8px; }
+            .ab-e ul { margin-top: 10px; }
+            .ab-e li:nth-child(n+3) { display: none; }
+        }
         .ab-nums { display: grid; grid-template-columns: repeat(4, 1fr); border-top: 1px solid var(--line); margin-top: 48px; }
         .ab-nums div { padding: 26px 22px 0 0; }
         .ab-nums div + div { border-left: 1px solid var(--line); padding-left: 22px; }
@@ -477,8 +485,8 @@
         /* Блок партнёров: список выгод + колонка с кнопками */
         .ab-partner { display: grid; grid-template-columns: 1.3fr 1fr; gap: 24px; margin-top: 36px; }
         .ab-list { margin: 0; padding: 0; list-style: none; border-top: 1px solid var(--line); }
-        .ab-list li { position: relative; padding: 20px 0 20px 34px; border-bottom: 1px solid var(--line); font-size: 19px; line-height: 1.45; color: #c9c5bd; }
-        .ab-list li:before { content: ''; position: absolute; left: 0; top: 33px; width: 18px; height: 2px; background: var(--lime); }
+        .ab-list li { position: relative; padding: clamp(10px, 1.9vh, 20px) 0 clamp(10px, 1.9vh, 20px) 34px; border-bottom: 1px solid var(--line); font-size: 19px; line-height: 1.45; color: #c9c5bd; }
+        .ab-list li:before { content: ''; position: absolute; left: 0; top: calc(clamp(10px, 1.9vh, 20px) + 13px); width: 18px; height: 2px; background: var(--lime); }
         .ab-list b { color: var(--paper); font-weight: 600; }
         .ab-partner-side { background: #141416; border-radius: 6px; border-top: 3px solid var(--lime); padding: clamp(28px, 3vw, 40px); display: flex; flex-direction: column; gap: 14px; align-self: start; }
         .ab-partner-side p { margin: 0 0 10px; font-size: 17px; line-height: 1.5; color: #d2cec6; }
@@ -497,6 +505,13 @@
         .ab-strip div { background: var(--ink); padding: 26px; }
         .ab-strip b { display: block; font-size: 20px; margin-bottom: 6px; }
         .ab-strip span { font-size: 14px; color: #bdb9b1; line-height: 1.45; }
+        .ab-prod { margin-top: 36px; }
+        .ab-prod b { font-size: 19px; }
+        .ab-proof { margin: clamp(22px, 4vh, 40px) 0 0; max-width: 980px; font-size: 17px; line-height: 1.6; color: #c9c5bd; }
+        .ab-proof b { color: var(--lime); font-weight: 600; }
+        .ab-e-note { margin: -6px 0 12px; font-size: 13px; line-height: 1.4; color: #bdb9b1; }
+        .ab-offices { margin-top: 18px; font-size: 14px; line-height: 1.6; color: #bdb9b1; }
+        .ab-offices b { color: var(--paper); font-weight: 600; }
         .ab-cta { margin-top: clamp(40px, 9vh, 96px); display: flex; justify-content: space-between; align-items: flex-end; gap: 30px; flex-wrap: wrap; }
         .ab-contacts { display: flex; gap: 12px; flex-wrap: wrap; }
 
@@ -514,6 +529,9 @@
             .ab-list li { font-size: 18px; padding: 18px 0 18px 30px; }
             .ab-list li:before { top: 30px; }
             .ab-strip { grid-template-columns: 1fr 1fr; }
+            .ab-prod { grid-template-columns: 1fr; }
+            .ab-prod div { padding: 18px 20px; }
+            .ab-proof { font-size: 15px; }
             .ab-strip div { padding: 18px; }
         }
 
@@ -774,7 +792,7 @@
         <!-- ЭКРАН 4: КОНТАКТЫ + ПОДВАЛ -->
         <section class="snap-section contact-section" id="contact">
             <div class="contact-content">
-                <div class="contact-top"><span class="eyebrow" style="margin:0;">04 / Оставить заявку</span><span>Санкт-Петербург · Россия</span></div>
+                <div class="contact-top"><span class="eyebrow" style="margin:0;">04 / Оставить заявку</span><span>Владивосток · Санкт-Петербург</span></div>
                 <div class="cf-grid">
                     <div class="cf-main">
                         <h2>Есть объект?<br><em>Давайте добавим ему света.</em></h2>
@@ -933,7 +951,7 @@
             <div class="ab-nums">
                 <div><strong>17</strong><span>лет в архитектурном освещении, с 2009 года</span></div>
                 <div><strong id="ab-count">74+</strong><span>объектов в портфолио</span></div>
-                <div><strong>14</strong><span>городов и регионов — от Владивостока до Калининграда</span></div>
+                <div><strong id="ab-cities">27</strong><span>городов — от Калининграда до Камчатки</span></div>
                 <div><strong class="red">1 день</strong><span>на визуализацию и расчёт</span></div>
             </div>
         </div></section>
@@ -945,10 +963,12 @@
             <div class="ab-partner">
                 <ul class="ab-list">
                     <li><b>Скидка до 40%</b> от розничных цен для партнёров</li>
-                    <li><b>Светильники под ваше ТЗ</b> — собственное производство</li>
+                    <li><b>Светильники под ваше ТЗ</b> — завод в Китае работает только на нас</li>
+                    <li><b>Аналоги Philips и iGuzzini</b>, замена дорогих российских брендов</li>
                     <li><b>КП и визуализация за 1 день</b> для вашего заказчика</li>
+                    <li><b>Тестовые светильники бесплатно</b> — проверьте на объекте</li>
+                    <li><b>Агентское вознаграждение</b> за рекомендации</li>
                     <li><b>Техподдержка 24 часа</b> при монтаже и запуске</li>
-                    <li><b>Образцы</b>; постоянным партнёрам — бесплатная партия</li>
                 </ul>
                 <div class="ab-partner-side">
                     <p>Пришлите объект или спецификацию — подготовим КП и визуализацию. Оптовый прайс и скидка — после заключения договора о партнёрстве.</p>
@@ -959,14 +979,27 @@
             </div>
         </div></section>
 
-        <!-- 3: ХРОНИКА — одна полоса из четырёх эпох -->
+        <!-- 3: ПРОИЗВОДСТВО — Китай называем прямо и сразу показываем, почему это не риск -->
+        <section class="snap-section ab-screen"><div class="ab-wrap">
+            <div class="ab-eyebrow">Производство</div>
+            <h2 class="ab-h2">Делаем в Китае. <em>Под своим контролем.</em></h2>
+            <div class="ab-strip ab-prod">
+                <div><b>Завод работает только на нас</b><span>10 лет с одним партнёром: арендуем площади, светильники выходят под брендом «Система Арт»</span></div>
+                <div><b>По нашим ТЗ</b><span>Мощность, оптика, цвет, корпус, крепления — доработаем любую позицию</span></div>
+                <div><b>Контроль дважды</b><span>Сборку принимают наши люди на заводе, перед отгрузкой — пункт проверки во Владивостоке</span></div>
+                <div><b>Сроки под объект</b><span>Когда заказов много, добавляем смены. Поставка от 40 дней до склада во Владивостоке</span></div>
+            </div>
+            <p class="ab-proof"><b>Почему это не риск:</b> 17 лет в архитектурном освещении, объекты 2011–2012 годов — парусник «Надежда», аэропорт Владивостока, «Фетисов Арена» — светят до сих пор. Гарантия 3 года, на проекты до 5 лет, 3% от каждой поставки лежит на складе за наш счёт. Официальный импорт, без серых схем.</p>
+        </div></section>
+
+        <!-- 4: ХРОНИКА — одна полоса из четырёх эпох -->
         <section class="snap-section ab-screen"><div class="ab-wrap">
             <div class="ab-chron-head">
                 <div>
                     <div class="ab-eyebrow">Хроника · с 1993 года</div>
                     <h2 class="ab-h2">От наружной рекламы <em>к свету городов</em></h2>
                 </div>
-                <p>С 1993 года на рынке, с 2009-го — архитектурное освещение. Нажмите на эпоху, чтобы посмотреть её объекты.</p>
+                <p>С 1993 года на рынке, с 2009-го — архитектурное освещение: от Владивостока к Сахалину, Камчатке, Москве и Калининграду. Нажмите на эпоху, чтобы посмотреть её объекты.</p>
             </div>
             <div class="ab-chron" id="ab-eras"></div>
         </div></section>
@@ -976,7 +1009,7 @@
             <div class="ab-eyebrow">Почему нам доверяют</div>
             <div class="ab-strip">
                 <div><b>С 1993 года</b><span>на рынке; с 2009 — архитектурный свет</span></div>
-                <div><b>Своё производство</b><span>работает только на нас, контроль на месте</span></div>
+                <div><b>Завод в Китае</b><span>10 лет работает только на нас, контроль сборки — наш</span></div>
                 <div><b>3–5 лет гарантии</b><span>«Фетисов Арена» светит с 2012</span></div>
                 <div><b>От 40 дней</b><span>поставка до склада во Владивостоке</span></div>
             </div>
@@ -987,6 +1020,7 @@
                     <a class="ab-btn ab-btn-line" href="mailto:info@sysart.ru">info@sysart.ru</a>
                 </div>
             </div>
+            <p class="ab-offices"><b>Владивосток</b> — главный офис, склад, инженеры и проверка оборудования. <b>Санкт-Петербург</b> — встречи, презентации и быстрая связь с партнёрами.</p>
         </div></section>
     </div>
 
@@ -1157,13 +1191,13 @@
             RGB3:   ['ЖК «Акватория»', 'Владивосток', 2024],
             RGB4:   ['ТЦ «Снежинка»', 'Кисловодск', 2024],
             RGB5:   ['Здание на Тополевой, 30', 'Владивосток', 2024],
-            RGB6:   ['ТЦ «Галант Плаза»', 'Петропавловск-Камчатский', 2021],
+            RGB6:   ['ТЦ «Галант Плаза»', 'Петропавловск-Камчатский', 2019],
             RGB8:   ['Шлюзовый комплекс канала им. Октябрьской Революции', 'Кизилюрт', 2023],
             RGB10:  ['Парусник «Надежда»', 'Владивосток', 2011],
             RGB11:  ['ЖК «Три богатыря»', 'Находка', 2026],
             RGB12:  ['Торговый центр', 'Махачкала', 2022],
             RGB13:  ['ЦСИ им. Курёхина', 'Санкт-Петербург', 2025],
-            RGB14:  ['Колесо обозрения «Главрыба»', 'Сулакский каньон', 2022],
+            RGB14:  ['Колесо обозрения «Главрыба»', 'Сулакский каньон', 2021],
             RGB15:  ['ТРЦ «Brosko Mall»', 'Хабаровск', 2024],
             RGB16:  ['БЦ «Дредноут»', 'Владивосток', 2018],
             RGB17:  ['Отель Marine Garden Sochi 2', 'Сочи', 2023],
@@ -1249,6 +1283,8 @@
             }).join('');
             const cityCount = new Set(Object.values(cities).map(c => c.counts).filter(Boolean)).size;
             const objCount = pts.reduce((s, p) => s + p.n, 0);
+            const abCities = document.getElementById('ab-cities');
+            if (abCities) abCities.textContent = cityCount;
             box.querySelector('.geo-cap').innerHTML = `<b>${objCount}</b> ${word(objCount)} · <b>${cityCount}</b> городов · от Калининграда до Камчатки`;
 
             const tip = box.querySelector('.geo-tip');
@@ -1418,13 +1454,13 @@
             return { img: src || `images/min/${key}.jpg`, full: src || `images/${key}.jpg`, name: c[0], place: `${c[1]}, ${c[2]}` };
         };
         const aboutEras = [
-            { years: '2009–2013', title: 'Первые знаковые объекты',
+            { years: '2009–2013', title: 'Саммит АТЭС и символы Владивостока', note: 'Подсветка к саммиту АТЭС, 70+ жилых домов города',
               items: ['MONO43', 'RGB10', 'tvtower', 'RGB23', 'RGB19'].map(obj) },
-            { years: '2014–2018', title: 'Медиафасады и исторический центр',
+            { years: '2014–2018', title: 'Приморье, Сахалин и первые медиафасады', note: 'Сахалин — 40+ объектов, первый медиафасад на линейных светильниках',
               items: ['RGB24', 'RGB25', 'MONO17', 'MONO16', 'RGB16'].map(obj) },
-            { years: '2019–2022', title: 'Выход в регионы',
+            { years: '2019–2022', title: 'Выход в регионы', note: 'Крупнейший медиафасад в азиатской части России, 75 объектов в Калининградской области',
               items: ['MONO12', 'MONO24', 'MONO27', 'MONO30', 'RGB6', 'MONO3', 'MONO41', 'RGB14'].map(obj) },
-            { years: '2023–2026', title: 'Управляемый свет и жилые комплексы',
+            { years: '2023–2026', title: 'Москва, Юг и Северо-Запад', note: 'Сочи Парк, Музей Мирового океана, ЦСИ им. Курёхина',
               items: ['MONO15', 'RGB18', 'MONO14', 'MONO18', 'MONO9', 'MONO34', 'RGB13', 'MONO32', 'RGB11', 'MONO7'].map(obj) },
         ];
 
@@ -1442,7 +1478,7 @@
             return `
             <div class="ab-e" data-era="${ei}">
                 <div class="ab-e-years">${era.years}</div>
-                <div class="ab-e-title">${era.title}</div>
+                <div class="ab-e-title">${era.title}</div>${era.note ? `<div class="ab-e-note">${era.note}</div>` : ''}
                 <div class="ab-e-img"><img loading="lazy" src="${cover.img}" alt="${cover.name}, ${cover.place}"><span class="ab-e-count"><b>${era.items.length}</b> ${plural(era.items.length, 'объект', 'объекта', 'объектов')} ↗</span></div>
                 <ul>${era.items.slice(0, ERA_LIST).map(o => `<li><b>${o.name}</b> · ${o.place}</li>`).join('')}${rest > 0 ? `<li>и ещё ${rest}</li>` : ''}</ul>
             </div>`;
