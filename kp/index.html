@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="robots" content="noindex, nofollow">
+<meta name="theme-color" content="#0a0a0a">
+<title>Конфигуратор КП — Система Арт</title>
+<link rel="icon" type="image/png" href="../images/favicon-32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
+<link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<!-- Вход по паролю: прайс хранится зашифрованным -->
+<section id="lock" class="lock">
+  <form id="lockForm" class="lock-card">
+    <img src="logo.png" alt="Система Арт" class="lock-logo">
+    <span class="eyebrow">Конфигуратор коммерческих предложений</span>
+    <h1>Оптовый прайс <em>2026</em></h1>
+    <label class="field">
+      <span>Пароль</span>
+      <input id="lockPass" type="password" autocomplete="current-password" required>
+    </label>
+    <label class="check"><input id="lockRemember" type="checkbox"> Запомнить на этом устройстве</label>
+    <button class="btn btn-main" type="submit">Открыть</button>
+    <p id="lockErr" class="lock-err" hidden>Неверный пароль</p>
+  </form>
+</section>
+
+<div id="app" class="app" hidden>
+  <header class="top">
+    <img src="logo.png" alt="Система Арт" class="top-logo">
+    <div class="top-title"><span class="eyebrow">Конфигуратор КП</span><b id="priceDate"></b></div>
+    <div class="top-settings">
+      <label title="Курс продажи доллара">$ <input id="setRate" type="number" step="0.1" min="1"></label>
+      <label class="switch" title="Цены с НДС 22 %"><input id="setVat" type="checkbox"><span>НДС</span></label>
+      <label title="Наценка (+) или скидка (−) ко всем позициям из прайса">± % <input id="setAdjust" type="number" step="1"></label>
+      <button class="icon-btn" id="openSettings" title="Настройки">⚙</button>
+    </div>
+    <button class="btn btn-main cart-btn" id="openKp">КП <i id="kpCount">0</i></button>
+  </header>
+
+  <nav class="cats" id="cats"></nav>
+  <div class="search-row">
+    <input id="search" type="search" placeholder="Поиск: маркировка, IP, угол, мощность…">
+    <span id="found" class="muted"></span>
+  </div>
+  <main class="grid" id="grid"></main>
+</div>
+
+<!-- Конфигуратор модели -->
+<div class="sheet" id="cfg" hidden>
+  <div class="sheet-back" data-close></div>
+  <div class="sheet-panel cfg-panel">
+    <button class="sheet-close" data-close>×</button>
+    <div id="cfgBody"></div>
+  </div>
+</div>
+
+<!-- КП -->
+<div class="sheet" id="kp" hidden>
+  <div class="sheet-back" data-close></div>
+  <div class="sheet-panel kp-panel">
+    <button class="sheet-close" data-close>×</button>
+    <div class="kp-head">
+      <div>
+        <span class="eyebrow">Коммерческое предложение</span>
+        <h2 id="kpTitle">Новое КП</h2>
+      </div>
+      <div class="kp-actions">
+        <button class="btn btn-line" id="kpSaved">Сохранённые</button>
+        <button class="btn btn-line" id="kpNew">Новое</button>
+        <button class="btn btn-main" id="kpPdf">Скачать PDF</button>
+      </div>
+    </div>
+    <div class="kp-meta" id="kpMeta"></div>
+    <div class="kp-lines" id="kpLines"></div>
+    <div class="kp-bottom">
+      <button class="btn btn-line" id="kpAddCustom">+ Своя позиция</button>
+      <div class="kp-total" id="kpTotal"></div>
+    </div>
+  </div>
+</div>
+
+<!-- Настройки менеджера -->
+<div class="sheet" id="settings" hidden>
+  <div class="sheet-back" data-close></div>
+  <div class="sheet-panel small-panel">
+    <button class="sheet-close" data-close>×</button>
+    <span class="eyebrow">Настройки</span>
+    <h2>Расчёт и подпись</h2>
+    <div id="settingsBody"></div>
+  </div>
+</div>
+
+<!-- Сохранённые КП -->
+<div class="sheet" id="saved" hidden>
+  <div class="sheet-back" data-close></div>
+  <div class="sheet-panel small-panel">
+    <button class="sheet-close" data-close>×</button>
+    <span class="eyebrow">На этом устройстве</span>
+    <h2>Сохранённые КП</h2>
+    <div id="savedBody"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<!-- Документ для печати / PDF -->
+<div id="print" class="print"></div>
+
+<script src="app.js"></script>
+</body>
+</html>
