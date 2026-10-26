@@ -1,0 +1,386 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="theme-color" content="#0a0a0a">
+    <title>Конструктор альбома — Система Арт</title>
+    <meta name="description" content="Соберите PDF-альбом из выбранных объектов портфолио «Система Арт».">
+    <meta name="robots" content="noindex">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
+    <link rel="icon" type="image/png" sizes="32x32" href="../images/favicon-32.png">
+    <link rel="apple-touch-icon" href="../images/apple-touch-icon.png">
+
+    <!-- Yandex.Metrika counter -->
+    <script type="text/javascript">
+        (function(m,e,t,r,i,k,a){
+            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
+            m[i].l=1*new Date();
+            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
+            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
+        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=113787422', 'ym');
+        ym(113787422, 'init', {ssr:true, webvisor:true, clickmap:true, referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
+    </script>
+    <!-- /Yandex.Metrika counter -->
+
+    <style>
+        :root {
+            --ink: #0a0a0a;
+            --paper: #ffffff;
+            --muted: #8c8b86;
+            --line: rgba(255,255,255,.18);
+            --lime: #ef3b36;
+            --glow: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%);
+        }
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+        html, body { margin: 0; padding: 0; background: var(--ink); color: var(--paper); font-family: 'Manrope', Arial, sans-serif; -webkit-font-smoothing: antialiased; }
+        body { background: var(--glow), var(--ink); background-attachment: fixed; min-height: 100vh; padding-bottom: 140px; }
+        a, button { color: inherit; text-decoration: none; font: inherit; background: none; border: none; cursor: pointer; }
+        .mono { font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; }
+
+        /* --- Шапка — как на сайте --- */
+        .site-header { height: 84px; display: flex; align-items: center; gap: 20px; padding: 0 clamp(16px, 4vw, 64px); border-bottom: 1px solid var(--line); position: sticky; top: 0; z-index: 30; background: rgba(10,10,10,.82); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); }
+        .site-header img { height: 40px; display: block; }
+        .header-back { display: inline-flex; align-items: center; gap: 8px; height: 42px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.18); color: #cfcbc3; font-size: 13px; font-weight: 500; white-space: nowrap; transition: color .25s, border-color .25s; }
+        .header-back span { color: var(--lime); font-size: 16px; }
+        .header-back:hover { color: var(--paper); border-color: var(--lime); }
+
+        /* --- Заголовок --- */
+        .intro { padding: clamp(36px, 6vw, 72px) clamp(16px, 5vw, 80px) 24px; display: flex; align-items: flex-end; justify-content: space-between; gap: 32px; flex-wrap: wrap; }
+        .kicker { color: var(--muted); display: flex; align-items: center; gap: 12px; margin-bottom: 18px; }
+        .kicker i { width: 32px; height: 1px; background: var(--lime); }
+        h1 { font-size: clamp(40px, 6.4vw, 92px); line-height: .9; letter-spacing: -.05em; font-weight: 700; margin: 0; }
+        h1 em { color: var(--lime); font-style: normal; font-weight: 400; }
+        .intro p { max-width: 430px; margin: 0; color: #cfcbc3; font-size: 15px; line-height: 1.55; }
+
+        /* --- Панель фильтров --- */
+        .toolbar { position: sticky; top: 84px; z-index: 20; display: flex; align-items: center; gap: 8px; padding: 14px clamp(16px, 5vw, 80px); background: rgba(10,10,10,.78); backdrop-filter: blur(10px); -webkit-backdrop-filter: blur(10px); border-bottom: 1px solid var(--line); overflow-x: auto; scrollbar-width: none; }
+        .toolbar::-webkit-scrollbar { display: none; }
+        .chip { flex: none; height: 36px; padding: 0 14px; border-radius: 999px; border: 1px solid rgba(255,255,255,.16); color: #cfcbc3; white-space: nowrap; transition: color .2s, border-color .2s, background .2s; }
+        .chip b { color: var(--muted); font-weight: 400; margin-left: 4px; }
+        .chip:hover { color: var(--paper); border-color: rgba(255,255,255,.4); }
+        .chip.on { color: var(--paper); background: rgba(239,59,54,.18); border-color: rgba(239,59,54,.55); }
+        .toolbar .sep { flex: none; width: 1px; height: 22px; background: var(--line); margin: 0 6px; }
+        .toolbar .act { flex: none; height: 36px; padding: 0 10px; color: var(--muted); white-space: nowrap; }
+        .toolbar .act:hover { color: var(--paper); }
+
+        /* --- Сетка объектов --- */
+        .grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)); gap: 18px; padding: 24px clamp(16px, 5vw, 80px); }
+        .obj { position: relative; text-align: left; display: block; border-radius: 6px; overflow: hidden; background: #141414; outline: 1px solid rgba(255,255,255,.06); transition: outline-color .2s, transform .2s; }
+        .obj:hover { outline-color: rgba(255,255,255,.3); }
+        .obj .ph { position: relative; aspect-ratio: 16 / 10; overflow: hidden; background: #1a1a1a; }
+        .obj img { width: 100%; height: 100%; object-fit: cover; display: block; transition: transform .6s cubic-bezier(.2,.8,.2,1), filter .3s; }
+        .obj:hover img { transform: scale(1.04); }
+        .obj .n { position: absolute; left: 10px; bottom: 10px; padding: 4px 8px; border-radius: 999px; background: rgba(10,10,10,.75); color: #cfcbc3; font-size: 10px; }
+        .obj .tick { position: absolute; top: 10px; right: 10px; width: 30px; height: 30px; border-radius: 50%; border: 1.5px solid rgba(255,255,255,.7); background: rgba(10,10,10,.45); display: grid; place-items: center; transition: background .2s, border-color .2s; }
+        .obj .tick svg { width: 15px; height: 15px; opacity: 0; transition: opacity .2s; }
+        .obj .cap { padding: 14px 16px 16px; }
+        .obj .cap b { display: block; font-size: 15px; font-weight: 600; letter-spacing: -.01em; line-height: 1.25; }
+        .obj .cap span { display: block; margin-top: 6px; color: var(--muted); }
+        .obj.sel { outline: 2px solid var(--lime); }
+        .obj.sel .tick { background: var(--lime); border-color: var(--lime); }
+        .obj.sel .tick svg { opacity: 1; }
+        .obj[hidden] { display: none; }
+        .empty { padding: 60px 20px; text-align: center; color: var(--muted); }
+
+        /* --- Нижняя панель: выбор, логотип, кнопка --- */
+        .dock { position: fixed; left: 50%; bottom: 18px; z-index: 40; transform: translateX(-50%); width: min(980px, calc(100% - 24px)); border-radius: 18px; border: 1px solid rgba(255,255,255,.14); background: rgba(18,16,16,.94); backdrop-filter: blur(14px); -webkit-backdrop-filter: blur(14px); box-shadow: 0 20px 60px rgba(0,0,0,.6); }
+        .dock-row { display: flex; align-items: center; gap: 18px; padding: 12px 12px 12px 22px; }
+        .count { flex: none; }
+        .count strong { display: block; font-size: 26px; line-height: 1; letter-spacing: -.03em; }
+        .count span { color: var(--muted); }
+        .switch { display: flex; align-items: center; gap: 10px; margin-left: auto; color: #cfcbc3; font-size: 13px; cursor: pointer; user-select: none; }
+        .switch input { position: absolute; opacity: 0; pointer-events: none; }
+        .switch .box { flex: none; width: 22px; height: 22px; border-radius: 5px; border: 1.5px solid rgba(255,255,255,.5); display: grid; place-items: center; transition: background .2s, border-color .2s; }
+        .switch .box svg { width: 13px; height: 13px; opacity: 0; }
+        .switch input:checked + .box { background: var(--lime); border-color: var(--lime); }
+        .switch input:checked + .box svg { opacity: 1; }
+        .switch input:focus-visible + .box { outline: 2px solid #fff; outline-offset: 2px; }
+        .go { flex: none; height: 52px; padding: 0 26px; border-radius: 999px; background: var(--lime); color: #fff; display: inline-flex; align-items: center; gap: 10px; transition: background .25s, color .25s, opacity .25s; }
+        .go:hover { background: #fff; color: var(--ink); }
+        .go:disabled { opacity: .35; pointer-events: none; }
+        .dealer { display: none; grid-template-columns: repeat(4, 1fr); gap: 10px; padding: 0 12px 14px 22px; }
+        .dealer.show { display: grid; }
+        .dealer-note { grid-column: 1 / -1; color: var(--muted); font-size: 12px; line-height: 1.45; }
+        .dealer input { width: 100%; height: 40px; padding: 0 12px; border-radius: 8px; border: 1px solid rgba(255,255,255,.16); background: rgba(255,255,255,.04); color: var(--paper); font: inherit; font-size: 13px; }
+        .dealer input::placeholder { color: #6f6e6a; }
+        .dealer input:focus { outline: none; border-color: var(--lime); }
+
+        /* --- Окно сборки --- */
+        .veil { position: fixed; inset: 0; z-index: 80; display: none; align-items: center; justify-content: center; padding: 20px; background: rgba(5,5,5,.86); backdrop-filter: blur(8px); -webkit-backdrop-filter: blur(8px); }
+        .veil.show { display: flex; }
+        .modal { width: min(440px, 100%); padding: 32px; border-radius: 18px; border: 1px solid rgba(255,255,255,.14); background: #121010; text-align: center; }
+        .modal h2 { margin: 0 0 8px; font-size: 26px; letter-spacing: -.03em; }
+        .modal p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.5; }
+        .bar { height: 4px; margin: 24px 0 12px; border-radius: 4px; background: rgba(255,255,255,.1); overflow: hidden; }
+        .bar i { display: block; height: 100%; width: 0; background: var(--lime); transition: width .3s; }
+        .modal .actions { display: none; flex-direction: column; gap: 10px; margin-top: 24px; }
+        .modal.done .actions { display: flex; }
+        .modal.done .bar { display: none; }
+        .modal .actions a, .modal .actions button { height: 48px; border-radius: 999px; display: flex; align-items: center; justify-content: center; }
+        .modal .actions a { background: var(--lime); color: #fff; }
+        .modal .actions button { border: 1px solid rgba(255,255,255,.2); color: #cfcbc3; }
+
+        @media (max-width: 760px) {
+            .site-header { height: 68px; }
+            .site-header img { height: 32px; }
+            .toolbar { top: 68px; }
+            .header-back b { display: none; }
+            .grid { grid-template-columns: repeat(2, 1fr); gap: 10px; }
+            .obj .cap { padding: 10px 10px 12px; }
+            .obj .cap b { font-size: 13px; }
+            .obj .cap span { font-size: 9px; }
+            .obj .tick { width: 26px; height: 26px; top: 8px; right: 8px; }
+            .obj .n { display: none; }
+            .dock { bottom: 10px; border-radius: 16px; }
+            .dock-row { gap: 12px; padding: 10px 10px 10px 16px; flex-wrap: wrap; }
+            .count strong { font-size: 22px; }
+            .switch { order: 3; width: 100%; margin: 0; }
+            .go { margin-left: auto; height: 46px; padding: 0 20px; }
+            .dealer { grid-template-columns: 1fr 1fr; padding: 0 10px 12px 16px; }
+            body { padding-bottom: 180px; }
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header">
+        <a href="../" aria-label="На главную"><img src="../images/logo.png" alt="Система Арт"></a>
+        <a class="header-back" href="../#projects"><span>←</span> <b>К портфолио</b></a>
+    </header>
+
+    <section class="intro">
+        <div>
+            <div class="kicker mono"><i></i> Конструктор альбома</div>
+            <h1>Соберите<br><em>свой</em> альбом.</h1>
+        </div>
+        <p>Отметьте объекты и нажмите «Создать альбом» — получится PDF в нашем фирменном стиле: обложка, о компании, выбранные проекты по годам с описаниями, услуги, карта всех городов и контакты.</p>
+    </section>
+
+    <nav class="toolbar" id="toolbar" aria-label="Фильтр объектов"></nav>
+    <main class="grid" id="grid" aria-live="polite"><div class="empty">Загружаем объекты…</div></main>
+
+    <div class="dock" id="dock">
+        <div class="dock-row">
+            <div class="count"><strong id="sel-count">0</strong><span class="mono" id="sel-word">объектов выбрано</span></div>
+            <label class="switch">
+                <input type="checkbox" id="with-logo" checked>
+                <span class="box"><svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg></span>
+                <span>С логотипом «Система Арт»</span>
+            </label>
+            <button class="go mono" id="go" disabled>Создать альбом <span>→</span></button>
+        </div>
+        <div class="dealer" id="dealer">
+            <div class="dealer-note">Альбом без логотипа и без упоминаний «Система Арт». Можно указать свои данные — они появятся на обложке, в подвале страниц и на странице контактов. Все поля необязательны.</div>
+            <input id="d-company" placeholder="Название компании" autocomplete="organization">
+            <input id="d-phone" placeholder="Телефон" autocomplete="tel" inputmode="tel">
+            <input id="d-email" placeholder="E-mail" autocomplete="email" inputmode="email">
+            <input id="d-site" placeholder="Сайт" autocomplete="url" inputmode="url">
+        </div>
+    </div>
+
+    <div class="veil" id="veil" role="dialog" aria-modal="true" aria-labelledby="m-title">
+        <div class="modal" id="modal">
+            <h2 id="m-title">Собираем альбом</h2>
+            <p id="m-text">Подготовка…</p>
+            <div class="bar"><i id="m-bar"></i></div>
+            <div class="actions">
+                <a id="m-download" class="mono" href="#" download>Скачать PDF ↓</a>
+                <button id="m-close" class="mono">Вернуться к выбору</button>
+            </div>
+        </div>
+    </div>
+
+    <script src="lib/pdf-lib.min.js"></script>
+    <script src="lib/fontkit.umd.min.js"></script>
+    <script src="objects.js"></script>
+    <script src="builder.js"></script>
+    <script>
+        // Объекты, города и подписи берутся с главной страницы (photoCaptions и GEO_CITIES в index.html):
+        // новый объект в портфолио сам появляется в конструкторе и на карте альбома.
+        const $ = id => document.getElementById(id);
+        const goal = name => { try { ym(113787422, 'reachGoal', name); } catch (e) {} };
+        const PHOTO = key => key === 'tvtower' ? '../images/about/tvtower.jpg' : `../images/${key}.jpg`;
+        const THUMB = key => key === 'tvtower' ? '../images/about/tvtower.jpg' : `../images/min/${key}.jpg`;
+        const COVER = '../images/RGB18.jpg';
+
+        // Достаём объект-литерал «const NAME = {...};» из скрипта главной страницы
+        function pickLiteral(html, name) {
+            const start = html.indexOf(`const ${name} = {`);
+            if (start < 0) throw new Error(`На главной не найден ${name}`);
+            const from = html.indexOf('{', start);
+            const to = html.indexOf('\n        };', from);
+            return Function(`"use strict"; return (${html.slice(from, to + 10)});`)();
+        }
+
+        let objects = [], mapData = null;
+        const selected = new Set();
+        let filter = 'Все';
+
+        async function init() {
+            const [html, dotsSvg] = await Promise.all([
+                fetch('../index.html').then(r => r.text()),
+                fetch('../images/geo-dots.svg').then(r => r.text()),
+            ]);
+            const captions = pickLiteral(html, 'photoCaptions');
+            const geoCities = pickLiteral(html, 'GEO_CITIES');
+
+            // Объект = уникальная пара «название + город»; несколько фото одного объекта — на одну страницу
+            const byId = new Map();
+            for (const [key, [name, city, year]] of Object.entries(captions)) {
+                const id = name + '|' + city;
+                if (!byId.has(id)) byId.set(id, { id, name, city, year: +year || 0, keys: [] });
+                const o = byId.get(id);
+                o.keys.push(key);
+                if (+year > o.year) o.year = +year;
+            }
+            const DEF = window.ALBUM_DEFAULT_TEXT;
+            objects = [...byId.values()].map(o => {
+                const rec = o.keys.map(k => ALBUM_OBJECTS[k]).find(Boolean) || [];
+                const category = rec[0] || '';
+                const description = o.keys.map(k => ALBUM_OBJECTS[k] && ALBUM_OBJECTS[k][1]).find(Boolean) || DEF[category] || DEF[''];
+                return { ...o, category, description, photos: o.keys.map(PHOTO), thumb: THUMB(o.keys[0]) };
+            }).sort((a, b) => b.year - a.year || a.name.localeCompare(b.name, 'ru'));
+
+            mapData = buildMap(captions, geoCities, dotsSvg);
+            renderToolbar();
+            renderGrid();
+        }
+
+        // --- Карта: та же логика, что buildGeoMap на главной (слияние близких городов, фото у городов с 3+ объектами) ---
+        function geoProject(lat, lon) {
+            const rad = Math.PI / 180, n = 0.852869, c = 1.719846, r0 = 1.537669, k = 603.0205;
+            const x = (lon - 100) * rad * n, r = Math.sqrt(c - 2 * n * Math.sin(lat * rad)) / n;
+            return [441.355 + k * r * Math.sin(x), 875.397 - k * (r0 - r * Math.cos(x))];
+        }
+        function buildMap(captions, GEO_CITIES, dotsSvg) {
+            const cities = {};
+            for (const [key, [name, city, year]] of Object.entries(captions)) {
+                const g = GEO_CITIES[city];
+                if (!g) { console.warn('Карта альбома: нет координат для города', city); continue; }
+                const id = g[2] || city, at = GEO_CITIES[id] || g;
+                const c = cities[id] = cities[id] || { city: id, lat: at[0], lon: at[1], counts: g[2] === null ? null : id, objects: new Set(), photo: null };
+                c.objects.add(name);
+                if (!c.photo && key !== 'tvtower') c.photo = THUMB(key);
+            }
+            const pts = [];
+            const MAIN = ['Владивосток', 'Калининград', 'Санкт-Петербург', 'Москва', 'Сочи', 'Махачкала'];
+            const rank = c => (MAIN.indexOf(c.city) + 1 || 99);
+            Object.values(cities).sort((a, b) => b.objects.size - a.objects.size || rank(a) - rank(b)).forEach(c => {
+                const [x, y] = geoProject(c.lat, c.lon);
+                const near = pts.find(p => Math.hypot(p.x - x, p.y - y) < 24);
+                if (near) { near.members.push(c); near.n += c.objects.size; if (!near.photo) near.photo = c.photo; }
+                else pts.push({ x, y, members: [c], n: c.objects.size, photo: c.photo });
+            });
+            pts.forEach(p => {
+                p.big = p.n >= 3 && !!p.photo;
+                p.r = p.big ? 14 + Math.min(p.n, 26) * 0.5 : 3.6 + Math.min(p.n, 20) / 4;
+                const name = p.members.some(m => ['Махачкала', 'Каспийск', 'Кизилюрт'].includes(m.city)) ? 'Дагестан' : p.members[0].city;
+                p.label = p.n >= 2 ? name : '';
+                p.right = p.x < 690;
+            });
+            const dots = [...dotsSvg.matchAll(/M([\d.]+) ([\d.]+)h0/g)].map(m => [+m[1], +m[2]]);
+            return {
+                points: pts, dots,
+                objCount: pts.reduce((s, p) => s + p.n, 0),
+                cityCount: new Set(Object.values(cities).map(c => c.counts).filter(Boolean)).size,
+            };
+        }
+
+        // --- Интерфейс ---
+        function renderToolbar() {
+            const cats = {};
+            objects.forEach(o => { cats[o.category] = (cats[o.category] || 0) + 1; });
+            const list = [['Все', objects.length], ...Object.entries(cats).filter(([c]) => c).sort((a, b) => b[1] - a[1])];
+            $('toolbar').innerHTML = list.map(([c, n]) => `<button class="chip${c === filter ? ' on' : ''}" data-cat="${c}">${c}<b>${n}</b></button>`).join('')
+                + `<span class="sep"></span><button class="act mono" data-act="all">Выбрать видимые</button><button class="act mono" data-act="none">Снять всё</button>`;
+        }
+        function renderGrid() {
+            const tick = '<svg viewBox="0 0 24 24" fill="none" stroke="#fff" stroke-width="3.5" stroke-linecap="round" stroke-linejoin="round"><path d="M5 12.5l4.5 4.5L19 7.5"/></svg>';
+            $('grid').innerHTML = objects.map((o, i) => `
+                <button class="obj${selected.has(o.id) ? ' sel' : ''}" data-i="${i}" aria-pressed="${selected.has(o.id)}">
+                    <div class="ph"><img loading="lazy" src="${o.thumb}" alt="" onerror="this.onerror=null;this.src='${o.photos[0]}'">
+                        <span class="tick">${tick}</span>${o.keys.length > 1 ? `<span class="n mono">${o.keys.length} фото</span>` : ''}</div>
+                    <div class="cap"><b>${o.name}</b><span class="mono">${o.city}${o.year ? ' · ' + o.year : ''}</span></div>
+                </button>`).join('');
+            applyFilter();
+            updateDock();
+        }
+        function applyFilter() {
+            document.querySelectorAll('.obj').forEach(el => { el.hidden = filter !== 'Все' && objects[+el.dataset.i].category !== filter; });
+        }
+        function updateDock() {
+            const n = selected.size;
+            $('sel-count').textContent = n;
+            $('sel-word').textContent = `${albumPlural(n, 'объект', 'объекта', 'объектов')} выбрано`;
+            $('go').disabled = !n;
+        }
+
+        $('toolbar').addEventListener('click', e => {
+            const b = e.target.closest('button'); if (!b) return;
+            if (b.dataset.cat) { filter = b.dataset.cat; renderToolbar(); applyFilter(); return; }
+            const visible = [...document.querySelectorAll('.obj:not([hidden])')];
+            visible.forEach(el => {
+                const o = objects[+el.dataset.i];
+                if (b.dataset.act === 'all') selected.add(o.id);
+                el.classList.toggle('sel', b.dataset.act === 'all' || (b.dataset.act !== 'none' && selected.has(o.id)));
+            });
+            if (b.dataset.act === 'none') { selected.clear(); document.querySelectorAll('.obj').forEach(el => el.classList.remove('sel')); }
+            updateDock();
+        });
+        $('grid').addEventListener('click', e => {
+            const el = e.target.closest('.obj'); if (!el) return;
+            const o = objects[+el.dataset.i];
+            selected.has(o.id) ? selected.delete(o.id) : selected.add(o.id);
+            el.classList.toggle('sel', selected.has(o.id));
+            el.setAttribute('aria-pressed', selected.has(o.id));
+            updateDock();
+        });
+        $('with-logo').addEventListener('change', e => $('dealer').classList.toggle('show', !e.target.checked));
+
+        let lastUrl = null;
+        $('go').addEventListener('click', async () => {
+            const logo = $('with-logo').checked;
+            const dealer = logo ? {} : { company: $('d-company').value.trim(), phone: $('d-phone').value.trim(), email: $('d-email').value.trim(), site: $('d-site').value.trim() };
+            // В альбоме — по годам, от ранних к новым
+            const list = objects.filter(o => selected.has(o.id)).sort((a, b) => a.year - b.year || a.name.localeCompare(b.name, 'ru'));
+            $('modal').classList.remove('done');
+            $('m-title').textContent = 'Собираем альбом';
+            $('m-text').textContent = 'Подготовка…';
+            $('m-bar').style.width = '2%';
+            $('veil').classList.add('show');
+            const steps = list.length + 6;
+            let step = 0;
+            try {
+                const bytes = await buildAlbum({
+                    objects: list, logo, dealer, map: mapData, cover: COVER,
+                    onProgress: label => { step++; $('m-text').textContent = label; $('m-bar').style.width = Math.min(98, step / steps * 100) + '%'; },
+                });
+                if (lastUrl) URL.revokeObjectURL(lastUrl);
+                lastUrl = URL.createObjectURL(new Blob([bytes], { type: 'application/pdf' }));
+                const fname = logo ? 'Система Арт — альбом проектов.pdf' : `${dealer.company ? dealer.company.replace(/[\\/:*?"<>|]/g, '') + ' — ' : ''}Альбом проектов.pdf`;
+                const a = $('m-download');
+                a.href = lastUrl; a.download = fname;
+                $('m-title').textContent = 'Альбом готов';
+                $('m-text').textContent = `${list.length + 5} страниц · ${(bytes.length / 1048576).toFixed(1).replace('.', ',')} МБ`;
+                $('modal').classList.add('done');
+                a.click();
+                goal(logo ? 'album_create' : 'album_create_nologo');
+            } catch (err) {
+                console.error(err);
+                $('m-title').textContent = 'Не получилось';
+                $('m-text').textContent = 'Попробуйте ещё раз или выберите меньше объектов. ' + (err.message || '');
+                $('m-download').style.display = 'none';
+                $('modal').classList.add('done');
+            }
+        });
+        $('m-close').addEventListener('click', () => { $('veil').classList.remove('show'); $('m-download').style.display = ''; });
+
+        init().catch(err => {
+            console.error(err);
+            $('grid').innerHTML = '<div class="empty">Не удалось загрузить объекты. Обновите страницу.</div>';
+        });
+    </script>
+</body>
+</html>

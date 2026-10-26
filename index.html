@@ -173,7 +173,15 @@
         .project-section { max-width: var(--max); margin: 0 auto; padding: 100px clamp(22px, 5vw, 80px) 30px; }
         .eyebrow { color: var(--lime); font-size: 10px; font-family: 'DM Mono', monospace; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 10px; display: block; }
         .project-section h2 { font-size: clamp(32px, 6vw, 60px); line-height: .9; letter-spacing: -.05em; font-weight: 600; margin: 0 0 20px; }
-        
+        /* Кнопка «Создать альбом» — конструктор PDF-альбома из объектов портфолио (/album/) */
+        .project-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 16px; }
+        .album-btn { flex: none; height: 42px; margin-bottom: 20px; padding: 0 18px; border-radius: 999px; border: 1px solid rgba(239,59,54,.6); display: inline-flex; align-items: center; gap: 8px; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--paper); white-space: nowrap; transition: background .25s, border-color .25s; }
+        .album-btn svg { width: 15px; height: 15px; color: var(--lime); flex: none; transition: color .25s; }
+        .album-btn:hover { background: var(--lime); border-color: var(--lime); }
+        .album-btn:hover svg { color: #fff; }
+        .gallery-tools { display: flex; align-items: center; gap: 18px; }
+        .gallery-tools .album-btn { margin: 0; height: 38px; }
+
         .category-portals { flex: 1; min-height: 0; display: flex; gap: 16px; width: 100%; }
         /* Текст карточки идёт в потоке (прижат к низу), поэтому карточка никогда не бывает ниже своего текста */
         .portal-card { flex: 1; min-width: 0; position: relative; display: flex; flex-direction: column; justify-content: flex-end; background: #111; border-radius: 4px; overflow: hidden; cursor: pointer; border: 1px solid rgba(255,255,255,0.05); transition: flex 0.7s cubic-bezier(0.2, 0.8, 0.2, 1), box-shadow 0.4s ease; }
@@ -571,6 +579,10 @@
             
             .project-section { padding: 90px 20px 20px; }
             .project-section h2 { margin-bottom: 10px; font-size: 32px; }
+            .project-head .album-btn { margin-bottom: 10px; height: 36px; padding: 0 14px; }
+            .gallery-tools { gap: 10px; }
+            .gallery-tools .album-btn { width: 38px; padding: 0; justify-content: center; }
+            .gallery-tools .album-btn span { display: none; }
             .category-portals { flex-direction: column; gap: 10px; margin-top: 10px; }
             .portal-card { flex: 1 0 auto; min-height: 120px; }
             .portal-card.is-open { flex-grow: 1.6; min-height: 170px; }
@@ -675,9 +687,12 @@
 
         <!-- ЭКРАН 2: ПОРТАЛЫ ПРОЕКТОВ -->
         <section class="snap-section project-section" id="projects">
-            <div>
-                <span class="eyebrow">01 / Selected work</span>
-                <h2>Проекты</h2>
+            <div class="project-head">
+                <div>
+                    <span class="eyebrow">01 / Selected work</span>
+                    <h2>Проекты</h2>
+                </div>
+                <a class="album-btn" href="album/" title="Выберите объекты — соберём PDF-альбом"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M12 8v8M8 12h8"/></svg>Создать альбом</a>
             </div>
             
             <div class="category-portals">
@@ -804,7 +819,10 @@
     <div id="gallery-view">
         <header class="gallery-header">
             <h2 class="gallery-title" id="gallery-title">Проекты</h2>
-            <span class="gallery-count" id="gallery-count"></span>
+            <div class="gallery-tools">
+                <span class="gallery-count" id="gallery-count"></span>
+                <a class="album-btn" href="album/" title="Создать альбом" aria-label="Создать альбом"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M12 8v8M8 12h8"/></svg><span>Создать альбом</span></a>
+            </div>
         </header>
 
         <div class="gallery-container">
@@ -999,6 +1017,7 @@
         <div class="mnav-bottom">
             <button class="main" onclick="toggleMenu(false); openCallback();">Заказать звонок</button>
             <a class="line" href="kp/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Вход для партнёров</a>
+            <a class="line" href="album/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M12 8v8M8 12h8"/></svg>Создать альбом</a>
             <a class="line" href="mailto:info@sysart.ru">info@sysart.ru</a>
         </div>
     </div>
@@ -1147,7 +1166,7 @@
             RGB14:  ['Колесо обозрения «Главрыба»', 'Сулакский каньон', 2022],
             RGB15:  ['ТРЦ «Brosko Mall»', 'Хабаровск', 2024],
             RGB16:  ['БЦ «Дредноут»', 'Владивосток', 2018],
-            RGB17:  ['Отель Marine Garden Sochi', 'Сочи', 2023],
+            RGB17:  ['Отель Marine Garden Sochi 2', 'Сочи', 2023],
             RGB18:  ['Музей Мирового океана', 'Калининград', 2024],
             RGB19:  ['КСК «Фетисов Арена»', 'Владивосток', 2012],
             RGB20:  ['Здание на Дзержинского, 13', 'Находка', 2025],
