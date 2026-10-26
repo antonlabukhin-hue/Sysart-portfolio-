@@ -838,9 +838,13 @@
     block('С УВАЖЕНИЕМ', [mg.name, mg.title, S.company, [mg.phone, mg.email].filter(Boolean).join(' · ')].filter(Boolean));
 
     const buf = await wb.xlsx.writeBuffer();
+    return new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+  }
+
+  function download(blob, name) {
     const a = document.createElement('a');
-    a.href = URL.createObjectURL(new Blob([buf], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' }));
-    a.download = kpFileName('.xlsx');
+    a.href = URL.createObjectURL(blob);
+    a.download = name;
     document.body.appendChild(a);
     a.click();
     setTimeout(() => { URL.revokeObjectURL(a.href); a.remove(); }, 1000);
@@ -851,9 +855,13 @@
     const b = e.currentTarget;
     b.disabled = true;
     b.textContent = 'Готовлю…';
-    sendKpMail();
+    // Скачивание может оборвать ещё не завершённую отправку письма (браузер показывает ошибку,
+    // хотя письмо дошло) — поэтому сначала ждём ответ почты, но не дольше 6 секунд
+    const mail = sendKpMail();
     try {
-      await buildXlsx();
+      const blob = await buildXlsx();
+      await Promise.race([mail, new Promise(r => setTimeout(r, 6000))]);
+      download(blob, kpFileName('.xlsx'));
     } catch (err) {
       console.error(err);
       toast('Не удалось собрать Excel, проверьте интернет');
@@ -923,16 +931,20 @@
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
       keepalive: true,
-      body: JSON.stringify({ access_key: key, subject, from_name: 'Конфигуратор КП sysartspb.com', name: S.manager.name, email: S.manager.email, message: text }),
+      // Пустой email не передаём: сервис может счесть его ошибкой
+      body: JSON.stringify(Object.assign({ access_key: key, subject, from_name: 'Конфигуратор КП sysartspb.com', name: S.manager.name, message: text }, S.manager.email ? { email: S.manager.email } : {})),
     }).then(r => r.json())));
     const ok = results.some(r => r.status === 'fulfilled' && r.value && r.value.success);
-    if (ok) {
+    // Ошибку показываем, только если сервис явно ответил отказом. Обрыв ответа (сеть, скачивание файла)
+    // не значит, что письмо не ушло — повторно такое КП не шлём, чтобы не было дублей
+    const refused = results.every(r => r.status === 'fulfilled' && !(r.value && r.value.success));
+    if (!refused) {
       KP.mailedHash = h;
       saveKp();
-      toast('Копия КП отправлена на почту');
-    } else {
-      toast('Не удалось отправить копию КП на почту');
     }
+    if (ok) toast('Копия КП отправлена на почту');
+    else if (refused) toast('Не удалось отправить копию КП на почту');
+    return ok;
   }
 
   function docTerms() {
