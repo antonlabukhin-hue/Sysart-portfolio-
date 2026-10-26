@@ -252,7 +252,28 @@
     renderCats();
     renderGrid();
     updateCount();
+    if (!S.profileDone) askProfile();
   }
+
+  // ---------- Кто собирает КП ----------
+  // Поля пустые: на чужом устройстве не должно стоять подписи Антона по умолчанию
+  function askProfile() {
+    $('#profile').hidden = false;
+    document.body.style.overflow = 'hidden';
+    setTimeout(() => $('#profileForm').name.focus(), 50);
+  }
+  $('#profileForm').addEventListener('submit', e => {
+    e.preventDefault();
+    const f = e.target;
+    const v = k => f[k].value.trim();
+    S.manager = { name: v('name'), title: v('title'), phone: v('phone'), email: v('email') };
+    S.company = v('company');
+    S.profileDone = true;
+    saveSettings();
+    $('#profile').hidden = true;
+    document.body.style.overflow = '';
+    toast(`Готово, ${S.manager.name.split(' ')[0]}! Можно собирать КП`);
+  });
 
   function renderCats() {
     const count = id => DATA.products.filter(p => p.cat === id).length;
@@ -335,7 +356,7 @@
   document.querySelectorAll('.sheet').forEach(s => s.addEventListener('click', e => { if (e.target.closest('[data-close]')) closeSheet(s); }));
   document.addEventListener('keydown', e => {
     if (e.key !== 'Escape') return;
-    const open = [...document.querySelectorAll('.sheet')].filter(s => !s.hidden).pop();
+    const open = [...document.querySelectorAll('.sheet')].filter(s => !s.hidden && s.id !== 'profile').pop();
     if (open) closeSheet(open);
   });
 
@@ -704,7 +725,8 @@
       `Заказчик: ${m.client || '—'}`,
       `Объект: ${m.object || '—'}`,
       '',
-      `Подготовил: ${mg.name}, ${mg.title}, ${mg.phone}, ${mg.email}`,
+      `Подготовил: ${[mg.name, mg.title, S.company].filter(Boolean).join(', ')}`,
+      `Контакты: ${[mg.phone, mg.email].filter(Boolean).join(', ') || '—'}`,
       `Расчёт: курс $ ${S.rate}, ${S.vat ? 'с НДС' : 'без НДС'}, ${S.adjust ? (S.adjust > 0 ? 'наценка ' : 'скидка ') + Math.abs(S.adjust) + ' %' : 'по прайсу'}`,
       '',
       'Позиции:',
@@ -728,7 +750,7 @@
     for (let i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) | 0;
     if (KP.mailedHash === h) return;
     const m = KP.meta;
-    const subject = `КП с сайта: ${m.client || 'без заказчика'}${m.object ? ' — ' + m.object : ''} — ${fmt(kpTotal())} ₽`;
+    const subject = `КП с сайта (${S.company || S.manager.name || 'без подписи'}): ${m.client || 'без заказчика'}${m.object ? ' — ' + m.object : ''} — ${fmt(kpTotal())} ₽`;
     const results = await Promise.allSettled(MAIL_KEYS.map(key => fetch('https://api.web3forms.com/submit', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
@@ -759,7 +781,7 @@
       <div class="doc-head">
         <div class="doc-head-row">
           <img src="logo.png" alt="Система Арт">
-          <div class="doc-contacts">${esc(mg.phone)}<br>${esc(mg.email)}<br>sysartspb.com</div>
+          <div class="doc-contacts">${[mg.phone, mg.email, 'sysartspb.com'].filter(Boolean).map(esc).join('<br>')}</div>
         </div>
         <div class="doc-kicker">Архитектурное освещение · с 2009 года</div>
         <h1>Коммерческое <em>предложение</em></h1>
@@ -794,7 +816,7 @@
           <div>${m.note ? `<h4>Примечание</h4><p>${esc(m.note)}</p>` : ''}</div>
         </div>
         <div class="doc-sign">
-          <p>С уважением,<br><b>${esc(mg.name)}</b><br>${esc(mg.title)}<br>${esc(S.company)}<br>${esc(mg.phone)} · ${esc(mg.email)}</p>
+          <p>С уважением,<br>${[`<b>${esc(mg.name)}</b>`, esc(mg.title), esc(S.company), [mg.phone, mg.email].filter(Boolean).map(esc).join(' · ')].filter(x => x && x !== '<b></b>').join('<br>')}</p>
           <span class="site">Портфолио объектов: sysartspb.com</span>
         </div>
       </div>

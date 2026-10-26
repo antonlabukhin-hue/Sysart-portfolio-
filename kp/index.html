@@ -92,6 +92,24 @@
 </div>
 
 <!-- Настройки менеджера -->
+<!-- Кто собирает КП — спрашиваем при первом входе на устройстве -->
+<div class="sheet" id="profile" hidden>
+  <div class="sheet-back"></div>
+  <form class="sheet-panel small-panel" id="profileForm">
+    <span class="eyebrow">Первый вход на этом устройстве</span>
+    <h2>Кто собирает КП?</h2>
+    <p class="muted" style="margin:-8px 0 18px;font-size:13px;line-height:1.5">Эти данные будут в подписи КП и в копии, которая уходит в «Система Арт». Изменить их можно в настройках ⚙.</p>
+    <div class="settings-grid">
+      <label class="field"><span>Имя и фамилия *</span><input type="text" name="name" autocomplete="name" required></label>
+      <label class="field"><span>Компания *</span><input type="text" name="company" autocomplete="organization" required></label>
+      <label class="field"><span>Телефон *</span><input type="tel" name="phone" autocomplete="tel" inputmode="tel" required></label>
+      <label class="field"><span>E-mail</span><input type="email" name="email" autocomplete="email"></label>
+      <label class="field"><span>Должность</span><input type="text" name="title" autocomplete="organization-title"></label>
+      <button class="btn btn-main" type="submit">Продолжить</button>
+    </div>
+  </form>
+</div>
+
 <div class="sheet" id="settings" hidden>
   <div class="sheet-back" data-close></div>
   <div class="sheet-panel small-panel">
