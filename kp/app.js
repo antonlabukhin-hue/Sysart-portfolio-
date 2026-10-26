@@ -676,6 +676,7 @@
   // ---------- PDF ----------
   $('#kpPdf').addEventListener('click', async () => {
     if (!KP.lines.length) { toast('В КП нет позиций'); return; }
+    sendKpMail();
     buildDoc();
     const imgs = [...document.querySelectorAll('#print img')];
     await Promise.all(imgs.map(i => i.complete ? null : new Promise(r => { i.onload = i.onerror = r; })));
@@ -686,6 +687,63 @@
     window.print();
     document.title = old;
   });
+
+  // ---------- Копия КП на почту ----------
+  // Web3Forms, те же ключи, что у формы заявки на сайте: antonlabukhin@gmail.com и info@sysart.ru
+  // (третий ключ сайта — zayavki@ для лидов Bitrix24 — сюда не подключаем).
+  const MAIL_KEYS = ['77dab5cc-b9f0-42d1-8365-e3fca0012b0c', 'bc2f0043-368f-439b-8681-7884b82a4c61'];
+
+  function kpText() {
+    const m = KP.meta;
+    const t = kpTotal();
+    const mg = S.manager;
+    const lines = KP.lines.map((l, i) =>
+      `${i + 1}. ${lineTitle(l)}\n   ${fmt(+l.qty || 0)} ${l.unit} × ${fmt(lineUnitPrice(l))} ₽ = ${fmt(lineSum(l))} ₽${l.manual != null && l.manual !== '' ? ' (цена изменена вручную)' : ''}`);
+    return [
+      `КП № ${m.number} от ${fmtDate(m.date)}`,
+      `Заказчик: ${m.client || '—'}`,
+      `Объект: ${m.object || '—'}`,
+      '',
+      `Подготовил: ${mg.name}, ${mg.title}, ${mg.phone}, ${mg.email}`,
+      `Расчёт: курс $ ${S.rate}, ${S.vat ? 'с НДС' : 'без НДС'}, ${S.adjust ? (S.adjust > 0 ? 'наценка ' : 'скидка ') + Math.abs(S.adjust) + ' %' : 'по прайсу'}`,
+      '',
+      'Позиции:',
+      ...lines,
+      '',
+      `ИТОГО: ${fmt(t)} ₽${S.vat ? ` (в т.ч. НДС 22 %: ${fmt(t * 22 / 122)} ₽)` : ' (без НДС)'}`,
+      kpWeight() ? `Вес ≈ ${fmt(kpWeight())} кг` : '',
+      '',
+      `Срок поставки: ${m.delivery || '—'}`,
+      `Гарантия: ${m.warranty || '—'}`,
+      `Оплата: ${m.payment || '—'}`,
+      m.terms ? 'Условия:\n' + m.terms : '',
+      m.note ? 'Примечание: ' + m.note : '',
+    ].join('\n').replace(/\n{3,}/g, '\n\n');
+  }
+
+  // Отправляем при скачивании PDF; повторно — только если КП изменилось
+  async function sendKpMail() {
+    const text = kpText();
+    let h = 0;
+    for (let i = 0; i < text.length; i++) h = (h * 31 + text.charCodeAt(i)) | 0;
+    if (KP.mailedHash === h) return;
+    const m = KP.meta;
+    const subject = `КП с сайта: ${m.client || 'без заказчика'}${m.object ? ' — ' + m.object : ''} — ${fmt(kpTotal())} ₽`;
+    const results = await Promise.allSettled(MAIL_KEYS.map(key => fetch('https://api.web3forms.com/submit', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+      keepalive: true,
+      body: JSON.stringify({ access_key: key, subject, from_name: 'Конфигуратор КП sysartspb.com', name: S.manager.name, email: S.manager.email, message: text }),
+    }).then(r => r.json())));
+    const ok = results.some(r => r.status === 'fulfilled' && r.value && r.value.success);
+    if (ok) {
+      KP.mailedHash = h;
+      saveKp();
+      toast('Копия КП отправлена на почту');
+    } else {
+      toast('Не удалось отправить копию КП на почту');
+    }
+  }
 
   function buildDoc() {
     const m = KP.meta;
