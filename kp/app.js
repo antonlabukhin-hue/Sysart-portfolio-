@@ -524,11 +524,11 @@
     const k = e.target.dataset.in;
     if (!k) return;
     if (k === 'length') { const v = Math.round(+e.target.value); if (v > 0) CFG.c.length = v; renderCfg(); }
-  });
-  $('#cfgBody').addEventListener('change', e => {
-    if (e.target.dataset.sel === 'length') { CFG.c.length = +e.target.value; renderCfg(); }
     if (k === 'ral') { CFG.c.ral = e.target.value.trim(); renderCfg(); }
     if (k === 'qty') CFG.qty = Math.max(1, +e.target.value || 1);
+  });
+  $('#cfgBody').addEventListener('change', e => {
+    if (e.target.dataset.sel === 'length' && +e.target.value > 0) { CFG.c.length = +e.target.value; renderCfg(); }
   });
 
   function addToKp() {
