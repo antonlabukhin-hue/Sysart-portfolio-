@@ -162,7 +162,7 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
 .kp-meta { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; padding: 16px 0 20px; border-top: 1px solid var(--line); }
 .kp-meta .wide { grid-column: span 2; }
 .kp-lines { border-top: 1px solid var(--line); }
-.kp-row { display: grid; grid-template-columns: 26px 56px 1fr 70px 96px 120px 130px 64px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
+.kp-row { display: grid; grid-template-columns: 26px 56px minmax(0, 1fr) 70px 96px 120px 130px 150px; gap: 12px; align-items: center; padding: 10px 0; border-bottom: 1px solid var(--line); }
 .kp-row.head { font-family: var(--mono); font-size: 10px; text-transform: uppercase; letter-spacing: .08em; color: var(--muted); }
 .kp-row .n { font-family: var(--mono); font-size: 11px; color: var(--muted); }
 .kp-row .ph { width: 56px; height: 56px; border-radius: 4px; background: #efede9; display: grid; place-items: center; overflow: hidden; }
@@ -204,13 +204,13 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
   .top-settings { order: 3; margin-left: 0; width: 100%; justify-content: space-between; }
   .cart-btn { margin-left: auto; }
   .kp-meta { grid-template-columns: 1fr 1fr; }
-  .kp-row { grid-template-columns: 56px 1fr 1fr; grid-template-areas: "ph name name" "qty price sum" "unit unit tools"; row-gap: 8px; }
+  .kp-row { grid-template-columns: 64px minmax(0, 1fr) minmax(0, 1fr); grid-template-areas: "ph name name" "qty price sum" "unit tools tools"; row-gap: 8px; }
   .kp-row.head { display: none; }
   .kp-row .n { display: none; }
   .kp-row .ph { grid-area: ph; }
   .kp-row .name { grid-area: name; }
   .kp-row .unit { grid-area: unit; text-align: left; font-size: 12px; color: var(--muted); }
-  .kp-row .qty { grid-area: qty; }
+  .kp-row .qty { grid-area: qty; padding-left: 4px; padding-right: 4px; text-align: center; }
   .kp-row .price-cell { grid-area: price; }
   .kp-row .sum { grid-area: sum; align-self: center; }
   .kp-row .tools { grid-area: tools; }
