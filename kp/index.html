@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="style.css?v=202610270006">
+<link rel="stylesheet" href="style.css?v=202610270310">
 </head>
 <body>
 
@@ -79,6 +79,8 @@
       <div class="kp-actions">
         <button class="btn btn-line" id="kpSaved">Сохранённые</button>
         <button class="btn btn-line" id="kpNew">Новое</button>
+        <label class="check pp-check"><input type="checkbox" id="kpPassports"> Подготовить паспорта</label>
+        <button class="btn btn-line" id="kpPassportsPdf" hidden>Паспорта PDF</button>
         <button class="btn btn-line" id="kpXlsx">Скачать Excel</button>
         <button class="btn btn-main" id="kpPdf">Скачать PDF</button>
       </div>
@@ -137,6 +139,6 @@
 <!-- Документ для печати / PDF -->
 <div id="print" class="print"></div>
 
-<script src="app.js?v=202610270006"></script>
+<script src="app.js?v=202610270310"></script>
 </body>
 </html>

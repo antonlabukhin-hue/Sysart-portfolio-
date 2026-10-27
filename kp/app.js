@@ -45,7 +45,14 @@
 
   // Фото, добавленные после сборки прайса: photos.json { "маркировка" | "категория:id": "файл.webp" }
   const slug = s => s.toLowerCase().replace(/[^a-zа-я0-9]+/gi, '-').replace(/^-|-$/g, '');
+  // Чертежи для паспортов: drawings.json { id модели: [файлы в drw/] } — собирает _kp-tools/build-drawings.js
+  let DRAWINGS = {};
+  async function loadDrawings() {
+    try { DRAWINGS = await (await fetch('drawings.json', { cache: 'no-cache' })).json(); } catch { DRAWINGS = {}; }
+  }
+
   async function applyPhotoOverrides() {
+    loadDrawings();
     let map = {};
     try { map = await (await fetch('photos.json', { cache: 'no-cache' })).json(); } catch { return; }
     for (const [key, file] of Object.entries(map)) {
@@ -473,6 +480,7 @@
           <span class="eyebrow">${esc(cat.name)}${p.group ? ' · ' + esc(p.group) : ''}</span>
           <h2>${esc(p.sku)}</h2>
           <div class="muted">${esc(p.type)}</div>
+          ${ppAvailable(p) ? '<button class="btn btn-line pp-btn" id="cfgPassport" type="button">Паспорт PDF</button>' : ''}
           ${p.note ? `<div class="cfg-note">${esc(p.note)}</div>` : ''}
           <details class="cfg-params" ${innerWidth > 600 ? 'open' : ''}><summary>Характеристики</summary>${esc(paramsText(p))}</details>
         </div>
@@ -516,6 +524,7 @@
       return;
     }
     if (e.target.id === 'cfgAdd') addToKp();
+    if (e.target.id === 'cfgPassport') printPassports([[CFG.p, null]], 'Паспорт ' + CFG.p.sku);
   });
   $('#cfgBody').addEventListener('input', e => {
     if (e.target.dataset.in === 'qty') CFG.qty = Math.max(1, +e.target.value || 1);
@@ -582,6 +591,8 @@
 
   function renderKp() {
     const m = KP.meta;
+    $('#kpPassports').checked = !!KP.passports;
+    $('#kpPassportsPdf').hidden = !KP.passports;
     $('#kpTitle').innerHTML = esc(m.client || 'Новое КП') + (m.object ? ` <em>· ${esc(m.object)}</em>` : '');
     $('#kpMeta').innerHTML = META_FIELDS.map(([k, label, cls, ph, type]) =>
       `<label class="field ${cls}"><span>${label}</span><input type="${type || 'text'}" data-meta="${k}" value="${esc(m[k])}" placeholder="${ph}"></label>`).join('') +
@@ -925,18 +936,205 @@
   });
 
   // ---------- PDF ----------
-  $('#kpPdf').addEventListener('click', async () => {
-    if (!KP.lines.length) { toast('В КП нет позиций'); return; }
-    sendKpMail();
-    buildDoc();
+  // Печать того, что лежит в #print (КП или паспорта); title — имя PDF-файла по умолчанию
+  async function printPrepared(title) {
     const imgs = [...document.querySelectorAll('#print img')];
     await Promise.all(imgs.map(i => i.complete ? null : new Promise(r => { i.onload = i.onerror = r; })));
     await document.fonts?.ready;
     const old = document.title;
-    const m = KP.meta;
-    document.title = ['КП Система Арт', m.client, m.object, fmtDate(m.date)].filter(Boolean).join(' — ');
+    document.title = title;
     window.print();
     document.title = old;
+  }
+
+  $('#kpPdf').addEventListener('click', async () => {
+    if (!KP.lines.length) { toast('В КП нет позиций'); return; }
+    sendKpMail();
+    buildDoc();
+    const m = KP.meta;
+    await printPrepared(['КП Система Арт', m.client, m.object, fmtDate(m.date)].filter(Boolean).join(' — '));
+  });
+
+  // ---------- Паспорт изделия ----------
+  // Всё строится из прайса: колонка «Параметры», цены (какое управление есть), вес, чертежи справа от цен.
+  // Юрлицо и декларация — как в декларации ЕАЭС (согласовано 27.10.2026). Завод-изготовитель не называем.
+  const PP_COMPANY = { name: 'ООО СТК «Система Арт»', inn: '2543125743', ogrn: '1182536016948', addr: '690089, г. Владивосток, ул. Днепровская, 29, офис 1', phone: '+7 914 970-40-00', email: 'info@sysart.ru', site: 'sysartspb.com' };
+  const PP_DECL = 'Декларация о соответствии ЕАЭС N RU Д-CN.PA02.B.14453/23 от 02.03.2023, действует до 01.03.2028. ТР ТС 004/2011, ТР ТС 020/2011, ТР ЕАЭС 037/2016. Светильники признаны годными к эксплуатации.';
+  // Декларация покрывает серии SA, SA-LCL, SA-LWL, SA-WPL, SA-INL, SA-UWL, SA-LSCPL, SA-LSTRL, SA-SEFL, SA-SFTL
+  const ppDeclared = p => /^SA[\s-]/i.test(p.sku);
+  const PP_KIND = {
+    contour: 'Светильник светодиодный линейный контурный', washer: 'Светильник светодиодный линейный заливающий',
+    accent: 'Светильник светодиодный акцентный', flood: 'Прожектор светодиодный', window: 'Светильник светодиодный для подсветки проёмов',
+    points: 'Светильник светодиодный точечный', inground: 'Светильник светодиодный грунтовый', landscape: 'Светильник светодиодный ландшафтный',
+  };
+  const PP_LEAD = {
+    contour: 'Линейный светильник для контурной подсветки фасадов, карнизов, парапетов и архитектурных линий.',
+    washer: 'Линейный светильник для заливающей подсветки фасадов, карнизов, ниш и протяжённых поверхностей.',
+    accent: 'Светильник для акцентной подсветки архитектурных элементов: колонн, пилястр, деталей фасада, деревьев и малых форм.',
+    flood: 'Прожектор для заливающей подсветки фасадов, крупных объектов и территорий.',
+    window: 'Светильник для подсветки оконных проёмов, откосов и простенков.',
+    points: 'Точечный светильник для декоративной и динамической подсветки фасадов.',
+    inground: 'Встраиваемый грунтовый светильник для подсветки фасадов, деревьев и пешеходных зон снизу.',
+    landscape: 'Светильник для ландшафтной подсветки садов, дорожек, лестниц и малых архитектурных форм.',
+  };
+  const ppKind = p => /спецэффект|шоу/i.test(p.group) ? 'Световой прибор для спецэффектов' : (PP_KIND[p.cat] || 'Светильник светодиодный');
+  const ppLead = p => /спецэффект|шоу/i.test(p.group) ? 'Световой прибор для создания динамических световых эффектов на фасадах и территориях.' : (PP_LEAD[p.cat] || '');
+  // Гарантия: 3 года, но у ряда групп прайс прямо пишет «2 года гарантии от производителя»
+  const ppWarrantyYears = p => /2 года гарантии/i.test(p.group + ' ' + (catOf(p).notes || []).join(' ')) ? 2 : 3;
+
+  // Значение поля из текста «Параметры»: «Рассеиватель: стекло Крепление: …» → «стекло»
+  const PP_LABELS = ['Светодиоды', 'Мощность', 'Напряжение питания', 'Угол свечения', 'Угол света', 'Размер корпуса', 'Цвет корпуса',
+    'Рассеиватель', 'Исполнение рассеивателя', 'Крепление', 'Материал корпуса', 'Материал', 'Длина отрезков', 'Кратность резки',
+    'Варианты изгиба', 'Варианты выхода кабеля', 'Температура света', 'Световой поток', 'Индекс цветопередачи', 'Дополнительные цвета свечения', 'LED', 'IP'];
+  function ppField(text, label) {
+    const others = PP_LABELS.filter(l => l !== label).map(l => l.replace(/\s/g, '\\s'));
+    const m = String(text || '').match(new RegExp(label.replace(/\s/g, '\\s') + '\\s*[:：]?\\s*(.+?)(?=\\s*(?:' + others.join('|') + ')(?:\\s|[:：])|$)', 'i'));
+    return m ? m[1].replace(/[\s,;.]+$/, '').replace(/\s*,\s*/g, ', ').replace(/\s*\/\s*/g, '/').trim() : '';
+  }
+  const ppAngle = a => String(a).replace('*', '×') + '°';
+  const ppVolt = list => list.length ? list.join(' / ') + ' В' : '';
+  const ppTemps = list => !list.length ? '' : list.length > 4 ? `${list[0]}–${list[list.length - 1]} K` : list.join(' / ') + ' K';
+
+  // Типовая кривая силы света: I(θ) = cosⁿθ, n подобран так, чтобы на половине угла было 50 %
+  function ppKss(angle) {
+    const parts = String(angle || 60).split('*').map(Number).filter(Boolean);
+    const curve = (deg, cls) => {
+      const half = Math.min(Math.max(deg, 2), 170) / 2 * Math.PI / 180;
+      const n = Math.log(0.5) / Math.log(Math.cos(half));
+      const pts = [];
+      for (let t = -90; t <= 90; t += 1) {
+        const th = t * Math.PI / 180;
+        const r = 122 * Math.pow(Math.max(Math.cos(th), 0), n);
+        pts.push(`${(130 + r * Math.sin(th)).toFixed(1)},${(10 + r * Math.cos(th)).toFixed(1)}`);
+      }
+      return `<polygon points="${pts.join(' ')}" class="${cls}"/>`;
+    };
+    const legend = parts.length > 1
+      ? `<g font-family="DM Mono, monospace" font-size="7"><text x="186" y="128" fill="#e6332e">— C0 ${parts[0]}°</text><text x="186" y="138" fill="#8c8b86">- - C90 ${parts[1]}°</text></g>` : '';
+    return `<svg class="pp-ksp" viewBox="0 0 260 150"><g fill="none" stroke="#d9d5ce" stroke-width=".8">
+      <path d="M10 10 A120 120 0 0 0 250 10"/><path d="M50 10 A80 80 0 0 0 210 10"/><path d="M90 10 A40 40 0 0 0 170 10"/>
+      <line x1="130" y1="10" x2="130" y2="140"/><line x1="130" y1="10" x2="45" y2="95"/><line x1="130" y1="10" x2="215" y2="95"/><line x1="10" y1="10" x2="250" y2="10"/></g>
+      ${parts[1] ? curve(parts[1], 'c90') : ''}${curve(parts[0], 'c0')}
+      <g font-family="DM Mono, monospace" font-size="7" fill="#8c8b86"><text x="134" y="146">0°</text><text x="30" y="104">45°</text><text x="214" y="104">45°</text><text x="2" y="20">90°</text><text x="240" y="20">90°</text></g>${legend}</svg>`;
+  }
+
+  // Данные паспорта. execs — исполнения модели (строки прайса с той же маркировкой); line — позиция КП или null
+  function ppData(p, line) {
+    const execs = line ? [p] : DATA.products.filter(x => x.cat === p.cat && slug(x.sku) === slug(p.sku));
+    const t = p.params || '';
+    const c = line && line.cfg;
+    const col = colorsOf(p);
+    const leds = [...new Set(execs.map(x => ppField(x.params, 'Светодиоды')).filter(Boolean))];
+    const control = [];
+    if (execs.some(x => x.usd.mono != null)) control.push('без управления');
+    if (execs.some(x => x.usd.dmx != null || x.usd.rgbw != null)) control.push('DMX512');
+    const angles = [...new Set(execs.flatMap(x => x.angles || []))];
+    const temps = [...new Set(execs.flatMap(x => colorsOf(x).temps))].sort((a, b) => a - b);
+    const colorNames = [...new Set(execs.flatMap(x => [...colorsOf(x).mono.map(m => COLOR_NAMES[m]), ...colorsOf(x).rgb]))];
+    const weight = p.weight ? (p.perMeter ? `${String(p.weight).replace('.', ',')} кг/м` : `${String(p.weight).replace('.', ',')} кг`) : '';
+    const unitW = p.powerUnit === 'Вт/м' ? 'Вт/м' : 'Вт';
+    let left, right, chips;
+    if (c) {
+      // Исполнение по КП — ровно выбранные параметры
+      const ctrl = priceCol(p, c) === 'mono' ? 'без управления' : (/PWM/i.test(p.sku) ? 'PWM' : 'DMX512');
+      const color = c.color == null ? '' : typeof c.color === 'number' ? `${c.color} K` : (COLOR_NAMES[c.color] || c.color);
+      const powerTxt = !c.power ? '' : isRigid(p) && c.length ? `до ${Math.round(c.power * c.length / 1000)} Вт (${c.power} Вт/м)` : `до ${c.power} ${unitW}`;
+      left = [['Светодиоды', ppField(t, 'Светодиоды')], ['Мощность', powerTxt], ['Напряжение питания', c.voltage ? c.voltage + ' В' : ''],
+        ['Цвет свечения', color], ['Угол свечения', c.angle ? ppAngle(c.angle) : ''], ['Управление', ctrl],
+        ['Длина', isRigid(p) && c.length ? fmtLen(c.length) + ' мм' : ''], ['Количество', `${fmt(+line.qty || 0)} ${line.unit}`]];
+      right = [['Корпус', ppField(t, 'Материал корпуса') || ppField(t, 'Материал')], ['Цвет корпуса', c.paint ? `RAL ${c.ral || '(по согласованию)'}` : ppField(t, 'Цвет корпуса')],
+        ['Рассеиватель', ppField(t, 'Рассеиватель') || ppField(t, 'Исполнение рассеивателя')], ['Размер корпуса', p.size ? p.size.replace(/\*/g, ' × ') + ' мм' : ''],
+        ['Крепление', ppField(t, 'Крепление')], ['Козырёк', c.visor ? 'есть' : (p.markups.visor === 'included' ? 'в комплекте' : '')],
+        ['Степень защиты', p.ip || ''], ['Вес', isRigid(p) && c.length && p.weight ? `≈ ${String(Math.round(p.weight * c.length / 100) / 10).replace('.', ',')} кг` : weight]];
+      chips = [powerTxt.replace(/ \(.*\)/, ''), c.voltage && c.voltage + ' В', p.ip, c.angle && ppAngle(c.angle), color, ctrl === 'без управления' ? '' : ctrl, isRigid(p) && c.length && fmtLen(c.length) + ' мм'];
+    } else {
+      const colorTxt = [ppTemps(temps), colorNames.join(', ')].filter(Boolean).join('; ');
+      left = [['Светодиоды', leds.join(' · или ')], ['Мощность', p.power ? `до ${p.power} ${unitW}` : ''], ['Напряжение питания', ppVolt(voltagesOf(p))],
+        ['Цвет свечения', colorTxt], ['Угол свечения', angles.map(ppAngle).join(', ')], ['Управление', control.join(' / ')],
+        ['Длина', lengthTable(p, 24) ? `по заказу, ${fmtLen(lengthTable(p, 24)[0])}–${fmtLen(lengthTable(p, 24).slice(-1)[0])} мм` : (isFlex(p) ? ppField(t, 'Длина отрезков') : '')]];
+      right = [['Корпус', ppField(t, 'Материал корпуса') || ppField(t, 'Материал')], ['Цвет корпуса', ppField(t, 'Цвет корпуса')],
+        ['Рассеиватель', ppField(t, 'Рассеиватель') || ppField(t, 'Исполнение рассеивателя')], ['Размер корпуса', p.size ? p.size.replace(/\*/g, ' × ') + ' мм' : ''],
+        ['Крепление', ppField(t, 'Крепление')], ['Степень защиты', p.ip || ''], ['Вес', weight]];
+      const angleNums = angles.flatMap(a => String(a).split('*').map(Number)).filter(Boolean);
+      const angleRange = angles.length > 1 ? `${Math.min(...angleNums)}–${Math.max(...angleNums)}°` : (angles[0] ? ppAngle(angles[0]) : '');
+      chips = [p.power && `до ${p.power} ${unitW}`, ppVolt(voltagesOf(p)), p.ip, angleRange, ppTemps(temps), '−40…+40 °C'];
+    }
+    const drawings = [...new Set(execs.flatMap(x => DRAWINGS[x.id] || []))].slice(0, 4);
+    return {
+      p, line, kind: ppKind(p), lead: ppLead(p), note: p.note && p.note !== p.note.toUpperCase() ? p.note : '',
+      left: left.filter(r => r[1]), right: right.filter(r => r[1]), chips: chips.filter(Boolean),
+      drawings, angle: c ? c.angle : (angles[0] || null), warranty: ppWarrantyYears(p), declared: ppDeclared(p), execs: execs.length,
+    };
+  }
+
+  function ppPages(d) {
+    const p = d.p, m = KP.meta;
+    const rows = list => `<table class="pp-table">${list.map(([k, v]) => `<tr><td>${esc(k)}</td><td>${esc(v)}</td></tr>`).join('')}</table>`;
+    const head = sub => `<div class="pp-head"><img src="logo-dark.jpg" alt="Система Арт"><span class="pp-mono">${esc(sub)}</span></div>`;
+    const footShort = `<div class="pp-foot"><span><b>${PP_COMPANY.name}</b> · ИНН ${PP_COMPANY.inn} · ${PP_COMPANY.addr.replace(/^\d+, /, '')} · ${PP_COMPANY.phone} · ${PP_COMPANY.email} · ${PP_COMPANY.site}</span><span class="pp-mono">1 / 2</span></div>`;
+    const footFull = `<div class="pp-foot"><span><b>${PP_COMPANY.name}</b> · ИНН ${PP_COMPANY.inn} · ОГРН ${PP_COMPANY.ogrn} · ${PP_COMPANY.addr}<br>${PP_COMPANY.phone} · ${PP_COMPANY.email} · ${PP_COMPANY.site}</span><span class="pp-mono">2 / 2</span></div>`;
+    const kpbox = d.line ? `<div class="pp-kpbox"><b>Исполнение по КП № ${esc(m.number)}${m.object ? ' · объект: ' + esc(m.object) : ''}</b><span>${esc(d.chips.join(' · '))} · ${esc(fmt(+d.line.qty || 0) + ' ' + d.line.unit)} — паспорт собран под эти параметры.</span></div>` : '';
+    const draws = d.drawings.length
+      ? `<div class="pp-draws n${d.drawings.length}">${d.drawings.map(f => `<div><img src="drw/${f}" alt=""></div>`).join('')}</div>`
+      : `<p>Габаритные размеры корпуса: ${esc(p.size ? p.size.replace(/\*/g, ' × ') + ' мм' : 'по запросу')}. Чертёж с вариантами крепления — по запросу.</p>`;
+    let n = 0;
+    const h = title => `<h2 class="pp-h"><i>${String(++n).padStart(2, '0')}</i> ${title}</h2>`;
+    const page1 = `<section class="pp-page">
+      ${head(d.line ? 'Паспорт изделия · по КП' : 'Паспорт изделия · общий')}
+      <div class="pp-title">
+        <div>
+          <div class="pp-kind pp-mono">${esc(d.kind)}</div>
+          <h1>${esc(p.sku)}</h1>
+          <p class="pp-lead">${esc(d.lead)}${d.note ? ' ' + esc(d.note) + (/[.!]$/.test(d.note) ? '' : '.') : ''}${d.execs > 1 ? ` Выпускается в ${d.execs} исполнениях.` : ''}</p>
+          <div class="pp-chips">${d.chips.map(c => `<span>${esc(c)}</span>`).join('')}</div>
+        </div>
+        <div class="pp-photo">${p.photo ? `<img src="img/${p.photo}" alt="">` : ''}</div>
+      </div>
+      ${kpbox}
+      <div class="pp-block">${h('Технические характеристики')}<div class="pp-two">${rows(d.left)}${rows(d.right)}</div></div>
+      <div class="pp-block">${h('Размеры и варианты крепления')}${draws}</div>
+      ${footShort}
+    </section>`;
+    const y = d.warranty;
+    const page2 = `<section class="pp-page">
+      ${head(p.sku + ' · паспорт изделия')}
+      <div class="pp-two" style="margin-top:22px">
+        <div>${h('Фотометрия')}${ppKss(d.angle)}<div class="pp-note">Типовая кривая силы света для угла ${esc(d.angle ? ppAngle(d.angle) : '—')}. Фактическая зависит от выбранной оптики.</div></div>
+        <div>${h('Эксплуатация')}${rows([['Срок службы', '50 000 ч'], ['Коэффициент мощности', '≥ 0,9'], ['Температура работы', '−40…+40 °C'], ['Климатическое исполнение', 'М1'], ['Гарантия', y === 2 ? '2 года' : '3 года']])}</div>
+      </div>
+      <div class="pp-block" style="margin-top:20px">${h('Монтаж и подключение')}<p>Кронштейны устанавливайте в 100–120 мм от торцевых крышек. При управлении по DMX512 расстояние от порта конвертера до последнего светильника в линии — не более 100 м; на большей длине ставьте усилитель сигнала через 60–80 м. Кабель в виниловой изоляции монтируйте при температуре выше 0 °C или прогрейте его перед монтажом.</p></div>
+      <div class="pp-two pp-block">
+        <div>${h('Безопасность')}<p>Монтаж и обслуживание — только при обесточенной сети. Подключение к сети с параметрами, отличными от указанных в паспорте, запрещено. Не эксплуатировать в химически активной среде.</p></div>
+        <div>${h('Хранение и комплектность')}<p>Хранить в сухих помещениях без паров кислот и щелочей. В комплекте: светильник — 1 шт., упаковка — 1 шт., паспорт — 1 шт. на партию до 100 шт.</p></div>
+      </div>
+      ${d.declared ? `<div class="pp-block">${h('Соответствие')}<p class="pp-eacrow"><span class="pp-eac">EAC</span><span>${PP_DECL}</span></p></div>` : ''}
+      <div class="pp-block">${h('Гарантийные обязательства')}<p>Гарантия — ${y * 12} месяцев со дня продажи при соблюдении правил монтажа, эксплуатации и хранения. В течение гарантийного срока неисправный светильник ремонтируется или заменяется бесплатно (кроме расходов на доставку). Гарантия не действует при самостоятельной разборке или ремонте, механических повреждениях, нарушении правил электропитания и отсутствии паспорта.</p>
+        <div class="pp-sign"><div>С условиями гарантии согласен (подпись, расшифровка)</div><div>Дата продажи</div><div>М.П.</div></div></div>
+      ${footFull}
+    </section>`;
+    return page1 + page2;
+  }
+
+  const ppAvailable = p => p && p.cat !== 'control';
+
+  async function printPassports(items, title) {
+    if (!items.length) { toast('Нет светильников для паспорта'); return; }
+    $('#print').innerHTML = `<div class="pp">${items.map(([p, line]) => ppPages(ppData(p, line))).join('')}</div>`;
+    await printPrepared(title);
+  }
+
+  // Паспорта по КП: по одному на каждую позицию-светильник, с выбранными параметрами
+  function kpPassportItems() {
+    return KP.lines.filter(l => ppAvailable(PROD[l.pid])).map(l => [PROD[l.pid], l]);
+  }
+  $('#kpPassports').addEventListener('change', e => {
+    KP.passports = e.target.checked;
+    saveKp();
+    $('#kpPassportsPdf').hidden = !KP.passports;
+  });
+  $('#kpPassportsPdf').addEventListener('click', () => {
+    const m = KP.meta;
+    printPassports(kpPassportItems(), ['Паспорта к КП', m.number, m.client, m.object].filter(Boolean).join(' — '));
   });
 
   // ---------- Копия КП на почту ----------
