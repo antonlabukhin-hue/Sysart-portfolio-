@@ -480,7 +480,7 @@
           <span class="eyebrow">${esc(cat.name)}${p.group ? ' · ' + esc(p.group) : ''}</span>
           <h2>${esc(p.sku)}</h2>
           <div class="muted">${esc(p.type)}</div>
-          ${ppAvailable(p) ? '<button class="btn btn-line pp-btn" id="cfgPassport" type="button">Паспорт PDF</button>' : ''}
+          ${ppAvailable(p) ? '<div class="pp-btns"><button class="btn btn-line pp-btn" id="cfgPassportCfg" type="button">Паспорт по параметрам</button><button class="btn btn-line pp-btn" id="cfgPassport" type="button">Общий паспорт</button></div>' : ''}
           ${p.note ? `<div class="cfg-note">${esc(p.note)}</div>` : ''}
           <details class="cfg-params" ${innerWidth > 600 ? 'open' : ''}><summary>Характеристики</summary>${esc(paramsText(p))}</details>
         </div>
@@ -525,6 +525,12 @@
     }
     if (e.target.id === 'cfgAdd') addToKp();
     if (e.target.id === 'cfgPassport') printPassports([[CFG.p, null]], 'Паспорт ' + CFG.p.sku);
+    // Паспорт ровно с выбранными параметрами — без добавления в КП
+    if (e.target.id === 'cfgPassportCfg') {
+      const q = $('#cfgBody [data-in="qty"]');
+      const line = { pid: CFG.p.id, cfg: { ...CFG.c }, qty: Math.max(1, +(q && q.value) || CFG.qty || 1), unit: isFlex(CFG.p) ? 'м' : 'шт.', fromCfg: true };
+      printPassports([[CFG.p, line]], 'Паспорт ' + CFG.p.sku);
+    }
   });
   $('#cfgBody').addEventListener('input', e => {
     if (e.target.dataset.in === 'qty') CFG.qty = Math.max(1, +e.target.value || 1);
@@ -616,6 +622,7 @@
             <span class="sum">${fmt(lineSum(l))}</span>
             <div class="tools">
               ${p ? '<button data-act="edit" title="Изменить параметры">✎</button>' : ''}
+              ${ppAvailable(p) ? '<button data-act="pp" title="Паспорт этой позиции (PDF)" class="pp-row">паспорт</button>' : ''}
               <button data-act="up" title="Выше">↑</button>
               <button data-act="del" title="Удалить">×</button>
             </div>
@@ -667,6 +674,7 @@
     if (act === 'up' && i > 0) [KP.lines[i - 1], KP.lines[i]] = [KP.lines[i], KP.lines[i - 1]];
     if (act === 'reset') KP.lines[i].manual = null;
     if (act === 'edit') { openCfg(KP.lines[i].pid, i); return; }
+    if (act === 'pp') { const l = KP.lines[i]; printPassports([[PROD[l.pid], l]], 'Паспорт ' + PROD[l.pid].sku); return; }
     saveKp();
     updateCount();
     renderKp();
@@ -985,12 +993,22 @@
   // Значение поля из текста «Параметры»: «Рассеиватель: стекло Крепление: …» → «стекло»
   const PP_LABELS = ['Светодиоды', 'Мощность', 'Напряжение питания', 'Угол свечения', 'Угол света', 'Размер корпуса', 'Цвет корпуса',
     'Рассеиватель', 'Исполнение рассеивателя', 'Крепление', 'Материал корпуса', 'Материал', 'Длина отрезков', 'Кратность резки',
-    'Варианты изгиба', 'Варианты выхода кабеля', 'Температура света', 'Световой поток', 'Индекс цветопередачи', 'Дополнительные цвета свечения', 'LED', 'IP'];
+    'Варианты изгиба', 'Варианты выхода кабеля', 'Температура света', 'Световой поток', 'Индекс цветопередачи', 'Дополнительные цвета свечения', 'LED', 'IP',
+    'Материал корпуса и рассеивателя', 'Подключение питания', 'Степень защиты', 'Эффекты', 'Управление', 'Модель', 'Креплление'];
+  // Граница поля — следующая подпись; «IP67» пишется слитно, поэтому для IP ждём цифру
+  const ppLabelRe = l => l === 'IP' ? 'IP\\s?\\d' : l.replace(/\s/g, '\\s') + '(?=\\s|[:：])';
   function ppField(text, label) {
-    const others = PP_LABELS.filter(l => l !== label).map(l => l.replace(/\s/g, '\\s'));
-    const m = String(text || '').match(new RegExp(label.replace(/\s/g, '\\s') + '\\s*[:：]?\\s*(.+?)(?=\\s*(?:' + others.join('|') + ')(?:\\s|[:：])|$)', 'i'));
+    const others = PP_LABELS.filter(l => l !== label && !l.startsWith(label + ' ') && !(label === 'Светодиоды' && l === 'LED')).map(ppLabelRe);
+    const m = String(text || '').match(new RegExp(label.replace(/\s/g, '\\s') + '\\s*[:：]?\\s*(.+?)(?=\\s*(?:' + others.join('|') + ')|$)', 'i'));
     return m ? m[1].replace(/[\s,;.]+$/, '').replace(/\s*,\s*/g, ', ').replace(/\s*\/\s*/g, '/').trim() : '';
   }
+  // Материал: «Материал корпуса и рассеивателя экструдированный силикон» — у гибкого неона одной строкой
+  function ppHousing(t) {
+    const both = ppField(t, 'Материал корпуса и рассеивателя');
+    return both ? ['Корпус и рассеиватель', both] : ['Корпус', ppField(t, 'Материал корпуса') || ppField(t, 'Материал')];
+  }
+  const ppLeds = t => ppField(t, 'Светодиоды').replace(/(\bLED\b).*$/i, '$1').replace(/[\s,]+$/, '');
+  const ppNum = n => String(n).replace('.', ',');
   const ppAngle = a => String(a).replace('*', '×') + '°';
   const ppVolt = list => list.length ? list.join(' / ') + ' В' : '';
   const ppTemps = list => !list.length ? '' : list.length > 4 ? `${list[0]}–${list[list.length - 1]} K` : list.join(' / ') + ' K';
@@ -1024,7 +1042,7 @@
     const t = p.params || '';
     const c = line && line.cfg;
     const col = colorsOf(p);
-    const leds = [...new Set(execs.map(x => ppField(x.params, 'Светодиоды')).filter(Boolean))];
+    const leds = [...new Set(execs.map(x => ppLeds(x.params)).filter(Boolean))];
     const control = [];
     if (execs.some(x => x.usd.mono != null)) control.push('без управления');
     if (execs.some(x => x.usd.dmx != null || x.usd.rgbw != null)) control.push('DMX512');
@@ -1038,26 +1056,26 @@
       // Исполнение по КП — ровно выбранные параметры
       const ctrl = priceCol(p, c) === 'mono' ? 'без управления' : (/PWM/i.test(p.sku) ? 'PWM' : 'DMX512');
       const color = c.color == null ? '' : typeof c.color === 'number' ? `${c.color} K` : (COLOR_NAMES[c.color] || c.color);
-      const powerTxt = !c.power ? '' : isRigid(p) && c.length ? `до ${Math.round(c.power * c.length / 1000)} Вт (${c.power} Вт/м)` : `до ${c.power} ${unitW}`;
-      left = [['Светодиоды', ppField(t, 'Светодиоды')], ['Мощность', powerTxt], ['Напряжение питания', c.voltage ? c.voltage + ' В' : ''],
+      const powerTxt = !c.power ? '' : isRigid(p) && c.length ? `до ${Math.round(c.power * c.length / 1000)} Вт (${ppNum(c.power)} Вт/м)` : `до ${ppNum(c.power)} ${unitW}`;
+      left = [['Светодиоды', ppLeds(t)], ['Мощность', powerTxt], ['Напряжение питания', c.voltage ? c.voltage + ' В' : ''],
         ['Цвет свечения', color], ['Угол свечения', c.angle ? ppAngle(c.angle) : ''], ['Управление', ctrl],
         ['Длина', isRigid(p) && c.length ? fmtLen(c.length) + ' мм' : ''], ['Количество', `${fmt(+line.qty || 0)} ${line.unit}`]];
-      right = [['Корпус', ppField(t, 'Материал корпуса') || ppField(t, 'Материал')], ['Цвет корпуса', c.paint ? `RAL ${c.ral || '(по согласованию)'}` : ppField(t, 'Цвет корпуса')],
+      right = [ppHousing(t), ['Цвет корпуса', c.paint ? `RAL ${c.ral || '(по согласованию)'}` : ppField(t, 'Цвет корпуса')],
         ['Рассеиватель', ppField(t, 'Рассеиватель') || ppField(t, 'Исполнение рассеивателя')], ['Размер корпуса', p.size ? p.size.replace(/\*/g, ' × ') + ' мм' : ''],
         ['Крепление', ppField(t, 'Крепление')], ['Козырёк', c.visor ? 'есть' : (p.markups.visor === 'included' ? 'в комплекте' : '')],
         ['Степень защиты', p.ip || ''], ['Вес', isRigid(p) && c.length && p.weight ? `≈ ${String(Math.round(p.weight * c.length / 100) / 10).replace('.', ',')} кг` : weight]];
       chips = [powerTxt.replace(/ \(.*\)/, ''), c.voltage && c.voltage + ' В', p.ip, c.angle && ppAngle(c.angle), color, ctrl === 'без управления' ? '' : ctrl, isRigid(p) && c.length && fmtLen(c.length) + ' мм'];
     } else {
       const colorTxt = [ppTemps(temps), colorNames.join(', ')].filter(Boolean).join('; ');
-      left = [['Светодиоды', leds.join(' · или ')], ['Мощность', p.power ? `до ${p.power} ${unitW}` : ''], ['Напряжение питания', ppVolt(voltagesOf(p))],
+      left = [['Светодиоды', leds.join(' · или ')], ['Мощность', p.power ? `до ${ppNum(p.power)} ${unitW}` : ''], ['Напряжение питания', ppVolt(voltagesOf(p))],
         ['Цвет свечения', colorTxt], ['Угол свечения', angles.map(ppAngle).join(', ')], ['Управление', control.join(' / ')],
         ['Длина', lengthTable(p, 24) ? `по заказу, ${fmtLen(lengthTable(p, 24)[0])}–${fmtLen(lengthTable(p, 24).slice(-1)[0])} мм` : (isFlex(p) ? ppField(t, 'Длина отрезков') : '')]];
-      right = [['Корпус', ppField(t, 'Материал корпуса') || ppField(t, 'Материал')], ['Цвет корпуса', ppField(t, 'Цвет корпуса')],
+      right = [ppHousing(t), ['Цвет корпуса', ppField(t, 'Цвет корпуса')],
         ['Рассеиватель', ppField(t, 'Рассеиватель') || ppField(t, 'Исполнение рассеивателя')], ['Размер корпуса', p.size ? p.size.replace(/\*/g, ' × ') + ' мм' : ''],
         ['Крепление', ppField(t, 'Крепление')], ['Степень защиты', p.ip || ''], ['Вес', weight]];
       const angleNums = angles.flatMap(a => String(a).split('*').map(Number)).filter(Boolean);
       const angleRange = angles.length > 1 ? `${Math.min(...angleNums)}–${Math.max(...angleNums)}°` : (angles[0] ? ppAngle(angles[0]) : '');
-      chips = [p.power && `до ${p.power} ${unitW}`, ppVolt(voltagesOf(p)), p.ip, angleRange, ppTemps(temps), '−40…+40 °C'];
+      chips = [p.power && `до ${ppNum(p.power)} ${unitW}`, ppVolt(voltagesOf(p)), p.ip, angleRange, ppTemps(temps), '−40…+40 °C'];
     }
     const drawings = [...new Set(execs.flatMap(x => DRAWINGS[x.id] || []))].slice(0, 4);
     return {
@@ -1073,18 +1091,18 @@
     const head = sub => `<div class="pp-head"><img src="logo-dark.jpg" alt="Система Арт"><span class="pp-mono">${esc(sub)}</span></div>`;
     const footShort = `<div class="pp-foot"><span><b>${PP_COMPANY.name}</b> · ИНН ${PP_COMPANY.inn} · ${PP_COMPANY.addr.replace(/^\d+, /, '')} · ${PP_COMPANY.phone} · ${PP_COMPANY.email} · ${PP_COMPANY.site}</span><span class="pp-mono">1 / 2</span></div>`;
     const footFull = `<div class="pp-foot"><span><b>${PP_COMPANY.name}</b> · ИНН ${PP_COMPANY.inn} · ОГРН ${PP_COMPANY.ogrn} · ${PP_COMPANY.addr}<br>${PP_COMPANY.phone} · ${PP_COMPANY.email} · ${PP_COMPANY.site}</span><span class="pp-mono">2 / 2</span></div>`;
-    const kpbox = d.line ? `<div class="pp-kpbox"><b>Исполнение по КП № ${esc(m.number)}${m.object ? ' · объект: ' + esc(m.object) : ''}</b><span>${esc(d.chips.join(' · '))} · ${esc(fmt(+d.line.qty || 0) + ' ' + d.line.unit)} — паспорт собран под эти параметры.</span></div>` : '';
+    const kpbox = d.line ? `<div class="pp-kpbox"><b>${d.line.fromCfg ? 'Исполнение по заказу' : `Исполнение по КП № ${esc(m.number)}${m.object ? ' · объект: ' + esc(m.object) : ''}`}</b><span>${esc(d.chips.join(' · '))} · ${esc(fmt(+d.line.qty || 0) + ' ' + d.line.unit)} — паспорт собран под эти параметры.</span></div>` : '';
     const draws = d.drawings.length
       ? `<div class="pp-draws n${d.drawings.length}">${d.drawings.map(f => `<div><img src="drw/${f}" alt=""></div>`).join('')}</div>`
       : `<p>Габаритные размеры корпуса: ${esc(p.size ? p.size.replace(/\*/g, ' × ') + ' мм' : 'по запросу')}. Чертёж с вариантами крепления — по запросу.</p>`;
     let n = 0;
     const h = title => `<h2 class="pp-h"><i>${String(++n).padStart(2, '0')}</i> ${title}</h2>`;
     const page1 = `<section class="pp-page">
-      ${head(d.line ? 'Паспорт изделия · по КП' : 'Паспорт изделия · общий')}
+      ${head(!d.line ? 'Паспорт изделия · общий' : d.line.fromCfg ? 'Паспорт изделия · по заказу' : 'Паспорт изделия · по КП')}
       <div class="pp-title">
         <div>
           <div class="pp-kind pp-mono">${esc(d.kind)}</div>
-          <h1>${esc(p.sku)}</h1>
+          <h1 class="${p.sku.length > 16 ? 'long' : ''}">${esc(p.sku)}</h1>
           <p class="pp-lead">${esc(d.lead)}${d.note ? ' ' + esc(d.note) + (/[.!]$/.test(d.note) ? '' : '.') : ''}${d.execs > 1 ? ` Выпускается в ${d.execs} исполнениях.` : ''}</p>
           <div class="pp-chips">${d.chips.map(c => `<span>${esc(c)}</span>`).join('')}</div>
         </div>
@@ -1117,10 +1135,14 @@
 
   const ppAvailable = p => p && p.cat !== 'control';
 
+  // Safari (iPhone, iPad, Mac) добавляет к листу свои поля и колонтитулы — там лист делаем ниже и плотнее
+  const ppSafeMode = () => { const ua = navigator.userAgent; return /iP(hone|ad|od)/.test(ua) || (/Safari/.test(ua) && !/Chrome|Chromium|CriOS|Edg|OPR|YaBrowser/.test(ua)); };
+  const ppFileTitle = s => s.replace(/[\\/:*?"<>|]+/g, ' ').replace(/\s+/g, ' ').trim();
+
   async function printPassports(items, title) {
     if (!items.length) { toast('Нет светильников для паспорта'); return; }
-    $('#print').innerHTML = `<div class="pp">${items.map(([p, line]) => ppPages(ppData(p, line))).join('')}</div>`;
-    await printPrepared(title);
+    $('#print').innerHTML = `<div class="pp${ppSafeMode() ? ' safe' : ''}">${items.map(([p, line]) => ppPages(ppData(p, line))).join('')}</div>`;
+    await printPrepared(ppFileTitle(title));
   }
 
   // Паспорта по КП: по одному на каждую позицию-светильник, с выбранными параметрами

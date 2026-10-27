@@ -369,3 +369,20 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
 .pp-sign div { border-top: 1px solid var(--pp-ink); padding-top: 5px; }
 .pp-foot { position: absolute; left: 52px; right: 52px; bottom: 26px; display: flex; justify-content: space-between; gap: 20px; border-top: 1px solid var(--pp-line); padding-top: 10px; font-size: 8.5px; line-height: 1.5; color: var(--pp-muted); }
 .pp-foot b { color: var(--pp-soft); font-weight: 600; }
+.pp-btns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+.pp-btns .pp-btn { margin-top: 0; }
+.kp-row .tools button.pp-row { width: auto; padding: 0 9px; border-radius: 999px; border: 1px solid var(--line-2); font-size: 11px; color: var(--soft); }
+.kp-row .tools button.pp-row:hover { border-color: var(--red); color: #fff; }
+.pp h1.long { font-size: 30px; line-height: 1.05; }
+/* Safari: лист ниже A4 на поля и колонтитулы браузера, всё плотнее */
+.pp.safe .pp-page { width: auto; height: 262mm; padding: 30px 36px 56px; }
+.pp.safe h1 { font-size: 32px; } .pp.safe h1.long { font-size: 26px; }
+.pp.safe .pp-title { margin-top: 16px; grid-template-columns: 1fr 210px; gap: 20px; }
+.pp.safe .pp-photo { height: 200px; } .pp.safe .pp-photo img { max-height: 200px; }
+.pp.safe .pp-lead { margin: 10px 0 12px !important; }
+.pp.safe .pp-kpbox { margin-top: 12px; padding: 9px 12px; }
+.pp.safe .pp-block { margin-top: 12px; }
+.pp.safe .pp-table td { padding: 4px 7px; }
+.pp.safe .pp-draws div { height: 120px; } .pp.safe .pp-draws.n1 div, .pp.safe .pp-draws.n2 div { height: 160px; }
+.pp.safe .pp-ksp { max-height: 170px; }
+.pp.safe .pp-foot { left: 36px; right: 36px; bottom: 16px; }
