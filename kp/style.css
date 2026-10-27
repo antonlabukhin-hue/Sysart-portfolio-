@@ -386,3 +386,14 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
 .pp.safe .pp-draws div { height: 120px; } .pp.safe .pp-draws.n1 div, .pp.safe .pp-draws.n2 div { height: 160px; }
 .pp.safe .pp-ksp { max-height: 170px; }
 .pp.safe .pp-foot { left: 36px; right: 36px; bottom: 16px; }
+
+/* Курс $: ЦБ + 1 ₽, ручной курс подсвечен */
+.rate-box { display: flex; flex-direction: column; gap: 2px; padding: 2px 0; }
+.rate-box label { display: flex; align-items: center; gap: 6px; }
+.top-settings .rate-box input[type=number] { width: 78px; }
+.rate-meta { display: flex; gap: 8px; align-items: center; font-family: var(--mono); font-size: 9px; letter-spacing: .02em; color: var(--muted); white-space: nowrap; }
+.rate-meta button { padding: 0; font-family: var(--mono); font-size: 9px; color: var(--red); text-decoration: underline; text-underline-offset: 2px; }
+.rate-meta button:hover { color: #fff; }
+.rate-box.manual input { border-color: var(--red) !important; background: rgba(239,59,54,.18) !important; color: #fff; }
+.rate-box.manual #rateInfo { color: #ff8a86; }
+@media (max-width: 600px) { .rate-meta { white-space: normal; flex-wrap: wrap; } }

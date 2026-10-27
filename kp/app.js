@@ -98,7 +98,72 @@
   const isSimple = p => p.cat === 'control';
   const catOf = p => DATA.categories.find(c => c.id === p.cat);
   const coef = () => DATA.general.baseCoef * (S.vat ? DATA.general.vatCoef : 1);
-  const rub = usd => usd * S.rate * coef();
+  const rub = usd => usd * workRate() * coef();
+
+  // ---------- Курс $ ----------
+  // Автокурс = курс ЦБ на сегодня + 1 ₽. Данные ЦБ берём с cbr-xml-daily.ru (зеркало ЦБ: сайт ЦБ браузеру их не отдаёт).
+  // Ручной курс действует до конца дня и подсвечивается. Каждое КП запоминает курс при первой позиции (KP.rate),
+  // поэтому старые КП сами не пересчитываются — только кнопкой.
+  const RATE_PLUS = 1;
+  let CBR = store.get('kp.cbr', null); // { usd, date: дата курса ЦБ, got: день загрузки }
+  const round2 = n => Math.round(n * 100) / 100;
+  const fmtRate = n => (+n).toFixed(2).replace('.', ',');
+  const manualToday = () => (S.rateManual && S.rateManual.day === today() ? S.rateManual.value : null);
+  const cbrRate = () => (CBR ? round2(CBR.usd + RATE_PLUS) : null);
+  const todayRate = () => manualToday() ?? cbrRate() ?? (S.rate || DATA.general.rate);
+  const workRate = () => (KP && KP.rate) || todayRate();
+  const todayKind = () => (manualToday() != null ? 'manual' : CBR ? 'cbr' : 'price');
+  const rateNote = (kind, rate) => kind === 'manual' ? `ручной курс ${fmtRate(rate)}`
+    : kind === 'cbr' ? `ЦБ ${fmtRate(CBR.usd)} + ${RATE_PLUS} ₽ на ${fmtDate(CBR.date)}` : `курс прайса ${fmtRate(rate)}`;
+
+  async function loadCbr() {
+    try {
+      const j = await (await fetch('https://www.cbr-xml-daily.ru/daily_json.js', { cache: 'no-cache' })).json();
+      CBR = { usd: j.Valute.USD.Value, date: String(j.Date).slice(0, 10), got: today() };
+      store.set('kp.cbr', CBR);
+    } catch { /* нет сети — остаётся последний полученный курс */ }
+    if (DATA) { renderGrid(); updateCount(); if (!$('#kp').hidden) renderKp(); if (!$('#cfg').hidden) renderCfg(); }
+  }
+
+  // КП запоминает курс, когда в него попадает первая позиция
+  function freezeRate() {
+    if (KP.rate) return;
+    const kind = todayKind();
+    KP.rate = todayRate();
+    KP.rateKind = kind;
+    KP.rateNote = rateNote(kind, KP.rate);
+  }
+
+  // 'update' — у КП курс не сегодняшний; 'cbr' — стоит ручной курс, а ЦБ доступен; '' — всё актуально
+  function rateAction() {
+    const tr = todayRate();
+    if (KP && KP.rate && KP.lines.length && Math.abs(KP.rate - tr) >= 0.01) return 'update';
+    const manualNow = (KP && KP.rate && KP.lines.length) ? KP.rateKind === 'manual' : todayKind() === 'manual';
+    return manualNow && cbrRate() ? 'cbr' : '';
+  }
+
+  function renderRate() {
+    const inp = $('#setRate'), info = $('#rateInfo'), btn = $('#rateAction');
+    if (!inp || !DATA) return;
+    if (document.activeElement !== inp) inp.value = fmtRate(workRate()).replace(',', '.');
+    const tr = todayRate();
+    let note, manual;
+    if (KP && KP.rate) {
+      manual = KP.rateKind === 'manual';
+      note = 'курс этого КП: ' + (KP.rateNote || fmtRate(KP.rate));
+    } else {
+      manual = todayKind() === 'manual';
+      note = rateNote(todayKind(), tr) + (manual ? ' · до конца дня' : '');
+    }
+    const act = rateAction();
+    const action = act === 'update' ? `обновить до ${fmtRate(tr)}` : act === 'cbr' ? `вернуть ЦБ + 1 = ${fmtRate(cbrRate())}` : '';
+    if (todayKind() === 'price' && !manual) note = 'курс ЦБ не загрузился — проверьте курс';
+    else if (CBR && CBR.got !== today() && !manual) note += ' · нет связи, курс не свежий';
+    inp.closest('.rate-box').classList.toggle('manual', manual || todayKind() === 'price');
+    info.textContent = note;
+    btn.textContent = action;
+    btn.hidden = !action;
+  }
   const roundTo = n => { const r = +S.round || 1; return Math.round(n / r) * r; };
   const adjusted = n => roundTo(n * (1 + (+S.adjust || 0) / 100));
 
@@ -259,6 +324,11 @@
   function loadKp() {
     const all = allKp();
     KP = all[store.get('kp.currentId', '')] || newKp();
+    migrateRate(KP);
+  }
+  // КП, собранные до автокурса, запоминают курс, по которому их считали (раньше он хранился в настройках)
+  function migrateRate(k) {
+    if (k && k.lines.length && !k.rate) { k.rate = S.rate || DATA.general.rate; k.rateKind = 'manual'; k.rateNote = `курс ${fmtRate(k.rate)} (до автокурса)`; }
   }
 
   function lineUnitPrice(l) {
@@ -286,10 +356,10 @@
     $('#lock').hidden = true;
     $('#app').hidden = false;
     $('#priceDate').textContent = 'Прайс с 01.05.2026 · ' + DATA.products.length + ' моделей';
-    $('#setRate').value = S.rate;
     $('#setVat').checked = S.vat;
     $('#setAdjust').value = S.adjust;
     loadKp();
+    loadCbr();
     renderCats();
     renderGrid();
     updateCount();
@@ -377,7 +447,21 @@
   });
 
   // Настройки расчёта в шапке
-  $('#setRate').addEventListener('change', e => { S.rate = +e.target.value || DATA.general.rate; saveSettings(); refreshPrices(); });
+  // Ввод курса вручную: действует до конца дня; если в КП уже есть позиции — становится курсом этого КП
+  $('#setRate').addEventListener('change', e => {
+    const v = round2(+String(e.target.value).replace(',', '.'));
+    if (!(v > 0)) { renderRate(); return; }
+    S.rateManual = { value: v, day: today() };
+    saveSettings();
+    if (KP.lines.length) { KP.rate = v; KP.rateKind = 'manual'; KP.rateNote = rateNote('manual', v); saveKp(); }
+    refreshPrices();
+  });
+  // Кнопка у курса: «обновить до …» — старое КП на сегодняшний курс; «вернуть ЦБ + 1» — убрать ручной курс
+  $('#rateAction').addEventListener('click', () => {
+    if (rateAction() === 'cbr') { S.rateManual = null; saveSettings(); }
+    if (KP.lines.length) { KP.rate = null; freezeRate(); saveKp(); }
+    refreshPrices();
+  });
   $('#setVat').addEventListener('change', e => { S.vat = e.target.checked; saveSettings(); refreshPrices(); });
   $('#setAdjust').addEventListener('change', e => { S.adjust = +e.target.value || 0; saveSettings(); refreshPrices(); });
   function refreshPrices() {
@@ -385,7 +469,7 @@
     updateCount();
     if (!$('#kp').hidden) renderKp();
     if (!$('#cfg').hidden) renderCfg();
-    toast(`Курс ${S.rate} · ${S.vat ? 'с НДС' : 'без НДС'} · ${S.adjust > 0 ? '+' : ''}${S.adjust} %`);
+    toast(`Курс ${fmtRate(workRate())} · ${S.vat ? 'с НДС' : 'без НДС'} · ${S.adjust > 0 ? '+' : ''}${S.adjust} %`);
   }
 
   // ---------- Панели ----------
@@ -561,7 +645,7 @@
       // Такая же конфигурация уже есть — увеличиваем количество
       const same = KP.lines.find(l => l.pid === p.id && JSON.stringify(l.cfg) === JSON.stringify(c) && !l.nameEdited && l.manual == null);
       if (same) same.qty = (+same.qty || 0) + qty;
-      else KP.lines.push(line);
+      else { freezeRate(); KP.lines.push(line); }
       toast(`Добавлено в КП: ${p.sku} × ${qty}`);
       closeSheet($('#cfg'));
     }
@@ -570,6 +654,7 @@
   }
 
   function updateCount() {
+    renderRate();
     $('#kpCount').textContent = KP.lines.length;
     // Панель КП внизу (на телефоне)
     const n = KP.lines.length;
@@ -638,7 +723,7 @@
     const w = kpWeight();
     $('#kpTotal').innerHTML = `<div class="big">${fmt(t)} ₽</div>
       <div class="sub">${S.vat ? `в т.ч. НДС 22 %: ${fmt(t * 22 / 122)} ₽` : 'без НДС'} · позиций: ${KP.lines.length}${w ? ` · вес ≈ ${fmt(w)} кг` : ''}<br>
-      курс $ ${S.rate}${S.adjust ? ` · ${S.adjust > 0 ? 'наценка' : 'скидка'} ${Math.abs(S.adjust)} %` : ''}</div>`;
+      курс $ ${fmtRate(workRate())}${S.adjust ? ` · ${S.adjust > 0 ? 'наценка' : 'скидка'} ${Math.abs(S.adjust)} %` : ''}</div>`;
   }
 
   $('#kpMeta').addEventListener('input', e => {
@@ -681,6 +766,7 @@
   });
 
   $('#kpAddCustom').addEventListener('click', () => {
+    freezeRate();
     KP.lines.push({ id: uid(), pid: null, cfg: null, name: 'Пусконаладочные работы', nameEdited: true, unit: 'компл.', qty: 1, manual: 0 });
     saveKp();
     updateCount();
@@ -713,14 +799,18 @@
     if (!a) return;
     const id = a.closest('.saved-item').dataset.id;
     const all = allKp();
-    if (a.dataset.act === 'open') { KP = all[id]; store.set('kp.currentId', id); closeSheet($('#saved')); renderKp(); updateCount(); }
+    if (a.dataset.act === 'open') { KP = all[id]; migrateRate(KP); store.set('kp.currentId', id); closeSheet($('#saved')); renderKp(); updateCount(); }
     if (a.dataset.act === 'copy') {
       const c = JSON.parse(JSON.stringify(all[id]));
       const fresh = newKp();
       Object.assign(c, { id: fresh.id, created: Date.now() });
       c.meta.number = fresh.meta.number;
       c.meta.date = today();
-      KP = c; saveKp(); closeSheet($('#saved')); renderKp(); updateCount();
+      // копия — новое КП сегодняшним числом, поэтому и курс сегодняшний
+      c.rate = null;
+      KP = c;
+      if (KP.lines.length) freezeRate();
+      saveKp(); closeSheet($('#saved')); renderKp(); updateCount();
       toast('Копия КП открыта');
     }
     if (a.dataset.act === 'del') {
@@ -737,7 +827,6 @@
   function renderSettings() {
     const f = (k, label, v, type = 'text') => `<label class="field"><span>${label}</span><input type="${type}" data-s="${k}" value="${esc(v)}"></label>`;
     $('#settingsBody').innerHTML = `<div class="settings-grid">
-      ${f('rate', 'Курс продажи доллара, ₽', S.rate, 'number')}
       <label class="field"><span>Округление цены</span><select data-s="round">${[1, 10, 50, 100].map(r => `<option value="${r}" ${+S.round === r ? 'selected' : ''}>до ${r} ₽</option>`).join('')}</select></label>
       <p class="muted" style="font-size:12px;margin:0">Цена = цена в $ × курс × 1,1${S.vat ? ' × 1,22 (НДС)' : ''} × длина по правилу прайса + наценки, затем ± % из шапки и округление.</p>
       <h3>Подпись в КП</h3>
@@ -757,7 +846,6 @@
     if (k === 'rate' || k === 'round') v = +v || (k === 'rate' ? DATA.general.rate : 1);
     if (k.startsWith('manager.')) S.manager[k.split('.')[1]] = v; else S[k] = v;
     saveSettings();
-    $('#setRate').value = S.rate;
     refreshPrices();
   });
   $('#settingsBody').addEventListener('click', e => {
@@ -1177,7 +1265,7 @@
       '',
       `Подготовил: ${[mg.name, mg.title, S.company].filter(Boolean).join(', ')}`,
       `Контакты: ${[mg.phone, mg.email].filter(Boolean).join(', ') || '—'}`,
-      `Расчёт: курс $ ${S.rate}, ${S.vat ? 'с НДС' : 'без НДС'}, ${S.adjust ? (S.adjust > 0 ? 'наценка ' : 'скидка ') + Math.abs(S.adjust) + ' %' : 'по прайсу'}`,
+      `Расчёт: курс $ ${fmtRate(workRate())}${KP.rateNote ? ' (' + KP.rateNote + ')' : ''}, ${S.vat ? 'с НДС' : 'без НДС'}, ${S.adjust ? (S.adjust > 0 ? 'наценка ' : 'скидка ') + Math.abs(S.adjust) + ' %' : 'по прайсу'}`,
       '',
       'Позиции:',
       ...lines,

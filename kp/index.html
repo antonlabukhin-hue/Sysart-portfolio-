@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="style.css?v=202610271033">
+<link rel="stylesheet" href="style.css?v=202610271448">
 </head>
 <body>
 
@@ -37,7 +37,10 @@
     <a href="../" class="back-link"><span>←</span> <b>На сайт</b></a>
     <div class="top-title"><span class="eyebrow">Конфигуратор КП</span><b id="priceDate"></b></div>
     <div class="top-settings">
-      <label title="Курс продажи доллара">$ <input id="setRate" type="number" step="0.1" min="1"></label>
+      <div class="rate-box">
+        <label title="Курс доллара для расчёта: курс ЦБ на сегодня + 1 ₽. Можно вписать свой — он действует до конца дня.">Курс $ <input id="setRate" type="number" step="0.01" min="1" inputmode="decimal"></label>
+        <span class="rate-meta"><span id="rateInfo"></span><button id="rateAction" type="button" hidden></button></span>
+      </div>
       <label class="switch" title="Цены с НДС 22 %"><input id="setVat" type="checkbox"><span>НДС</span></label>
       <label title="Наценка (+) или скидка (−) ко всем позициям из прайса">± % <input id="setAdjust" type="number" step="1"></label>
       <button class="icon-btn" id="openSettings" title="Настройки">⚙</button>
@@ -139,6 +142,6 @@
 <!-- Документ для печати / PDF -->
 <div id="print" class="print"></div>
 
-<script src="app.js?v=202610271033"></script>
+<script src="app.js?v=202610271448"></script>
 </body>
 </html>
