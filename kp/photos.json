@@ -4,5 +4,10 @@
   "hlg-185-24": "x7c14fc2257c.webp",
   "hlg-240-24": "x7c14fc2257c.webp",
   "hlg-320-24": "x7c14fc2257c.webp",
-  "sa-lcl-2828": "xc8c8587c9fa.webp"
+  "sa-lcl-2828": "xc8c8587c9fa.webp",
+  "contour:sa-sftl-1515-single-led-neon": "x-sftl-1515-1312-20261103.webp",
+  "contour:sa-sftl-1515-rgb-pwm-led-neon": "x-sftl-1515-1312-20261103.webp",
+  "contour:sa-sftl-1515-single-3d-led-neon": "x-sftl-1515-1312-20261103.webp",
+  "contour:sa-sftl-1312-single-dmx-led-neon": "x-sftl-1515-1312-20261103.webp",
+  "contour:sa-sftl-1312-ww-rgb-rgbw-pwm-led-neon": "x-sftl-1515-1312-20261103.webp"
 }
