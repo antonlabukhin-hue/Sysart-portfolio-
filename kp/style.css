@@ -397,3 +397,40 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
 .rate-box.manual input { border-color: var(--red) !important; background: rgba(239,59,54,.18) !important; color: #fff; }
 .rate-box.manual #rateInfo { color: #ff8a86; }
 @media (max-width: 600px) { .rate-meta { white-space: normal; flex-wrap: wrap; } }
+/* Понятные настройки расчёта: курс, налог и коммерческая корректировка */
+.top-settings { border-radius: 18px; padding: 10px; gap: 16px; align-items: center; }
+.top-settings .rate-box { min-width: 260px; max-width: 340px; padding: 10px 12px; border: 1px solid rgba(239,59,54,.5); border-radius: 12px; background: rgba(239,59,54,.09); gap: 7px; }
+.rate-heading, .rate-controls { display:flex; align-items:center; justify-content:space-between; gap:10px; }
+.rate-heading label { color:#fff; font-family:'Manrope',Arial,sans-serif; font-weight:700; font-size:13px; }
+#rateStatus { font-size:9px; color:#f3b3af; text-align:right; }
+.top-settings .rate-box input[type=number] { width:94px; border-radius:8px; font-size:19px; font-weight:600; padding:7px 9px; color:#fff; }
+#rateRefresh { background:var(--red); color:#fff; border-radius:8px; padding:10px 11px; font-size:11px; font-weight:600; white-space:nowrap; }
+#rateRefresh:hover { background:#d92c28; }
+#rateRefresh:disabled { opacity:.6; cursor:wait; }
+.rate-meta { white-space:normal; flex-wrap:wrap; line-height:1.5; font-size:10px; }
+.rate-meta button { font-size:10px; }
+.rate-box.needs-update { border-color:#e6aa43; background:rgba(230,170,67,.12); }
+.rate-box.needs-update #rateStatus { color:#ffd187; }
+.setting-title { font:600 12px 'Manrope',Arial,sans-serif; color:#fff; }
+.tax-box { display:flex; flex-direction:column; align-items:flex-start; gap:9px; }
+.top-settings .adjust-box { display:flex; flex-direction:column; align-items:flex-start; gap:8px; border-left:1px solid var(--line-2); padding-left:16px; }
+.tax-box small, .adjust-box small { font:10px 'Manrope',Arial,sans-serif; color:#bbb; white-space:nowrap; }
+.adjust-value { display:flex; align-items:center; gap:7px; }
+.top-settings .adjust-box input { width:76px; border-radius:8px; font-size:16px; }
+.switch span { display:block; font-size:12px; padding:8px 10px; }
+.switch input:focus-visible + span { outline:2px solid white; outline-offset:3px; }
+.top-settings .icon-btn { flex-shrink:0; }
+@media (max-width:1250px) { .top { flex-wrap:wrap; } .top-settings { order:3; width:100%; margin-left:0; justify-content:space-between; } .cart-btn { margin-left:auto; } .top-settings .rate-box { max-width:none; flex:1; } }
+@media (max-width:600px) {
+ .top-settings { display:grid; grid-template-columns:1fr 1fr 38px; gap:12px; padding:10px; border-radius:14px; }
+ .top-settings .rate-box { grid-column:1/-1; width:100%; min-width:0; }
+ .rate-heading label { font-size:14px; }
+ #rateStatus { font-size:10px; }
+ .top-settings .rate-box input[type=number] { width:105px; font-size:20px; }
+ #rateRefresh { padding:11px 16px; font-size:12px; }
+ .top-settings .adjust-box { padding-left:12px; }
+ .tax-box small, .adjust-box small { white-space:normal; font-size:10px; }
+ .top-settings .adjust-box input { width:68px; }
+ .setting-title { font-size:11px; }
+}
+.rate-reminder { font: 11px "Manrope", Arial, sans-serif; color: #f3b3af; }

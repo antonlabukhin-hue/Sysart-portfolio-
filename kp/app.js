@@ -135,10 +135,12 @@
   async function loadCbr() {
     try {
       const j = await (await fetch('https://www.cbr-xml-daily.ru/daily_json.js', { cache: 'no-cache' })).json();
+      if (!(Number.isFinite(j?.Valute?.USD?.Value) && j.Valute.USD.Value > 0) || !j.Date) throw Error('Invalid rate');
       CBR = { usd: j.Valute.USD.Value, date: String(j.Date).slice(0, 10), got: today() };
       store.set('kp.cbr', CBR);
-    } catch { /* нет сети — остаётся последний полученный курс */ }
+    } catch { return false; /* нет сети — остаётся последний полученный курс */ }
     if (DATA) { renderGrid(); updateCount(); if (!$('#kp').hidden) renderKp(); if (!$('#cfg').hidden) renderCfg(); }
+    return true;
   }
 
   // КП запоминает курс, когда в него попадает первая позиция
@@ -179,6 +181,9 @@
     info.textContent = note;
     btn.textContent = action;
     btn.hidden = !action;
+    const stale = todayKind() === 'price' || (!manual && CBR && CBR.got !== today());
+    inp.closest('.rate-box').classList.toggle('needs-update', !!stale || act === 'update');
+    $('#rateStatus').textContent = stale ? 'Проверьте курс' : act === 'update' ? 'КП по старому курсу' : manual ? 'Введён вручную' : 'ЦБ + 1 ₽';
   }
   const roundTo = n => { const r = +S.round || 1; return Math.round(n / r) * r; };
   const adjusted = n => roundTo(n * (1 + (+S.adjust || 0) / 100));
@@ -478,8 +483,20 @@
     if (KP.lines.length) { KP.rate = null; freezeRate(); saveKp(); }
     refreshPrices();
   });
+  $('#rateRefresh').addEventListener('click', async () => {
+    const btn = $('#rateRefresh');
+    btn.disabled = true;
+    btn.textContent = 'Обновляю…';
+    try {
+      if (!(await loadCbr())) { renderRate(); toast('Курс не загрузился. Проверьте интернет или введите курс вручную.'); return; }
+      S.rateManual = null;
+      saveSettings();
+      if (KP.lines.length) { KP.rate = null; freezeRate(); saveKp(); }
+      refreshPrices();
+    } finally { btn.disabled = false; btn.textContent = '↻ Обновить курс'; }
+  });
   $('#setVat').addEventListener('change', e => { S.vat = e.target.checked; saveSettings(); refreshPrices(); });
-  $('#setAdjust').addEventListener('change', e => { S.adjust = +e.target.value || 0; saveSettings(); refreshPrices(); });
+  $('#setAdjust').addEventListener('change', e => { S.adjust = Math.max(-100, +e.target.value || 0); e.target.value = S.adjust; saveSettings(); refreshPrices(); });
   function refreshPrices() {
     renderGrid();
     updateCount();
