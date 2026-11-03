@@ -78,6 +78,11 @@
     DATA.products = DATA.products.filter(p => !discontinued.has(slug(p.sku)));
 
     await applyPhotoOverrides();
+    // Обновлённая маркировка; внутренний id сохраняет связь с чертежом и ранее созданными КП.
+    DATA.products.forEach(p => {
+      if (slug(p.sku).replace(/-/g, '') === 'salwl3740') p.sku = 'SA-LWL4266';
+    });
+
     // Убираем только дубль SA-LCL3050 без фото; основную карточку с фото оставляем.
     DATA.products = DATA.products.filter(p =>
       !(slug(p.sku).replace(/-/g, '') === 'salcl3050' && !p.photo));
