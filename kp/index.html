@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="style.css?v=2026110305">
+<link rel="stylesheet" href="style.css?v=2026110306">
 </head>
 <body>
 
@@ -38,13 +38,12 @@
     <div class="top-title"><span class="eyebrow">Конфигуратор КП</span><b id="priceDate"></b></div>
     <div class="top-settings" aria-label="Настройки расчёта">
       <div class="rate-box">
-        <div class="rate-heading"><label for="setRate">Курс доллара, ₽</label><span id="rateStatus">Проверьте курс</span></div>
+        <div class="rate-heading"><label for="setRate">Курс $, ₽</label><span id="rateStatus">Проверьте курс</span></div>
         <div class="rate-controls"><input id="setRate" type="number" step="0.01" min="1" inputmode="decimal"><button id="rateRefresh" type="button">↻ Обновить курс</button></div>
-        <small class="rate-reminder">Перед отправкой КП обновите курс</small>
-        <span class="rate-meta"><span id="rateInfo" aria-live="polite"></span><button id="rateAction" type="button" hidden></button></span>
+        <details class="rate-details"><summary aria-label="Подробнее о курсе">ⓘ</summary><div class="rate-popover"><small class="rate-reminder">Перед отправкой КП обновите курс</small><span class="rate-meta"><span id="rateInfo" aria-live="polite"></span><button id="rateAction" type="button" hidden></button></span></div></details>
       </div>
-      <div class="tax-box"><span class="setting-title">Налог</span><label class="switch"><input id="setVat" type="checkbox"><span>НДС 22 %</span></label><small>Включается этой кнопкой</small></div>
-      <label class="adjust-box" for="setAdjust"><span class="setting-title">Скидка / наценка</span><span class="adjust-value"><input id="setAdjust" type="number" step="1" min="-100" inputmode="decimal"><span>%</span></span><small>− скидка · + наценка</small></label>
+      <div class="tax-box"><label class="switch"><input id="setVat" type="checkbox"><span>НДС 22 %</span></label></div>
+      <label class="adjust-box" for="setAdjust"><span class="setting-title" title="Отрицательное число — скидка, положительное — наценка. Это не НДС.">Скидка − / наценка +</span><span class="adjust-value"><input id="setAdjust" type="number" step="1" min="-100" inputmode="decimal"><span>%</span></span></label>
       <button class="icon-btn" id="openSettings" title="Настройки">⚙</button>
     </div>
     <button class="btn btn-main cart-btn" id="openKp">КП <i id="kpCount">0</i></button>
@@ -144,6 +143,6 @@
 <!-- Документ для печати / PDF -->
 <div id="print" class="print"></div>
 
-<script src="app.js?v=2026110305"></script>
+<script src="app.js?v=2026110306"></script>
 </body>
 </html>

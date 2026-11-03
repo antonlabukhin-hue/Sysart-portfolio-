@@ -397,40 +397,59 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
 .rate-box.manual input { border-color: var(--red) !important; background: rgba(239,59,54,.18) !important; color: #fff; }
 .rate-box.manual #rateInfo { color: #ff8a86; }
 @media (max-width: 600px) { .rate-meta { white-space: normal; flex-wrap: wrap; } }
-/* Понятные настройки расчёта: курс, налог и коммерческая корректировка */
-.top-settings { border-radius: 18px; padding: 10px; gap: 16px; align-items: center; }
-.top-settings .rate-box { min-width: 260px; max-width: 340px; padding: 10px 12px; border: 1px solid rgba(239,59,54,.5); border-radius: 12px; background: rgba(239,59,54,.09); gap: 7px; }
-.rate-heading, .rate-controls { display:flex; align-items:center; justify-content:space-between; gap:10px; }
-.rate-heading label { color:#fff; font-family:'Manrope',Arial,sans-serif; font-weight:700; font-size:13px; }
-#rateStatus { font-size:9px; color:#f3b3af; text-align:right; }
-.top-settings .rate-box input[type=number] { width:94px; border-radius:8px; font-size:19px; font-weight:600; padding:7px 9px; color:#fff; }
-#rateRefresh { background:var(--red); color:#fff; border-radius:8px; padding:10px 11px; font-size:11px; font-weight:600; white-space:nowrap; }
+
+/* Компактная панель расчёта; пояснения раскрываются отдельно */
+.top { gap: 12px; }
+.top-settings { border-radius: 12px; padding: 6px 8px; gap: 12px; align-items:center; width:auto; order:initial; }
+.top-settings .rate-box { position:relative; display:flex; flex-direction:row; align-items:center; gap:7px; min-width:0; padding:5px 7px; border:1px solid rgba(239,59,54,.45); border-radius:9px; background:var(--red-soft); }
+.rate-heading { display:flex; flex-direction:column; gap:2px; }
+.rate-heading label { color:white; font:600 11px 'Manrope',Arial,sans-serif; white-space:nowrap; }
+#rateStatus { font-size:8px; color:#f4b4b1; max-width:105px; }
+.rate-controls { display:flex; align-items:center; gap:6px; }
+.top-settings .rate-box input[type=number] { width:77px; height:34px; padding:4px 6px; font-size:16px; border-radius:7px; }
+#rateRefresh { height:34px; padding:0 10px; border-radius:7px; background:var(--red); color:white; font-size:10px; white-space:nowrap; }
 #rateRefresh:hover { background:#d92c28; }
 #rateRefresh:disabled { opacity:.6; cursor:wait; }
+.rate-details { position:relative; }
+.rate-details summary { list-style:none; cursor:pointer; font-size:17px; padding:6px; color:#ddd; }
+.rate-details summary::-webkit-details-marker { display:none; }
+.rate-popover { position:absolute; top:calc(100% + 10px); right:0; width:280px; padding:14px; border:1px solid var(--line-2); border-radius:10px; background:#242121; box-shadow:0 12px 35px #0008; z-index:25; }
+.rate-reminder { display:block; font:12px 'Manrope',Arial,sans-serif; color:#f3b3af; margin-bottom:8px; }
 .rate-meta { white-space:normal; flex-wrap:wrap; line-height:1.5; font-size:10px; }
-.rate-meta button { font-size:10px; }
-.rate-box.needs-update { border-color:#e6aa43; background:rgba(230,170,67,.12); }
+.rate-meta button { font-size:11px; }
+.rate-box.needs-update { border-color:#e6aa43; background:rgba(230,170,67,.14); }
 .rate-box.needs-update #rateStatus { color:#ffd187; }
-.setting-title { font:600 12px 'Manrope',Arial,sans-serif; color:#fff; }
-.tax-box { display:flex; flex-direction:column; align-items:flex-start; gap:9px; }
-.top-settings .adjust-box { display:flex; flex-direction:column; align-items:flex-start; gap:8px; border-left:1px solid var(--line-2); padding-left:16px; }
-.tax-box small, .adjust-box small { font:10px 'Manrope',Arial,sans-serif; color:#bbb; white-space:nowrap; }
-.adjust-value { display:flex; align-items:center; gap:7px; }
-.top-settings .adjust-box input { width:76px; border-radius:8px; font-size:16px; }
-.switch span { display:block; font-size:12px; padding:8px 10px; }
-.switch input:focus-visible + span { outline:2px solid white; outline-offset:3px; }
-.top-settings .icon-btn { flex-shrink:0; }
-@media (max-width:1250px) { .top { flex-wrap:wrap; } .top-settings { order:3; width:100%; margin-left:0; justify-content:space-between; } .cart-btn { margin-left:auto; } .top-settings .rate-box { max-width:none; flex:1; } }
-@media (max-width:600px) {
- .top-settings { display:grid; grid-template-columns:1fr 1fr 38px; gap:12px; padding:10px; border-radius:14px; }
- .top-settings .rate-box { grid-column:1/-1; width:100%; min-width:0; }
- .rate-heading label { font-size:14px; }
- #rateStatus { font-size:10px; }
- .top-settings .rate-box input[type=number] { width:105px; font-size:20px; }
- #rateRefresh { padding:11px 16px; font-size:12px; }
- .top-settings .adjust-box { padding-left:12px; }
- .tax-box small, .adjust-box small { white-space:normal; font-size:10px; }
- .top-settings .adjust-box input { width:68px; }
- .setting-title { font-size:11px; }
+.tax-box { display:flex; align-items:center; flex:none; }
+.switch span { display:block; padding:8px 9px; font-size:11px; white-space:nowrap; }
+.top-settings .adjust-box { display:flex; flex-direction:column; align-items:flex-start; gap:3px; padding-left:10px; border-left:1px solid var(--line-2); }
+.setting-title { color:#eee; font:600 10px 'Manrope',Arial,sans-serif; white-space:nowrap; }
+.adjust-value { display:flex; gap:5px; align-items:center; }
+.top-settings .adjust-box input { width:65px; height:29px; border-radius:6px; padding:3px 7px; font-size:14px; }
+.top-settings .icon-btn { flex-shrink:0; width:34px; height:34px; }
+.cart-btn { margin-left:0; }
+@media (max-width:1300px) { .top-title { display:none; } }
+@media (max-width:1080px) {
+ .top { flex-wrap:wrap; gap:8px 12px; }
+ .cart-btn { margin-left:auto; }
+ .top-settings { order:3; width:100%; margin-left:0; justify-content:space-between; }
 }
-.rate-reminder { font: 11px "Manrope", Arial, sans-serif; color: #f3b3af; }
+@media (max-width:600px) {
+ /* На телефоне шапка уходит вместе со страницей, освобождая каталог. */
+ .top { position:relative; padding-top:8px; padding-bottom:8px; }
+ .top-logo { height:28px; }
+ .top > .back-link { height:32px; padding:0 10px; }
+ .top .cart-btn { height:34px; padding:0 14px; }
+ .top-settings { display:grid; grid-template-columns:1fr auto 34px; gap:8px; padding:6px; }
+ .top-settings .rate-box { grid-column:1/-1; justify-content:space-between; padding:4px 6px; gap:6px; }
+ .rate-heading { flex:1; }
+ .rate-heading label { font-size:12px; }
+ #rateStatus { max-width:none; font-size:9px; }
+ .top-settings .rate-box input[type=number] { font-size:16px; width:75px; }
+ #rateRefresh { font-size:10px; padding:0 8px; }
+ .top-settings .adjust-box { flex-direction:row; align-items:center; gap:6px; border:0; padding-left:0; }
+ .setting-title { white-space:normal; max-width:85px; line-height:1.3; }
+ .top-settings .adjust-box input { width:51px; font-size:16px; height:32px; }
+ .tax-box { grid-column:1; grid-row:2; }
+ .adjust-box { grid-column:2; grid-row:2; }
+ .rate-popover { position:fixed; top:auto; left:16px; right:16px; width:auto; margin-top:10px; }
+}
