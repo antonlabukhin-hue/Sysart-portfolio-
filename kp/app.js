@@ -70,6 +70,13 @@
     if (remember) store.set('kp.pass', pass);
     try { sessionStorage.setItem('kp.pass', pass); } catch { }
     DATA.products.forEach(p => { PROD[p.id] = p; });
+    // Снятые с предложения модели сохраняем только для ранее созданных КП.
+    const discontinued = new Set([
+      'sa-sftl-1515-single-3d-led-neon',
+      'sa-sftl-1010-single-led-neon',
+    ]);
+    DATA.products = DATA.products.filter(p => !discontinued.has(slug(p.sku)));
+
     await applyPhotoOverrides();
     if (!S.rate) S.rate = DATA.general.rate;
     start();
