@@ -78,6 +78,10 @@
     DATA.products = DATA.products.filter(p => !discontinued.has(slug(p.sku)));
 
     await applyPhotoOverrides();
+    // Убираем только дубль SA-LCL3050 без фото; основную карточку с фото оставляем.
+    DATA.products = DATA.products.filter(p =>
+      !(slug(p.sku).replace(/-/g, '') === 'salcl3050' && !p.photo));
+
     if (!S.rate) S.rate = DATA.general.rate;
     start();
     return true;
