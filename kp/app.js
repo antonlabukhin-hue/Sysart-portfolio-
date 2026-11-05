@@ -352,21 +352,25 @@
     if (k && k.lines.length && !k.rate) { k.rate = S.rate || DATA.general.rate; k.rateKind = 'manual'; k.rateNote = `курс ${fmtRate(k.rate)} (до автокурса)`; }
   }
 
-  function lineUnitPrice(l) {
+  function lineWeight(l) {
+    const p = PROD[l.pid];
+    if (!p || !(+p.weight > 0)) return null;
+    return isRigid(p) && l.cfg.length ? p.weight * l.cfg.length / 1000 : +p.weight;
+  }
+  const kaliningradExtra = l => KP.kaliningrad ? Math.round((lineWeight(l) || 0) * 150 * 100) / 100 : 0;
+  function lineBasePrice(l) {
     if (l.manual != null && l.manual !== '') return +l.manual;
     const p = PROD[l.pid];
     if (!p) return 0;
     const b = basePrice(p, l.cfg);
     return b == null ? 0 : adjusted(b);
   }
+  const lineUnitPrice = l => lineBasePrice(l) + kaliningradExtra(l);
   const lineTitle = l => (l.nameEdited || !PROD[l.pid]) ? l.name : lineName(PROD[l.pid], l.cfg);
   const lineSum = l => lineUnitPrice(l) * (+l.qty || 0);
   const kpTotal = () => KP.lines.reduce((s, l) => s + lineSum(l), 0);
   const kpWeight = () => KP.lines.reduce((s, l) => {
-    const p = PROD[l.pid];
-    if (!p || !p.weight) return s;
-    const w = isRigid(p) && l.cfg.length ? p.weight * l.cfg.length / 1000 : p.weight;
-    return s + w * (+l.qty || 0);
+    return s + (lineWeight(l) || 0) * (+l.qty || 0);
   }, 0);
 
   // ---------- Каталог ----------
@@ -703,6 +707,12 @@
   // ---------- Экран КП ----------
   $('#openKp').addEventListener('click', () => { renderKp(); openSheet('#kp'); });
 
+  $('#kpKaliningrad').addEventListener('change', e => {
+    KP.kaliningrad = e.target.checked;
+    saveKp();
+    renderKp();
+  });
+
   const META_FIELDS = [
     ['client', 'Заказчик', 'wide', 'Компания или ФИО'],
     ['object', 'Объект', 'wide', 'Название объекта'],
@@ -715,6 +725,7 @@
 
   function renderKp() {
     const m = KP.meta;
+    $('#kpKaliningrad').checked = !!KP.kaliningrad;
     $('#kpPassports').checked = !!KP.passports;
     $('#kpPassportsPdf').hidden = !KP.passports;
     $('#kpTitle').innerHTML = esc(m.client || 'Новое КП') + (m.object ? ` <em>· ${esc(m.object)}</em>` : '');
@@ -775,7 +786,7 @@
     if (f === 'name') { l.name = e.target.value; l.nameEdited = true; }
     if (f === 'unit') l.unit = e.target.value;
     if (f === 'qty') l.qty = e.target.value;
-    if (f === 'manual') l.manual = e.target.value === '' ? null : +e.target.value;
+    if (f === 'manual') l.manual = e.target.value === '' ? null : Math.max(0, +e.target.value - kaliningradExtra(l));
     row.querySelector('.sum').textContent = fmt(lineSum(l));
     renderTotal();
     saveKp();
