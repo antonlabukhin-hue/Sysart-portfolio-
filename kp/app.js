@@ -1414,6 +1414,183 @@
     </div>`;
   }
 
+  // ---------- Полное КП ----------
+  const fullDrafts = new Map();
+  let albumProjects;
+  let albumLoading;
+  let fullExporting = false;
+
+  function fullDraft() {
+    if (!fullDrafts.has(KP.id)) fullDrafts.set(KP.id, { visual: '', selected: new Set() });
+    return fullDrafts.get(KP.id);
+  }
+
+  // Тот же источник и группировка по объекту и городу, что в конструкторе альбомов.
+  async function loadAlbumProjects() {
+    const response = await fetch('../index.html');
+    if (!response.ok) throw new Error('Альбом недоступен');
+    const html = await response.text();
+    const literal = html.match(/const photoCaptions = (\{[\s\S]*?\n        \});/);
+    if (!literal) throw new Error('Подписи объектов не найдены');
+    const captions = Function('"use strict"; return (' + literal[1] + ');')();
+    const projects = new Map();
+    for (const [key, [name, city, year]] of Object.entries(captions)) {
+      const id = name + '|' + city;
+      if (!projects.has(id)) {
+        const folder = key === 'tvtower' ? '../images/about/' : '../images/min/';
+        projects.set(id, { id, name, city, year, photo: folder + encodeURIComponent(key) + '.jpg' });
+      } else if (+year > +projects.get(id).year) {
+        projects.get(id).year = year;
+      }
+    }
+    return [...projects.values()].sort((a, b) => (+b.year || 0) - (+a.year || 0) || a.name.localeCompare(b.name, 'ru'));
+  }
+
+  function renderFullProjects() {
+    const selected = fullDraft().selected;
+    const query = $('#fullSearch').value.trim().toLocaleLowerCase('ru');
+    const filtered = (albumProjects || []).filter(p => (p.name + ' ' + p.city).toLocaleLowerCase('ru').includes(query));
+    $('#fullProjects').innerHTML = filtered.map(p => `<label class="full-project"><img src="${esc(p.photo)}" alt="" loading="lazy">
+      <span><input type="checkbox" value="${esc(p.id)}" ${selected.has(p.id) ? 'checked' : ''}>${esc(p.name)}
+      <br><small>${esc([p.city, p.year].filter(Boolean).join(' · '))}</small></span></label>`).join('') ||
+      '<p class="muted">Объекты не найдены.</p>';
+    $('#fullCount').textContent = 'Выбрано объектов: ' + selected.size;
+  }
+
+  function renderFullVisual() {
+    const visual = fullDraft().visual;
+    $('#fullVisual').innerHTML = visual ? `<img src="${esc(visual)}" alt="Визуализация объекта">` :
+      'Загрузите визуализацию для титульной страницы';
+    $('#fullRemove').hidden = !visual;
+  }
+
+  $('#kpFull').addEventListener('click', async () => {
+    if (!KP.lines.length) { toast('В КП нет позиций'); return; }
+    $('#fullSearch').value = '';
+    $('#fullStatus').textContent = '';
+    $('#fullSpec').textContent = `Позиций: ${KP.lines.length} · итого ${fmt(kpTotal())} ₽`;
+    renderFullVisual();
+    openSheet('#fullKp');
+    if (!albumProjects) {
+      $('#fullProjects').textContent = 'Загружаем проекты…';
+      try {
+        albumLoading ||= loadAlbumProjects();
+        albumProjects = await albumLoading;
+      } catch {
+        $('#fullProjects').textContent = 'Альбом недоступен. Откройте полное КП ещё раз, чтобы повторить.';
+        return;
+      } finally { albumLoading = null; }
+    }
+    renderFullProjects();
+  });
+  $('#fullSearch').addEventListener('input', () => { if (albumProjects) renderFullProjects(); });
+  $('#fullProjects').addEventListener('change', e => {
+    const input = e.target;
+    if (!input.matches('input[type=checkbox]')) return;
+    const selected = fullDraft().selected;
+    if (input.checked) selected.add(input.value);
+    else selected.delete(input.value);
+    $('#fullCount').textContent = 'Выбрано объектов: ' + selected.size;
+  });
+  let visualRequest = 0;
+  $('#fullFile').addEventListener('change', async e => {
+    const file = e.target.files[0];
+    e.target.value = '';
+    if (!file) return;
+    const request = ++visualRequest;
+    const draft = fullDraft();
+    const url = URL.createObjectURL(file);
+    try {
+      if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 25 * 1024 * 1024)
+        throw new Error('Выберите JPG или PNG размером до 25 МБ.');
+      const img = new Image();
+      img.src = url;
+      await img.decode();
+      if (request !== visualRequest || draft !== fullDraft()) { URL.revokeObjectURL(url); return; }
+      if (draft.visual) URL.revokeObjectURL(draft.visual);
+      draft.visual = url;
+      renderFullVisual();
+      $('#fullStatus').textContent = '';
+    } catch (error) {
+      URL.revokeObjectURL(url);
+      if (request === visualRequest) $('#fullStatus').textContent = error.message || 'Не удалось открыть изображение.';
+    }
+  });
+  $('#fullRemove').addEventListener('click', () => {
+    visualRequest++;
+    const draft = fullDraft();
+    if (draft.visual) URL.revokeObjectURL(draft.visual);
+    draft.visual = '';
+    renderFullVisual();
+  });
+
+  function fullQuoteData() {
+    const m = KP.meta;
+    const draft = fullDraft();
+    const manager = S.manager;
+    return {
+      ...m, date: fmtDate(m.date), visual: draft.visual,
+      projects: (albumProjects || []).filter(p => draft.selected.has(p.id)),
+      items: KP.lines.map(l => ({
+        name: lineTitle(l), unit: l.unit, qty: l.qty, price: fmt(lineUnitPrice(l)), sum: fmt(lineSum(l)),
+        photo: PROD[l.pid]?.photo ? 'img/' + PROD[l.pid].photo : '',
+      })),
+      total: fmt(kpTotal()), tax: S.vat ? 'В том числе НДС 22 %: ' + fmt(kpTotal() * 22 / 122) + ' ₽' : 'Без НДС',
+      terms: docTerms(), signature: [manager.name, manager.title, S.company, manager.phone, manager.email].filter(Boolean),
+    };
+  }
+
+  function buildFullPdf(data) {
+    buildDoc();
+    const doc = $('#print .doc');
+    doc.classList.add('full-print');
+    const spec = document.createElement('section');
+    spec.className = 'doc-spec';
+    spec.innerHTML = '<header class="full-spec-head"><div class="doc-kicker">02 / Оборудование</div><h2>Спецификация светильников</h2></header>';
+    spec.append(doc.querySelector('.doc-body'));
+    doc.innerHTML = `<section class="full-cover">
+      <div class="doc-kicker">Система Арт · Архитектурное освещение</div>
+      <h1>Коммерческое предложение</h1>
+      <h2>${esc(data.object || data.client)}</h2>
+      <p>КП № ${esc(data.number)} · ${esc(data.date)}</p>
+      ${data.client ? `<p>Заказчик: ${esc(data.client)}</p>` : ''}
+      ${data.visual ? `<img src="${esc(data.visual)}" alt="Визуализация объекта">` : ''}
+      </section>`;
+    doc.append(spec);
+    if (data.projects.length) doc.insertAdjacentHTML('beforeend', `<section class="full-portfolio">
+      <div class="doc-kicker">03 / Портфолио</div><h2>Примеры выполненных работ</h2>
+      ${data.projects.map(p => `<article class="full-case"><img src="${esc(p.photo)}" alt="">
+        <p><b>${esc(p.name)}</b></p><p>${esc([p.city, p.year].filter(Boolean).join(' · '))}</p></article>`).join('')}
+      </section>`);
+  }
+
+  async function exportFullQuote(format) {
+    if (fullExporting || !KP.lines.length) return;
+    fullExporting = true;
+    const controls = [$('#fullPdf'), $('#fullWord'), $('#fullFile'), $('#fullRemove')];
+    controls.forEach(control => { control.disabled = true; });
+    $('#fullStatus').textContent = 'Готовим документ…';
+    try {
+      const data = fullQuoteData();
+      const name = 'Полное ' + kpFileName('');
+      if (format === 'pdf') {
+        buildFullPdf(data);
+        await printPrepared(name);
+      } else {
+        const { buildFullWord } = await import('./full-word.mjs?v=2026110901');
+        download(await buildFullWord(data), name + '.docx');
+      }
+      $('#fullStatus').textContent = '';
+    } catch (error) {
+      $('#fullStatus').textContent = 'Не удалось сформировать документ. ' + (error.message || 'Попробуйте ещё раз.');
+    } finally {
+      fullExporting = false;
+      controls.forEach(control => { control.disabled = false; });
+    }
+  }
+  $('#fullPdf').addEventListener('click', () => exportFullQuote('pdf'));
+  $('#fullWord').addEventListener('click', () => exportFullQuote('word'));
+
   // ---------- Уведомления ----------
   let toastT;
   function toast(msg) {

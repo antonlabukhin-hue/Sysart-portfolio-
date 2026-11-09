@@ -10,7 +10,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=DM+Mono:wght@400;500&family=Manrope:wght@400;500;600;700;800&display=swap">
-<link rel="stylesheet" href="style.css?v=2026110306">
+<link rel="stylesheet" href="style.css?v=2026110901">
 </head>
 <body>
 
@@ -87,6 +87,7 @@
         <button class="btn btn-line" id="kpPassportsPdf" hidden>Паспорта PDF</button>
         <button class="btn btn-line" id="kpXlsx">Скачать Excel</button>
         <button class="btn btn-main" id="kpPdf">Скачать PDF</button>
+        <button class="btn btn-line" id="kpFull">Сформировать полное КП</button>
       </div>
     </div>
     <label class="check pp-check" style="display:flex;gap:10px;margin:12px 0 20px"><input type="checkbox" id="kpKaliningrad"> Калининград</label>
@@ -141,9 +142,40 @@
 
 <div class="toast" id="toast"></div>
 
+<div class="sheet" id="fullKp" hidden>
+  <div class="sheet-back" data-close></div>
+  <div class="sheet-panel kp-panel full-panel" role="dialog" aria-modal="true" aria-labelledby="fullTitle">
+    <button class="sheet-close" data-close aria-label="Закрыть">×</button>
+    <span class="eyebrow">Коммерческое предложение</span>
+    <h2 id="fullTitle">Полное КП</h2>
+    <div class="full-columns">
+      <section class="full-section">
+        <h3>01 · Визуализация объекта</h3>
+        <div class="full-visual" id="fullVisual">Загрузите визуализацию для титульной страницы</div>
+        <label class="btn btn-line full-upload">Загрузить JPG или PNG<input id="fullFile" type="file" accept="image/jpeg,image/png"></label>
+        <button type="button" class="btn btn-line" id="fullRemove" hidden>Убрать фото</button>
+        <h3 class="full-spec-title">02 · Спецификация светильников</h3>
+        <p id="fullSpec" class="muted"></p>
+        <p class="muted">Таблица текущего КП с увеличенными фотографиями, характеристиками и ценами.</p>
+      </section>
+      <section class="full-section">
+        <h3>03 · Примеры выполненных работ</h3>
+        <label class="field"><span>Поиск по объекту или городу</span><input type="search" id="fullSearch"></label>
+        <div id="fullProjects" class="full-projects"></div>
+        <p id="fullCount" class="muted"></p>
+      </section>
+    </div>
+    <p id="fullStatus" role="status" class="muted"></p>
+    <div class="kp-actions full-actions">
+      <button class="btn btn-main" id="fullPdf">Скачать PDF</button>
+      <button class="btn btn-line" id="fullWord">Скачать Word</button>
+    </div>
+  </div>
+</div>
+
 <!-- Документ для печати / PDF -->
 <div id="print" class="print"></div>
 
-<script src="app.js?v=2026110501"></script>
+<script src="app.js?v=2026110901"></script>
 </body>
 </html>
