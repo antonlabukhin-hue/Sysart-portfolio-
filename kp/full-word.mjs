@@ -77,10 +77,11 @@ export async function buildFullWord(data) {
       para(item.name, 19), para(item.unit, 18), para(item.qty, 18), para(item.price, 18), para(item.sum, 18)]);
   }
   table += '</w:tbl>';
-  let body = para('СИСТЕМА АРТ  /  АРХИТЕКТУРНОЕ ОСВЕЩЕНИЕ', 20, true) +
+  let body = para(data.partner ? data.company : 'СИСТЕМА АРТ  /  АРХИТЕКТУРНОЕ ОСВЕЩЕНИЕ', 20, true) +
     para('Коммерческое предложение', 48, true) + para(data.object || data.client, 32, true) +
     para('КП № ' + data.number + ' · ' + data.date) +
     (data.client ? para('Заказчик: ' + data.client) : '') +
+    (data.visual ? para(data.object.trim() ? 'Визуализация: ' + data.object.trim() : 'Визуализация', 26, true) : '') +
     await picture(data.visual, 6100000, 4700000, 'Визуализация объекта');
   body += page + para('02 / Спецификация светильников', 34, true) + table +
     para('Итого: ' + data.total + ' ₽', 26, true) + para(data.tax) +

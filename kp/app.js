@@ -927,9 +927,9 @@
     });
   }
 
-  function kpFileName(ext) {
+  function kpFileName(ext, prefix = 'КП Система Арт') {
     const m = KP.meta;
-    return ['КП Система Арт', m.client, m.object, fmtDate(m.date)].filter(Boolean).join(' — ').replace(/[\\/:*?"<>|]/g, '') + ext;
+    return [prefix, m.client, m.object, fmtDate(m.date)].filter(Boolean).join(' — ').replace(/[\\/:*?"<>|]/g, '') + ext;
   }
 
   async function buildXlsx() {
@@ -1363,7 +1363,7 @@
     ].filter(Boolean);
   }
 
-  function buildDoc() {
+  function buildDoc({ partner = false, signature } = {}) {
     const m = KP.meta;
     const t = kpTotal();
     const terms = docTerms();
@@ -1407,8 +1407,8 @@
           <div>${m.note ? `<h4>Примечание</h4><p>${esc(m.note)}</p>` : ''}</div>
         </div>
         <div class="doc-sign">
-          <p>С уважением,<br>${[`<b>${esc(mg.name)}</b>`, esc(mg.title), esc(S.company), [mg.phone, mg.email].filter(Boolean).map(esc).join(' · ')].filter(x => x && x !== '<b></b>').join('<br>')}</p>
-          <span class="site">Портфолио объектов: sysartspb.com</span>
+          <p>С уважением,<br>${partner ? signature.map(esc).join('<br>') : [`<b>${esc(mg.name)}</b>`, esc(mg.title), esc(S.company), [mg.phone, mg.email].filter(Boolean).map(esc).join(' · ')].filter(x => x && x !== '<b></b>').join('<br>')}</p>
+          ${partner ? '' : '<span class="site">Портфолио объектов: sysartspb.com</span>'}
         </div>
       </div>
     </div>`;
@@ -1421,7 +1421,7 @@
   let fullExporting = false;
 
   function fullDraft() {
-    if (!fullDrafts.has(KP.id)) fullDrafts.set(KP.id, { visual: '', selected: new Set() });
+    if (!fullDrafts.has(KP.id)) fullDrafts.set(KP.id, { visual: '', selected: new Set(), partner: false });
     return fullDrafts.get(KP.id);
   }
 
@@ -1464,12 +1464,26 @@
     $('#fullRemove').hidden = !visual;
   }
 
+  function renderFullPartner() {
+    const partner = fullDraft().partner;
+    $('#fullPartner').checked = partner;
+    const label = $('#fullPartnerCompany');
+    label.hidden = !partner;
+    label.textContent = S.company?.trim() || 'Укажите название компании в настройках.';
+  }
+  $('#fullPartner').addEventListener('change', e => {
+    fullDraft().partner = e.target.checked;
+    renderFullPartner();
+    $('#fullStatus').textContent = '';
+  });
+
   $('#kpFull').addEventListener('click', async () => {
     if (!KP.lines.length) { toast('В КП нет позиций'); return; }
     $('#fullSearch').value = '';
     $('#fullStatus').textContent = '';
     $('#fullSpec').textContent = `Позиций: ${KP.lines.length} · итого ${fmt(kpTotal())} ₽`;
     renderFullVisual();
+    renderFullPartner();
     openSheet('#fullKp');
     if (!albumProjects) {
       $('#fullProjects').textContent = 'Загружаем проекты…';
@@ -1528,20 +1542,27 @@
     const m = KP.meta;
     const draft = fullDraft();
     const manager = S.manager;
+    const company = S.company?.trim() || '';
+    const houseBrand = /система[\s«»"-]*арт|sysart(?:spb)?\.(?:ru|com)/iu;
+    if (draft.partner && (!company || houseBrand.test(company))) {
+      throw new Error('Укажите название своей компании в настройках КП.');
+    }
+    const signature = [manager.name, manager.title, company, manager.phone, manager.email].filter(Boolean);
     return {
       ...m, date: fmtDate(m.date), visual: draft.visual,
+      partner: draft.partner, company,
       projects: (albumProjects || []).filter(p => draft.selected.has(p.id)),
       items: KP.lines.map(l => ({
         name: lineTitle(l), unit: l.unit, qty: l.qty, price: fmt(lineUnitPrice(l)), sum: fmt(lineSum(l)),
         photo: PROD[l.pid]?.photo ? 'img/' + PROD[l.pid].photo : '',
       })),
       total: fmt(kpTotal()), tax: S.vat ? 'В том числе НДС 22 %: ' + fmt(kpTotal() * 22 / 122) + ' ₽' : 'Без НДС',
-      terms: docTerms(), signature: [manager.name, manager.title, S.company, manager.phone, manager.email].filter(Boolean),
+      terms: docTerms(), signature: draft.partner ? signature.filter(value => !houseBrand.test(value)) : signature,
     };
   }
 
   function buildFullPdf(data) {
-    buildDoc();
+    buildDoc(data);
     const doc = $('#print .doc');
     doc.classList.add('full-print');
     const spec = document.createElement('section');
@@ -1549,12 +1570,13 @@
     spec.innerHTML = '<header class="full-spec-head"><div class="doc-kicker">02 / Оборудование</div><h2>Спецификация светильников</h2></header>';
     spec.append(doc.querySelector('.doc-body'));
     doc.innerHTML = `<section class="full-cover">
-      <div class="doc-kicker">Система Арт · Архитектурное освещение</div>
+      <div class="doc-kicker">${esc(data.partner ? data.company : 'Система Арт · Архитектурное освещение')}</div>
       <h1>Коммерческое предложение</h1>
       <h2>${esc(data.object || data.client)}</h2>
       <p>КП № ${esc(data.number)} · ${esc(data.date)}</p>
       ${data.client ? `<p>Заказчик: ${esc(data.client)}</p>` : ''}
-      ${data.visual ? `<img src="${esc(data.visual)}" alt="Визуализация объекта">` : ''}
+      ${data.visual ? `<h3 class="full-visual-title">${esc(data.object.trim() ? 'Визуализация: ' + data.object.trim() : 'Визуализация')}</h3>
+        <img src="${esc(data.visual)}" alt="Визуализация объекта">` : ''}
       </section>`;
     doc.append(spec);
     if (data.projects.length) doc.insertAdjacentHTML('beforeend', `<section class="full-portfolio">
@@ -1567,17 +1589,17 @@
   async function exportFullQuote(format) {
     if (fullExporting || !KP.lines.length) return;
     fullExporting = true;
-    const controls = [$('#fullPdf'), $('#fullWord'), $('#fullFile'), $('#fullRemove')];
+    const controls = [$('#fullPdf'), $('#fullWord'), $('#fullFile'), $('#fullRemove'), $('#fullPartner')];
     controls.forEach(control => { control.disabled = true; });
     $('#fullStatus').textContent = 'Готовим документ…';
     try {
       const data = fullQuoteData();
-      const name = 'Полное ' + kpFileName('');
+      const name = 'Полное ' + kpFileName('', data.partner ? 'КП ' + data.company : undefined);
       if (format === 'pdf') {
         buildFullPdf(data);
         await printPrepared(name);
       } else {
-        const { buildFullWord } = await import('./full-word.mjs?v=2026110901');
+        const { buildFullWord } = await import('./full-word.mjs?v=2026110903');
         download(await buildFullWord(data), name + '.docx');
       }
       $('#fullStatus').textContent = '';
