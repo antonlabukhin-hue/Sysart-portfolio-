@@ -1469,7 +1469,7 @@
     $('#fullPartner').checked = partner;
     const label = $('#fullPartnerCompany');
     label.hidden = !partner;
-    label.textContent = S.company?.trim() || 'Укажите название компании в настройках.';
+    label.textContent = KP.meta.client?.trim() || 'Введите название компании в поле «Заказчик» обычного КП.';
   }
   $('#fullPartner').addEventListener('change', e => {
     fullDraft().partner = e.target.checked;
@@ -1542,10 +1542,10 @@
     const m = KP.meta;
     const draft = fullDraft();
     const manager = S.manager;
-    const company = S.company?.trim() || '';
+    const company = (draft.partner ? m.client : S.company)?.trim() || '';
     const houseBrand = /система[\s«»"-]*арт|sysart(?:spb)?\.(?:ru|com)/iu;
-    if (draft.partner && (!company || houseBrand.test(company))) {
-      throw new Error('Укажите название своей компании в настройках КП.');
+    if (draft.partner && !company) {
+      throw new Error('Введите название компании в поле «Заказчик» обычного КП.');
     }
     const signature = [manager.name, manager.title, company, manager.phone, manager.email].filter(Boolean);
     return {
