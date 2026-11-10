@@ -574,6 +574,18 @@
         .lightbox-cap b { display: block; font-size: 18px; font-weight: 600; letter-spacing: -0.01em; }
         .lightbox-cap span { display: block; margin-top: 6px; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: var(--lime); }
         .lightbox.has-cap img { max-height: 78vh; transform: translateY(-3vh); }
+        .lightbox.is-project { flex-direction: column; gap: 16px; padding: 60px 76px 24px; touch-action: pan-y; }
+        .lightbox.is-project img { min-height: 0; max-height: 68vh; object-fit: contain; transform: none; }
+        .lightbox.is-project .lightbox-cap { position: static; transform: none; width: min(100%, 760px); pointer-events: auto; }
+        .lightbox-cap .project-description { margin: 8px auto 12px; color: #cfcbc3; font-size: 14px; line-height: 1.5; }
+        .project-share { padding: 9px 16px; border: 1px solid #ffffff50; border-radius: 999px; background: #ffffff12; color: #fff; font: inherit; font-size: 13px; cursor: pointer; }
+        .project-share:hover, .project-share:focus-visible { border-color: var(--lime); }
+        @media (max-width: 680px) {
+            .lightbox.is-project { padding: 64px 14px 22px; gap: 14px; }
+            .lightbox.is-project img { max-width: 100%; max-height: 58vh; }
+            .lightbox.is-project .lightbox-cap b { font-size: 17px; }
+            .lightbox-cap .project-description { font-size: 13px; }
+        }
         /* Страницы каталога: крупнее и с возможностью приблизить пальцами */
         .lightbox.is-doc { touch-action: pinch-zoom; }
         .lightbox.is-doc img { max-width: 96%; max-height: 92vh; background: #fff; }
@@ -1097,9 +1109,10 @@
         <div class="lightbox-btn lightbox-prev" id="prevBtn">&#10094;</div>
         <div class="lightbox-btn lightbox-next" id="nextBtn">&#10095;</div>
         <img id="lightbox-img" src="" alt="Фото">
-        <p class="lightbox-cap" id="lightbox-cap"></p>
+        <div class="lightbox-cap" id="lightbox-cap"></div>
     </div>
 
+    <script src="album/objects.js"></script>
     <script>
         const homeView = document.getElementById('home-view');
         // --- ПЕРЕКЛЮЧЕНИЕ СТРАНИЦ: главная и внутренние (галерея, каталог, о компании) ---
@@ -1332,8 +1345,9 @@
             new IntersectionObserver(([en], io) => { if (en.isIntersecting) { box.querySelectorAll('image[data-href]').forEach(im => im.setAttribute('href', im.dataset.href)); box.classList.add('on'); io.disconnect(); } }, { threshold: 0.3 }).observe(box);
         }
 
+        const photoKey = src => (src || '').split('/').pop().replace(/\.\w+$/, '');
         const captionFor = src => {
-            const key = (src || '').split('/').pop().replace(/\.\w+$/, '');
+            const key = photoKey(src);
             const c = photoCaptions[key];
             return c ? { name: c[0], meta: c[2] ? `${c[1]} · ${c[2]}` : c[1] } : null;
         };
@@ -1347,11 +1361,69 @@
         });
 
         const lightboxCap = document.getElementById('lightbox-cap');
+        const projectPanels = new Map();
+        panels.forEach(panel => panel.querySelectorAll('img[data-full]').forEach(img => {
+            projectPanels.set(photoKey(img.dataset.full), panel);
+        }));
+        const projectTitles = {
+            static: 'Проекты от 2200K–6000K',
+            managed: 'Цветные и управляемые проекты',
+            gobo: 'Гобо проекции',
+        };
+        const projectHash = key => '#project=' + encodeURIComponent(key);
+        function setProjectHash(hash) {
+            const url = new URL(location.href);
+            url.hash = hash;
+            history.replaceState(null, '', url.href);
+        }
+        function closeLightbox() {
+            lightbox.classList.remove('active');
+            if (location.hash.startsWith('#project=')) setProjectHash('');
+        }
         function showLightboxPhoto() {
-            lightboxImg.src = activeImages[currentIndex];
-            const cap = lightbox.classList.contains('is-doc') ? null : captionFor(activeImages[currentIndex]);
-            lightboxCap.innerHTML = cap ? `<b>${cap.name}</b><span>${cap.meta}</span>` : '';
-            lightbox.classList.toggle('has-cap', !!cap);
+            const src = activeImages[currentIndex];
+            const key = photoKey(src);
+            lightboxImg.src = src;
+            const isDoc = lightbox.classList.contains('is-doc');
+            const panel = !isDoc && projectPanels.get(key);
+            const cap = isDoc ? null : captionFor(src);
+            const name = cap?.name || (panel ? 'Гобо-проекция №' + key.replace(/^gobo/, '') : '');
+            lightboxImg.alt = name || 'Фото';
+            lightboxCap.replaceChildren();
+            lightbox.classList.toggle('has-cap', !!name);
+            lightbox.classList.toggle('is-project', !!panel);
+            if (name) {
+                const title = document.createElement('b');
+                title.textContent = name;
+                lightboxCap.append(title);
+                if (cap?.meta) {
+                    const meta = document.createElement('span');
+                    meta.textContent = cap.meta;
+                    lightboxCap.append(meta);
+                }
+            }
+            if (!panel) return;
+            const entry = window.ALBUM_OBJECTS?.[key];
+            const description = document.createElement('p');
+            description.className = 'project-description';
+            description.textContent = entry?.[1] || (panel.dataset.panel === 'gobo'
+                ? 'Гобо-проекция добавляет световой рисунок на поверхность здания.'
+                : window.ALBUM_DEFAULT_TEXT?.[entry?.[0] || ''] || 'Подсветка подчёркивает архитектуру фасада в вечернее время.');
+            const share = document.createElement('button');
+            share.type = 'button';
+            share.className = 'project-share';
+            share.textContent = 'Скопировать ссылку';
+            share.onclick = async () => {
+                const url = new URL(projectHash(key), 'https://sysartspb.com/');
+                try {
+                    await navigator.clipboard.writeText(url.href);
+                    share.textContent = 'Ссылка скопирована';
+                } catch {
+                    window.prompt('Ссылка на проект', url.href);
+                }
+            };
+            lightboxCap.append(description, share);
+            setProjectHash(projectHash(key));
         }
 
         function openLightbox(list, index, isDoc) {
@@ -1374,8 +1446,8 @@
             });
         }
 
-        document.getElementById('closeBtn').addEventListener('click', () => lightbox.classList.remove('active'));
-        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) lightbox.classList.remove('active'); });
+        document.getElementById('closeBtn').addEventListener('click', closeLightbox);
+        lightbox.addEventListener('click', (e) => { if (e.target === lightbox) closeLightbox(); });
 
         function showNext() {
             currentIndex = (currentIndex < activeImages.length - 1) ? currentIndex + 1 : 0;
@@ -1402,7 +1474,7 @@
             if (lightbox.classList.contains('active')) {
                 if (e.key === 'ArrowRight') showNext();
                 if (e.key === 'ArrowLeft') showPrev();
-                if (e.key === 'Escape') lightbox.classList.remove('active');
+                if (e.key === 'Escape') closeLightbox();
             }
         });
 
@@ -1649,6 +1721,17 @@
             });
             catalogView.scrollTop = 0;
         }
+        function openProjectLink() {
+            const match = location.hash.match(/^#project=([\w-]+)$/);
+            const panel = match && projectPanels.get(match[1]);
+            if (!panel) return;
+            const category = panel.dataset.panel;
+            const list = Array.from(panel.querySelectorAll('img[data-full]'), img => img.dataset.full);
+            openGallery(category, projectTitles[category]);
+            openLightbox(list, list.findIndex(src => photoKey(src) === match[1]), false);
+        }
+        window.addEventListener('hashchange', openProjectLink);
+        openProjectLink();
     </script>
 </body>
 </html>
