@@ -664,7 +664,15 @@
             .portal-card:not(.is-open) .portal-meta, .category-portals:hover .portal-card.is-open:not(:hover) .portal-meta { opacity: 1; }
             .portal-card:not(.is-open) .portal-link, .category-portals:hover .portal-card.is-open:not(:hover) .portal-link { opacity: 1; transform: none; }
         }
-    </style>
+    .hero h1 {margin-bottom:clamp(16px,3vw,36px)}
+.hero-sales {grid-template-columns:minmax(0,1fr) auto;gap:20px}
+.hero-lead {max-width:540px;margin:0 0 18px;font-size:clamp(15px,1.4vw,20px);line-height:1.5;color:#ece7df}
+.hero-actions {display:flex;gap:10px;flex-wrap:wrap}
+.hero-action {display:inline-flex;gap:12px;align-items:center;justify-content:center;min-height:46px;padding:0 17px;border:1px solid #ffffff55;border-radius:999px;color:#fff;font-size:14px;font-weight:700}
+.hero-action-main {background:#c92f28;border-color:#c92f28}
+.hero-action:hover,.hero-action:focus-visible {outline:2px solid #fff;outline-offset:3px}
+@media(max-width:680px){.hero-sales {grid-template-columns:1fr;grid-template-rows:auto;gap:0}.hero-sales .hero-index {display:none}.hero-lead {margin-bottom:14px}.hero-action {padding:0 12px;font-size:13px;gap:6px}}
+</style>
 </head>
 <body>
 
@@ -695,10 +703,15 @@
         <section class="snap-section hero">
             <div class="hero-kicker"><span class="kicker-line"></span> Архитектурное освещение</div>
             <h1>Свет<br><em>формирует</em><br>пространство.</h1>
-            <div class="hero-bottom">
-                <p class="hero-intro">Визуальный архив проектов<br>Система Арт</p>
-                <a class="scroll-cue" href="#projects" onclick="document.getElementById('projects').scrollIntoView(); return false;"><span class="scroll-arrow">↓</span><span>Смотреть<br>проекты</span></a>
-                <div class="hero-index"><strong id="photo-count">60</strong><span><br>фото</span></div>
+            <div class="hero-bottom hero-sales">
+                <div>
+                    <p class="hero-lead">Архитектурное освещение фасадов. Подбираем и поставляем оборудование, готовим визуализацию и проектируем освещение.</p>
+                    <div class="hero-actions">
+                        <a class="hero-action hero-action-main" href="#contact" onclick="navGo('contact'); return false;">Обсудить объект <span aria-hidden="true">↗</span></a>
+                        <a class="hero-action" href="#projects" onclick="navGo('projects'); return false;">Смотреть проекты <span aria-hidden="true">↓</span></a>
+                    </div>
+                </div>
+                <div class="hero-index"><strong id="photo-count">82</strong><span>фото</span></div>
             </div>
             <div class="hero-orbit" aria-hidden="true"><span></span><i></i></div>
         </section>
