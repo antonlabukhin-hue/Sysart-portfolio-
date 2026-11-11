@@ -36,19 +36,7 @@
     <link rel="icon" type="image/png" sizes="512x512" href="images/favicon-512.png">
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
-    <!-- Yandex.Metrika counter -->
-    <script type="text/javascript">
-        (function(m,e,t,r,i,k,a){
-            m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
-            m[i].l=1*new Date();
-            for (var j = 0; j < document.scripts.length; j++) {if (document.scripts[j].src === r) { return; }}
-            k=e.createElement(t),a=e.getElementsByTagName(t)[0],k.async=1,k.src=r,a.parentNode.insertBefore(k,a)
-        })(window, document,'script','https://mc.yandex.ru/metrika/tag.js?id=113787422', 'ym');
-
-        ym(113787422, 'init', {ssr:true, webvisor:true, clickmap:true, ecommerce:"dataLayer", referrer: document.referrer, url: location.href, accurateTrackBounce:true, trackLinks:true});
-    </script>
-    <noscript><div><img src="https://mc.yandex.ru/watch/113787422" style="position:absolute; left:-9999px;" alt="" /></div></noscript>
-    <!-- /Yandex.Metrika counter -->
+    <script src="js/site-analytics.js" defer></script>
     <link rel="preload" as="image" href="images/logo.png">
     <link rel="preload" as="image" href="images/min/MONO28.jpg">
 
@@ -697,6 +685,7 @@
             <a href="#projects" data-nav="projects" onclick="navGo('projects'); return false;">Проекты</a>
             <a href="#catalog" data-nav="catalog" onclick="navGo('catalog'); return false;">Каталог</a>
             <a href="#about" data-nav="about" onclick="openAbout(); return false;">О компании</a>
+            <a href="partners/">Стать партнёром</a>
             <a href="#contact" data-nav="contact" onclick="navGo('contact'); return false;">Контакты</a>
         </nav>
         <div class="header-actions">
@@ -1077,7 +1066,8 @@
             <a href="#projects" onclick="navGo('projects'); return false;"><i>01</i>Проекты</a>
             <a href="#catalog" onclick="navGo('catalog'); return false;"><i>02</i>Каталог</a>
             <a href="#about" onclick="toggleMenu(false); openAbout(); return false;"><i>03</i>О компании</a>
-            <a href="#contact" onclick="navGo('contact'); return false;"><i>04</i>Контакты</a>
+            <a href="partners/"><i>04</i>Стать партнёром</a>
+            <a href="#contact" onclick="navGo('contact'); return false;"><i>05</i>Контакты</a>
         </nav>
         <div class="mnav-bottom">
             <button class="main" onclick="toggleMenu(false); openCallback();">Заказать звонок</button>
@@ -1625,17 +1615,7 @@
         });
 
         // --- ЦЕЛИ ЯНДЕКС МЕТРИКИ: звонок, почта, WhatsApp, скачивание каталога и открытие разделов ---
-        function goal(name) { try { ym(113787422, 'reachGoal', name); } catch (e) {} }
-        document.addEventListener('click', e => {
-            const a = e.target.closest('a[href]');
-            if (!a) return;
-            const href = a.getAttribute('href');
-            if (href.startsWith('tel:')) goal('phone');
-            else if (href.startsWith('mailto:')) goal('email');
-            else if (href.includes('wa.me/')) goal('whatsapp');
-            else if (href.includes('max.ru/')) goal('max');
-            else if (href.endsWith('.pdf')) goal('catalog_pdf');
-        });
+        function goal(name, data) { window.sysartAnalytics?.goal(name, data); }
 
         // --- ФОРМА ЗАЯВКИ: отправка через Web3Forms на почту (оттуда Bitrix24 делает лид) ---
         // Ключи доступа Web3Forms не секретные: один ключ — один ящик-получатель (Gmail, info@sysart.ru, zayavki@sysartspb.com → Bitrix24).
@@ -1645,6 +1625,7 @@
         cfForm.consent.addEventListener('change', e => e.target.closest('.cf-consent').classList.remove('invalid'));
         cfForm.addEventListener('submit', async e => {
             e.preventDefault();
+            if (cfForm.querySelector('.cf-btn').disabled || cfForm.classList.contains('sent')) return;
             const f = cfForm.elements;
             const name = f.name.value.trim(), phone = f.phone.value.trim(), object = f.object.value.trim();
             f.name.parentNode.classList.toggle('invalid', !name);
@@ -1653,21 +1634,29 @@
             if (cfForm.querySelector('.invalid')) { cfForm.querySelector('.invalid input').focus(); return; }
             if (f.botcheck.checked) return;
             const text = `Имя: ${name}\nТелефон: ${phone}\nОбъект: ${object || '—'}`;
-            goal('lead_form');
+            const attribution = window.sysartAnalytics?.attribution() || {};
+            const requestId = crypto.randomUUID();
+            const sourceText = '\nID заявки: ' + requestId + '\nИсточники перехода: ' + JSON.stringify(attribution);
+            goal('lead_form_attempt');
             if (!FORM_KEYS.length) {
-                location.href = 'mailto:info@sysart.ru?subject=' + encodeURIComponent('Заявка с сайта sysartspb.com') + '&body=' + encodeURIComponent(text);
+                location.href = 'mailto:info@sysart.ru?subject=' + encodeURIComponent('Заявка с сайта sysartspb.com') + '&body=' + encodeURIComponent(text + sourceText);
                 return;
             }
             const btn = cfForm.querySelector('.cf-btn');
             btn.disabled = true;
             try {
                 const results = await Promise.allSettled(FORM_KEYS.map(key => fetch('https://api.web3forms.com/submit', {
-                    method: 'POST', headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
-                    body: JSON.stringify({ access_key: key, subject: 'Заявка с сайта sysartspb.com: ' + name, from_name: 'Сайт sysartspb.com', name, phone, object: object || '—', consent: 'дано ' + new Date().toLocaleString('ru-RU'), message: text })
+                    method: 'POST', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    body: JSON.stringify({ access_key: key, subject: 'Заявка с сайта sysartspb.com: ' + name, from_name: 'Сайт sysartspb.com', name, phone, object: object || '—', consent: 'дано ' + new Date().toLocaleString('ru-RU'), request_id: requestId, ...attribution.last, first_touch: JSON.stringify(attribution.first || {}), page_url: attribution.page, message: text + sourceText })
                 }).then(r => r.json())));
                 if (!results.some(x => x.status === 'fulfilled' && x.value.success)) throw new Error('form');
+                goal('lead_form');
+                const crmResult = results[2];
+                if (crmResult?.status === 'fulfilled' && crmResult.value.success) goal('lead_crm_mail_accepted');
+                else goal('lead_crm_mail_error');
                 cfForm.classList.add('sent');
             } catch (err) {
+                goal('lead_form_error');
                 alert('Не получилось отправить заявку. Позвоните нам: +7 914 970-40-00 или напишите на info@sysart.ru');
             } finally { btn.disabled = false; }
         });
@@ -1744,8 +1733,20 @@
             openGallery(category, projectTitles[category]);
             openLightbox(list, list.findIndex(src => photoKey(src) === match[1]), false);
         }
-        window.addEventListener('hashchange', openProjectLink);
-        openProjectLink();
+        function openSiteLink() {
+            const section = location.hash.slice(1);
+            if (['projects', 'catalog', 'about', 'contact'].includes(section)) {
+                requestAnimationFrame(() => {
+                    navGo(section);
+                    const target = document.getElementById(section);
+                    homeView.scrollTo({ top: homeView.scrollTop + target.getBoundingClientRect().top - homeView.getBoundingClientRect().top, behavior: 'instant' });
+                });
+            } else {
+                openProjectLink();
+            }
+        }
+        window.addEventListener('hashchange', openSiteLink);
+        openSiteLink();
     </script>
 </body>
 </html>
