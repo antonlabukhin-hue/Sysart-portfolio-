@@ -5,7 +5,7 @@
     const now = Date.now();
     let saved = {};
     try { saved = JSON.parse(localStorage.getItem(storageKey) || '{}') || {}; } catch {}
-    if (!saved.updated || now - saved.updated > 90 * 86400000) saved = {};
+    if (typeof saved !== 'object' || Array.isArray(saved) || !saved.updated || now - saved.updated > 90 * 86400000) saved = {};
 
     const params = new URLSearchParams(location.search);
     const tags = Object.fromEntries(fields.filter(key => params.has(key)).map(key => [key, params.get(key).slice(0, 500)]));
@@ -22,7 +22,9 @@
 
     window.sysartAnalytics = {
         goal(name, data = {}) {
-            if (typeof window.ym === 'function') window.ym(counter, 'reachGoal', name, data);
+            try {
+                if (typeof window.ym === 'function') window.ym(counter, 'reachGoal', name, data);
+            } catch {}
         },
         attribution() {
             return { first: saved.first, last: saved.last, page: location.origin + location.pathname };

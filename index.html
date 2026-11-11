@@ -1615,7 +1615,7 @@
         });
 
         // --- ЦЕЛИ ЯНДЕКС МЕТРИКИ: звонок, почта, WhatsApp, скачивание каталога и открытие разделов ---
-        function goal(name, data) { window.sysartAnalytics?.goal(name, data); }
+        function goal(name, data) { try { window.sysartAnalytics?.goal(name, data); } catch {} }
 
         // --- ФОРМА ЗАЯВКИ: отправка через Web3Forms на почту (оттуда Bitrix24 делает лид) ---
         // Ключи доступа Web3Forms не секретные: один ключ — один ящик-получатель (Gmail, info@sysart.ru, zayavki@sysartspb.com → Bitrix24).
@@ -1634,8 +1634,11 @@
             if (cfForm.querySelector('.invalid')) { cfForm.querySelector('.invalid input').focus(); return; }
             if (f.botcheck.checked) return;
             const text = `Имя: ${name}\nТелефон: ${phone}\nОбъект: ${object || '—'}`;
-            const attribution = window.sysartAnalytics?.attribution() || {};
-            const requestId = crypto.randomUUID();
+            let attribution = {};
+            try { attribution = window.sysartAnalytics?.attribution() || {}; } catch {}
+            const requestId = typeof window.crypto?.randomUUID === 'function'
+                ? window.crypto.randomUUID()
+                : Date.now().toString(36) + '-' + Math.random().toString(36).slice(2);
             const sourceText = '\nID заявки: ' + requestId + '\nИсточники перехода: ' + JSON.stringify(attribution);
             goal('lead_form_attempt');
             if (!FORM_KEYS.length) {
@@ -1644,21 +1647,29 @@
             }
             const btn = cfForm.querySelector('.cf-btn');
             btn.disabled = true;
+            const originalButtonText = btn.textContent;
+            btn.textContent = 'Отправляем…';
+            const controller = new AbortController();
+            const timeout = setTimeout(() => controller.abort(), 20000);
             try {
                 const results = await Promise.allSettled(FORM_KEYS.map(key => fetch('https://api.web3forms.com/submit', {
-                    method: 'POST', signal: AbortSignal.timeout(20000), headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
+                    method: 'POST', signal: controller.signal, headers: { 'Content-Type': 'application/json', Accept: 'application/json' },
                     body: JSON.stringify({ access_key: key, subject: 'Заявка с сайта sysartspb.com: ' + name, from_name: 'Сайт sysartspb.com', name, phone, object: object || '—', consent: 'дано ' + new Date().toLocaleString('ru-RU'), request_id: requestId, ...attribution.last, first_touch: JSON.stringify(attribution.first || {}), page_url: attribution.page, message: text + sourceText })
                 }).then(r => r.json())));
                 if (!results.some(x => x.status === 'fulfilled' && x.value.success)) throw new Error('form');
+                cfForm.classList.add('sent');
                 goal('lead_form');
                 const crmResult = results[2];
                 if (crmResult?.status === 'fulfilled' && crmResult.value.success) goal('lead_crm_mail_accepted');
                 else goal('lead_crm_mail_error');
-                cfForm.classList.add('sent');
             } catch (err) {
                 goal('lead_form_error');
                 alert('Не получилось отправить заявку. Позвоните нам: +7 914 970-40-00 или напишите на info@sysart.ru');
-            } finally { btn.disabled = false; }
+            } finally {
+                clearTimeout(timeout);
+                btn.disabled = false;
+                btn.textContent = originalButtonText;
+            }
         });
 
         // На блоке с формой плавающая кнопка звонка не нужна и закрывала бы галочку согласия
