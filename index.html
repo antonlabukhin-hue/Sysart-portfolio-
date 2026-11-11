@@ -36,7 +36,7 @@
     <link rel="apple-touch-icon" href="images/apple-touch-icon.png">
 
     <script src="js/site-analytics.js" defer></script>
-    <link rel="preload" as="image" href="images/logo.png">
+    <link rel="preload" as="image" href="images/logo.webp">
     <link rel="preload" as="image" href="images/min/MONO28.jpg">
 
     <style>
@@ -314,7 +314,7 @@
         .catalog-section {
             justify-content: flex-end;
             padding: 100px clamp(22px, 8.2vw, 132px) clamp(24px, 4vh, 50px);
-            background: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%), linear-gradient(rgba(0,0,0,0.6), rgba(10,10,10,1)), url('images/catalog/bg.jpg') center/cover no-repeat;
+            background: radial-gradient(ellipse 50% 80% at 84% 48%, rgba(239,59,54,.15), transparent 67%), linear-gradient(rgba(0,0,0,0.6), rgba(10,10,10,1)), var(--catalog-photo, none) center/cover no-repeat;
         }
         .cat-kicker { font-family: 'DM Mono', monospace; font-size: 11px; color: var(--muted); display: flex; align-items: center; gap: 13px; text-transform: uppercase; letter-spacing: .08em; margin-bottom: 20px; }
         .catalog-section h2 { font-size: clamp(42px, min(7.6vw, 11.5vh), 116px); line-height: .88; letter-spacing: -.05em; font-weight: 700; margin: 0; }
@@ -678,7 +678,7 @@
 
     <!-- ШАПКА С НАВИГАЦИЕЙ — общая для всех страниц -->
     <header class="site-header">
-        <a href="#" aria-label="Sysart Portfolio" onclick="navGo('top'); return false;"><img src="images/logo.png" alt="Система Арт"></a>
+        <a href="#" aria-label="Sysart Portfolio" onclick="navGo('top'); return false;"><img src="images/logo.webp" alt="Система Арт"></a>
         <button class="header-back" onclick="backFromView()" aria-label="Назад"><span>←</span> <b id="header-back-text">На главную</b></button>
         <nav class="main-nav" aria-label="Разделы">
             <a href="#projects" data-nav="projects" onclick="navGo('projects'); return false;">Проекты</a>
@@ -729,7 +729,7 @@
             
             <div class="category-portals">
                 <div class="portal-card is-open" onclick="openGallery('static', 'Проекты от 2200K–6000K')">
-                    <img src="images/min/MONO22.jpg" alt="Проекты от 2200K–6000K">
+                    <img data-deferred-src="images/min/MONO22.jpg" decoding="async" alt="Проекты от 2200K–6000K">
                     <div class="portal-content">
                         <span class="portal-num">01</span>
                         <h3>Проекты от <span class="nowrap">2200K–6000K</span></h3>
@@ -739,7 +739,7 @@
                 </div>
 
                 <div class="portal-card" onclick="openGallery('managed', 'Цветные и управляемые проекты')">
-                    <img src="images/min/RGB18.jpg" alt="Цветные и управляемые проекты" onerror="this.src='images/min/RGB17.jpg'">
+                    <img data-deferred-src="images/min/RGB18.jpg" decoding="async" alt="Цветные и управляемые проекты" onerror="this.src='images/min/RGB17.jpg'">
                     <div class="portal-content">
                         <span class="portal-num">02</span>
                         <h3>Цветные и управляемые проекты</h3>
@@ -749,7 +749,7 @@
                 </div>
 
                 <div class="portal-card" onclick="openGallery('gobo', 'Гобо проекции')">
-                    <img class="portal-cover-gobo" src="images/min/gobo1.jpg" alt="Гобо проекции">
+                    <img class="portal-cover-gobo" data-deferred-src="images/min/gobo1.jpg" decoding="async" alt="Гобо проекции">
                     <div class="portal-content">
                         <span class="portal-num">03</span>
                         <h3>Гобо проекции</h3>
@@ -761,7 +761,7 @@
         </section>
 
         <!-- ЭКРАН 3: КАТАЛОГ ОБОРУДОВАНИЯ (карточки разделов собираются скриптом из catalogSections) -->
-        <section class="snap-section catalog-section" id="catalog">
+        <section class="snap-section catalog-section" id="catalog" data-deferred-background="images/catalog/bg.jpg">
             <div class="cat-top">
                 <div>
                     <div class="cat-kicker"><span class="kicker-line"></span> 02 / Каталог оборудования</div>
@@ -861,7 +861,7 @@
             <!-- СТАТИЧЕСКИЕ ПРОЕКТЫ -->
             <div class="project-panel" data-panel="static">
                 <div class="project-grid">
-                    <article class="project-card"><a class="project-visual" href="projects/mono28/"><img loading="lazy" src="images/min/MONO28.jpg" data-full="images/MONO28.jpg" data-project-page="projects/mono28/" alt="ЖК «Централ Парк», Калининград 2023 — архитектурная подсветка"><span class="visual-caption">Открыть проект</span><span class="visual-mark" aria-hidden="true">↗</span></a></article>
+                    <article class="project-card"><a class="project-visual" href="projects/mono28/"><img loading="lazy" decoding="async" src="images/min/MONO28.jpg" data-full="images/MONO28.jpg" data-project-page="projects/mono28/" alt="ЖК «Централ Парк», Калининград 2023 — архитектурная подсветка"><span class="visual-caption">Открыть проект</span><span class="visual-mark" aria-hidden="true">↗</span></a></article>
                     <article class="project-card"><a class="project-visual" href="projects/mono34/"><img loading="lazy" src="images/min/MONO34.jpg" data-full="images/MONO34.jpg" data-project-page="projects/mono34/" alt="Кино-концертный комплекс «Космос», Екатеринбург 2025 — архитектурная подсветка"><span class="visual-caption">Открыть проект</span><span class="visual-mark" aria-hidden="true">↗</span></a></article>
                     <article class="project-card"><a class="project-visual" href="projects/mono7/"><img loading="lazy" src="images/min/MONO7.jpg" data-full="images/MONO7.jpg" data-project-page="projects/mono7/" alt="ЖК «Академический», Екатеринбург 2026 — архитектурная подсветка"><span class="visual-caption">Открыть проект</span><span class="visual-mark" aria-hidden="true">↗</span></a></article>
                     <article class="project-card"><a class="project-visual" href="projects/mono25/"><img loading="lazy" src="images/min/MONO25.jpg" data-full="images/MONO25.jpg" data-project-page="projects/mono25/" alt="ЖК «Эволюция», Пермь 2023 — архитектурная подсветка"><span class="visual-caption">Открыть проект</span><span class="visual-mark" aria-hidden="true">↗</span></a></article>
@@ -1058,7 +1058,7 @@
     <!-- МОБИЛЬНОЕ МЕНЮ -->
     <div class="mnav" id="mnav" role="dialog" aria-label="Меню">
         <div class="mnav-top">
-            <img src="images/logo.png" alt="Система Арт">
+            <img src="images/logo.webp" alt="Система Арт">
             <button class="mnav-close" onclick="toggleMenu(false)" aria-label="Закрыть меню">&times;</button>
         </div>
         <nav class="mnav-links">
@@ -1520,7 +1520,7 @@
 
         catStrip.innerHTML = catalogSections.map((s, i) => `
             <button class="cat-card" onclick="openCatalog(${i})">
-                <img loading="lazy" src="images/catalog/thumbs/p${pad2(s.pages[0])}.jpg" width="600" height="424" alt="${s.name}">
+                <img decoding="async" data-deferred-src="images/catalog/thumbs/p${pad2(s.pages[0])}.jpg" width="600" height="424" alt="${s.name}">
                 <span class="cat-cap"><b>${pad2(i + 1)}</b>${s.name}</span>
             </button>`).join('');
         document.getElementById('cat-summary').textContent =
@@ -1754,6 +1754,30 @@
             } else {
                 openProjectLink();
             }
+        }
+
+        // Fetch lower-screen media only when it enters the home scroll area.
+        function loadDeferredMedia(element) {
+            if (element.dataset.deferredSrc) {
+                element.src = element.dataset.deferredSrc;
+                delete element.dataset.deferredSrc;
+            }
+            if (element.dataset.deferredBackground) {
+                element.style.setProperty('--catalog-photo', 'url("' + element.dataset.deferredBackground + '")');
+                delete element.dataset.deferredBackground;
+            }
+        }
+        const deferredMedia = document.querySelectorAll('[data-deferred-src], [data-deferred-background]');
+        if ('IntersectionObserver' in window) {
+            const mediaObserver = new IntersectionObserver(entries => {
+                entries.filter(entry => entry.isIntersecting).forEach(entry => {
+                    loadDeferredMedia(entry.target);
+                    mediaObserver.unobserve(entry.target);
+                });
+            }, { root: homeView });
+            deferredMedia.forEach(element => mediaObserver.observe(element));
+        } else {
+            deferredMedia.forEach(loadDeferredMedia);
         }
         window.addEventListener('hashchange', openSiteLink);
         openSiteLink();
