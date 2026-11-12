@@ -8,7 +8,7 @@
 <title>Конфигуратор КП — Система Арт</title>
 <link rel="icon" type="image/png" href="../images/favicon-32.png">
 <link rel="stylesheet" href="../fonts/fonts.css">
-<link rel="stylesheet" href="style.css?v=2026110903">
+<link rel="stylesheet" href="style.css?v=2026111201">
 </head>
 <body>
 
@@ -149,9 +149,9 @@
     <div class="full-columns">
       <section class="full-section">
         <h3>01 · Визуализация объекта</h3>
-        <div class="full-visual" id="fullVisual">Загрузите визуализацию для титульной страницы</div>
-        <label class="btn btn-line full-upload">Загрузить JPG или PNG<input id="fullFile" type="file" accept="image/jpeg,image/png"></label>
-        <button type="button" class="btn btn-line" id="fullRemove" hidden>Убрать фото</button>
+        <div class="full-visual" id="fullVisual">Загрузите до трёх визуализаций объекта</div>
+        <label class="btn btn-line full-upload">Добавить фото · до 3<input id="fullFile" type="file" accept="image/jpeg,image/png" multiple></label>
+        <button type="button" class="btn btn-line" id="fullRemove" hidden>Убрать все фото</button>
         <h3 class="full-spec-title">02 · Спецификация светильников</h3>
         <p id="fullSpec" class="muted"></p>
         <p class="muted">Таблица текущего КП с увеличенными фотографиями, характеристиками и ценами.</p>
@@ -176,6 +176,6 @@
 <!-- Документ для печати / PDF -->
 <div id="print" class="print"></div>
 
-<script src="app.js?v=2026110904"></script>
+<script src="app.js?v=2026111201"></script>
 </body>
 </html>

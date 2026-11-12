@@ -1421,47 +1421,56 @@
   let fullExporting = false;
 
   function fullDraft() {
-    if (!fullDrafts.has(KP.id)) fullDrafts.set(KP.id, { visual: '', selected: new Set(), partner: false });
-    return fullDrafts.get(KP.id);
+    if (!fullDrafts.has(KP.id)) fullDrafts.set(KP.id, { visuals: [], selected: new Set(), partner: false });
+    const draft = fullDrafts.get(KP.id);
+    if (!Array.isArray(draft.visuals)) draft.visuals = draft.visual ? [draft.visual] : [];
+    return draft;
   }
 
-  // Тот же источник и группировка по объекту и городу, что в конструкторе альбомов.
+  // Every gallery card is available, including unnamed gobo projects and additional photos.
   async function loadAlbumProjects() {
-    const response = await fetch('../index.html');
-    if (!response.ok) throw new Error('Альбом недоступен');
+    const response = await fetch('../index.html', { cache: 'no-cache' });
+    if (!response.ok) throw new Error('Портфолио недоступно');
     const html = await response.text();
     const literal = html.match(/const photoCaptions = (\{[\s\S]*?\n        \});/);
     if (!literal) throw new Error('Подписи объектов не найдены');
     const captions = Function('"use strict"; return (' + literal[1] + ');')();
-    const projects = new Map();
-    for (const [key, [name, city, year]] of Object.entries(captions)) {
-      const id = name + '|' + city;
-      if (!projects.has(id)) {
-        const folder = key === 'tvtower' ? '../images/about/' : '../images/min/';
-        projects.set(id, { id, name, city, year, photo: folder + encodeURIComponent(key) + '.jpg' });
-      } else if (+year > +projects.get(id).year) {
-        projects.get(id).year = year;
-      }
-    }
-    return [...projects.values()].sort((a, b) => (+b.year || 0) - (+a.year || 0) || a.name.localeCompare(b.name, 'ru'));
+    const page = new DOMParser().parseFromString(html, 'text/html');
+    return Array.from(page.querySelectorAll('.project-panel img[data-full]'), image => {
+      const id = image.dataset.full.split('/').pop().replace(/\.\w+$/, '');
+      const caption = captions[id];
+      const gobo = image.closest('.project-panel').dataset.panel === 'gobo';
+      return {
+        id,
+        name: caption?.[0] || (gobo ? 'Гобо-проекция ' + (id.match(/\d+/)?.[0] || '') : 'Архитектурное освещение'),
+        city: caption?.[1] || '', year: caption?.[2] || '',
+        photo: new URL(image.dataset.full, response.url).href,
+        thumbnail: new URL(image.getAttribute('src'), response.url).href,
+      };
+    });
   }
 
   function renderFullProjects() {
     const selected = fullDraft().selected;
     const query = $('#fullSearch').value.trim().toLocaleLowerCase('ru');
-    const filtered = (albumProjects || []).filter(p => (p.name + ' ' + p.city).toLocaleLowerCase('ru').includes(query));
-    $('#fullProjects').innerHTML = filtered.map(p => `<label class="full-project"><img src="${esc(p.photo)}" alt="" loading="lazy">
+    const filtered = (albumProjects || []).filter(p => (p.name + ' ' + p.city + ' ' + p.year + ' ' + p.id).toLocaleLowerCase('ru').includes(query));
+    $('#fullProjects').innerHTML = filtered.map(p => `<label class="full-project"><img src="${esc(p.thumbnail || p.photo)}" alt="" loading="lazy">
       <span><input type="checkbox" value="${esc(p.id)}" ${selected.has(p.id) ? 'checked' : ''}>${esc(p.name)}
       <br><small>${esc([p.city, p.year].filter(Boolean).join(' · '))}</small></span></label>`).join('') ||
       '<p class="muted">Объекты не найдены.</p>';
-    $('#fullCount').textContent = 'Выбрано объектов: ' + selected.size;
+    $('#fullCount').textContent = 'Выбрано: ' + selected.size + ' из ' + (albumProjects?.length || 0);
   }
 
+  let visualLoading = false;
   function renderFullVisual() {
-    const visual = fullDraft().visual;
-    $('#fullVisual').innerHTML = visual ? `<img src="${esc(visual)}" alt="Визуализация объекта">` :
-      'Загрузите визуализацию для титульной страницы';
-    $('#fullRemove').hidden = !visual;
+    const visuals = fullDraft().visuals;
+    $('#fullVisual').innerHTML = visuals.length ? visuals.map((url, index) =>
+      `<figure class="full-visual-item"><img src="${esc(url)}" alt="Визуализация ${index + 1}">
+      <figcaption>${index + 1} / 3<button type="button" data-remove-visual="${index}" aria-label="Удалить визуализацию ${index + 1}" ${fullExporting || visualLoading ? 'disabled' : ''}>Удалить</button></figcaption></figure>`).join('') :
+      'Загрузите до трёх визуализаций объекта';
+    $('#fullRemove').hidden = !visuals.length;
+    $('#fullFile').disabled = fullExporting || visualLoading || visuals.length >= 3;
+    $('#fullRemove').disabled = fullExporting || visualLoading;
   }
 
   function renderFullPartner() {
@@ -1504,37 +1513,59 @@
     const selected = fullDraft().selected;
     if (input.checked) selected.add(input.value);
     else selected.delete(input.value);
-    $('#fullCount').textContent = 'Выбрано объектов: ' + selected.size;
+    $('#fullCount').textContent = 'Выбрано: ' + selected.size + ' из ' + (albumProjects?.length || 0);
   });
   let visualRequest = 0;
   $('#fullFile').addEventListener('change', async e => {
-    const file = e.target.files[0];
+    const files = Array.from(e.target.files);
     e.target.value = '';
-    if (!file) return;
-    const request = ++visualRequest;
+    if (!files.length || fullExporting || visualLoading) return;
     const draft = fullDraft();
-    const url = URL.createObjectURL(file);
+    if (draft.visuals.length + files.length > 3) {
+      $('#fullStatus').textContent = 'Можно добавить не более трёх фото. Сейчас загружено: ' + draft.visuals.length + '.';
+      return;
+    }
+    const request = ++visualRequest;
+    const urls = [];
+    visualLoading = true;
+    renderFullVisual();
+    $('#fullStatus').textContent = 'Загружаем визуализации…';
     try {
-      if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 25 * 1024 * 1024)
-        throw new Error('Выберите JPG или PNG размером до 25 МБ.');
-      const img = new Image();
-      img.src = url;
-      await img.decode();
-      if (request !== visualRequest || draft !== fullDraft()) { URL.revokeObjectURL(url); return; }
-      if (draft.visual) URL.revokeObjectURL(draft.visual);
-      draft.visual = url;
-      renderFullVisual();
+      for (const file of files) {
+        if (!['image/jpeg', 'image/png'].includes(file.type) || file.size > 25 * 1024 * 1024)
+          throw new Error('Выберите JPG или PNG размером до 25 МБ каждый.');
+        const url = URL.createObjectURL(file);
+        urls.push(url);
+        const img = new Image();
+        img.src = url;
+        await img.decode();
+      }
+      if (request !== visualRequest || draft !== fullDraft()) return;
+      draft.visuals.push(...urls);
+      urls.length = 0;
       $('#fullStatus').textContent = '';
     } catch (error) {
-      URL.revokeObjectURL(url);
-      if (request === visualRequest) $('#fullStatus').textContent = error.message || 'Не удалось открыть изображение.';
+      if (request === visualRequest && draft === fullDraft())
+        $('#fullStatus').textContent = error.message || 'Не удалось открыть изображение.';
+    } finally {
+      urls.forEach(url => URL.revokeObjectURL(url));
+      visualLoading = false;
+      renderFullVisual();
     }
   });
+  $('#fullVisual').addEventListener('click', e => {
+    const button = e.target.closest('[data-remove-visual]');
+    if (!button || fullExporting || visualLoading) return;
+    const index = Number(button.dataset.removeVisual);
+    const removed = fullDraft().visuals.splice(index, 1);
+    removed.forEach(url => URL.revokeObjectURL(url));
+    renderFullVisual();
+  });
   $('#fullRemove').addEventListener('click', () => {
+    if (fullExporting || visualLoading) return;
     visualRequest++;
-    const draft = fullDraft();
-    if (draft.visual) URL.revokeObjectURL(draft.visual);
-    draft.visual = '';
+    fullDraft().visuals.forEach(url => URL.revokeObjectURL(url));
+    fullDraft().visuals = [];
     renderFullVisual();
   });
 
@@ -1549,7 +1580,8 @@
     }
     const signature = [manager.name, manager.title, company, manager.phone, manager.email].filter(Boolean);
     return {
-      ...m, date: fmtDate(m.date), visual: draft.visual,
+      ...m, date: fmtDate(m.date), visual: draft.visuals[0] || '', visuals: [...draft.visuals],
+      contacts: [manager.phone, manager.email].filter(value => value && (!draft.partner || !houseBrand.test(value))),
       partner: draft.partner, company,
       projects: (albumProjects || []).filter(p => draft.selected.has(p.id)),
       items: KP.lines.map(l => ({
@@ -1569,15 +1601,21 @@
     spec.className = 'doc-spec';
     spec.innerHTML = '<header class="full-spec-head"><div class="doc-kicker">02 / Оборудование</div><h2>Спецификация светильников</h2></header>';
     spec.append(doc.querySelector('.doc-body'));
-    doc.innerHTML = `<section class="full-cover">
-      <div class="doc-kicker">${esc(data.partner ? data.company : 'Система Арт · Архитектурное освещение')}</div>
-      <h1>Коммерческое предложение</h1>
-      <h2>${esc(data.object || data.client)}</h2>
-      <p>КП № ${esc(data.number)} · ${esc(data.date)}</p>
-      ${data.client ? `<p>Заказчик: ${esc(data.client)}</p>` : ''}
-      ${data.visual ? `<h3 class="full-visual-title">${esc(data.object.trim() ? 'Визуализация: ' + data.object.trim() : 'Визуализация')}</h3>
-        <img src="${esc(data.visual)}" alt="Визуализация объекта">` : ''}
-      </section>`;
+    const visuals = data.visuals || (data.visual ? [data.visual] : []);
+    const heading = doc.querySelector('.doc-head');
+    if (data.partner) {
+      heading.querySelector('.doc-head-row').innerHTML = `<strong class="full-brand">${esc(data.company)}</strong><div class="doc-contacts">${data.contacts.map(esc).join('<br>')}</div>`;
+      heading.querySelector('.doc-kicker').textContent = 'Оборудование для архитектурного освещения';
+    }
+    const header = heading.outerHTML;
+    const info = doc.querySelector('.doc-info').outerHTML;
+    const visualTitle = data.object?.trim() ? 'Визуализация: ' + data.object.trim() : 'Визуализация';
+    doc.innerHTML = (visuals.length ? visuals : ['']).map((visual, index) => `<section class="full-cover">
+      ${header}${info}<div class="full-cover-body">
+      <div class="full-cover-label"><h3 class="full-visual-title">${esc(visualTitle)}</h3>${visuals.length > 1 ? `<span>${index + 1} / ${visuals.length}</span>` : ''}</div>
+      ${visual ? `<img class="full-cover-image" src="${esc(visual)}" alt="Визуализация объекта ${index + 1}">` : '<div class="full-cover-placeholder">Место для визуализации объекта</div>'}
+      </div><footer class="full-cover-footer"><b>${esc(data.company)}</b><span>КП № ${esc(data.number)} · ${esc(data.date)}</span></footer>
+      </section>`).join('');
     doc.append(spec);
     if (data.projects.length) doc.insertAdjacentHTML('beforeend', `<section class="full-portfolio">
       <div class="doc-kicker">03 / Портфолио</div><h2>Примеры выполненных работ</h2>
@@ -1587,10 +1625,11 @@
   }
 
   async function exportFullQuote(format) {
-    if (fullExporting || !KP.lines.length) return;
+    if (fullExporting || visualLoading || !KP.lines.length) return;
     fullExporting = true;
     const controls = [$('#fullPdf'), $('#fullWord'), $('#fullFile'), $('#fullRemove'), $('#fullPartner')];
     controls.forEach(control => { control.disabled = true; });
+    renderFullVisual();
     $('#fullStatus').textContent = 'Готовим документ…';
     try {
       const data = fullQuoteData();
@@ -1599,7 +1638,7 @@
         buildFullPdf(data);
         await printPrepared(name);
       } else {
-        const { buildFullWord } = await import('./full-word.mjs?v=2026110903');
+        const { buildFullWord } = await import('./full-word.mjs?v=2026111201');
         download(await buildFullWord(data), name + '.docx');
       }
       $('#fullStatus').textContent = '';
@@ -1608,6 +1647,7 @@
     } finally {
       fullExporting = false;
       controls.forEach(control => { control.disabled = false; });
+      renderFullVisual();
     }
   }
   $('#fullPdf').addEventListener('click', () => exportFullQuote('pdf'));
