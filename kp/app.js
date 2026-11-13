@@ -510,7 +510,7 @@
   }
 
   // ---------- Панели ----------
-  function openSheet(id) { $(id).hidden = false; document.body.style.overflow = 'hidden'; }
+  function openSheet(id) { if (id === '#kp' && insertion) clearInsertion(); $(id).hidden = false; document.body.style.overflow = 'hidden'; }
   function closeSheet(el) {
     el.hidden = true;
     if ([...document.querySelectorAll('.sheet')].every(s => s.hidden)) document.body.style.overflow = '';
@@ -523,6 +523,15 @@
   });
 
   // ---------- Конфигуратор ----------
+  let insertion = null;
+  const insertNotice = document.createElement('div');
+  insertNotice.className = 'kp-insert-notice';
+  insertNotice.hidden = true;
+  $('#grid').before(insertNotice);
+  function clearInsertion() { insertion = null; insertNotice.hidden = true; }
+  insertNotice.addEventListener('click', e => {
+    if (e.target.closest('button')) { clearInsertion(); renderKp(); openSheet('#kp'); }
+  });
   let CFG = null; // { p, c, qty, editIndex }
 
   function openCfg(pid, editIndex = null) {
@@ -679,6 +688,19 @@
       closeSheet($('#cfg'));
       renderKp();
     } else {
+      if (insertion && insertion.kpId === KP.id) {
+        const index = insertion.beforeId == null ? KP.lines.length : KP.lines.findIndex(l => l.id === insertion.beforeId);
+        if (index < 0) { clearInsertion(); toast('Список изменился. Выберите место вставки ещё раз.'); return; }
+        freezeRate();
+        KP.lines.splice(index, 0, line);
+        clearInsertion();
+        closeSheet($('#cfg'));
+        saveKp(); updateCount(); renderKp(); openSheet('#kp');
+        requestAnimationFrame(() => $('#kpLines [data-i="' + index + '"]')?.scrollIntoView({ block: 'center' }));
+        toast('Позиция вставлена');
+        return;
+      }
+      clearInsertion();
       // Такая же конфигурация уже есть — увеличиваем количество
       const same = KP.lines.find(l => l.pid === p.id && JSON.stringify(l.cfg) === JSON.stringify(c) && !l.nameEdited && l.manual == null);
       if (same) same.qty = (+same.qty || 0) + qty;
@@ -755,7 +777,7 @@
               <button data-act="up" title="Выше">↑</button>
               <button data-act="del" title="Удалить">×</button>
             </div>
-          </div>`;
+          </div><div class="kp-insert"><button type="button" data-insert="${i + 1}" aria-label="Вставить позицию после ${i + 1}">+</button></div>`;
         }).join('');
     }
     renderTotal();
@@ -795,6 +817,17 @@
     if (e.target.dataset.f === 'manual') renderKp();
   });
   $('#kpLines').addEventListener('click', e => {
+    const insert = e.target.closest('[data-insert]');
+    if (insert) {
+      const index = +insert.dataset.insert;
+      KP.lines.forEach(l => { if (!l.id) l.id = uid(); });
+      saveKp();
+      insertion = { kpId: KP.id, beforeId: KP.lines[index]?.id ?? null };
+      insertNotice.innerHTML = `<span>Выберите светильник · после позиции ${index}</span><button type="button">Отмена</button>`;
+      insertNotice.hidden = false;
+      closeSheet($('#kp'));
+      return;
+    }
     const a = e.target.closest('[data-act]');
     if (!a) return;
     const i = +a.closest('.kp-row').dataset.i;
