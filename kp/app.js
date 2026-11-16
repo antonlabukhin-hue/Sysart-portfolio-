@@ -25,11 +25,12 @@
   ].join('\n');
 
   const S = Object.assign({
-    rate: null, vat: true, adjust: 0, round: 100,
+    rate: null, vat: true, adjust: 0, round: 1,
     manager: { name: 'Антон Андреевич Лабухин', title: 'Директор по развитию', phone: '+7 914 970-40-00', email: 'info@sysart.ru' },
     company: 'ООО «Светотехническая компания «Система Арт», Санкт-Петербург',
     terms: DEFAULT_TERMS,
   }, store.get('kp.settings', {}));
+  S.round = 1; // Старые настройки до 10/50/100 ₽ больше не применяются.
   const saveSettings = () => store.set('kp.settings', S);
 
   // ---------- Расшифровка прайса ----------
@@ -185,7 +186,7 @@
     inp.closest('.rate-box').classList.toggle('needs-update', !!stale || act === 'update');
     $('#rateStatus').textContent = stale ? 'Проверьте курс' : act === 'update' ? 'КП по старому курсу' : manual ? 'Введён вручную' : 'ЦБ + 1 ₽';
   }
-  const roundTo = n => { const r = +S.round || 1; return Math.round(n / r) * r; };
+  const roundTo = n => Math.round(n);
   const adjusted = n => roundTo(n * (1 + (+S.adjust || 0) / 100));
 
   // Коэффициент к цене 1 м для линейных (правило от 26.10.2026):
@@ -365,9 +366,9 @@
     const b = basePrice(p, l.cfg);
     return b == null ? 0 : adjusted(b);
   }
-  const lineUnitPrice = l => lineBasePrice(l) + kaliningradExtra(l);
+  const lineUnitPrice = l => roundTo(lineBasePrice(l) + kaliningradExtra(l));
   const lineTitle = l => (l.nameEdited || !PROD[l.pid]) ? l.name : lineName(PROD[l.pid], l.cfg);
-  const lineSum = l => lineUnitPrice(l) * (+l.qty || 0);
+  const lineSum = l => roundTo(lineUnitPrice(l) * (+l.qty || 0));
   const kpTotal = () => KP.lines.reduce((s, l) => s + lineSum(l), 0);
   const kpWeight = () => KP.lines.reduce((s, l) => {
     return s + (lineWeight(l) || 0) * (+l.qty || 0);
@@ -904,7 +905,7 @@
   function renderSettings() {
     const f = (k, label, v, type = 'text') => `<label class="field"><span>${label}</span><input type="${type}" data-s="${k}" value="${esc(v)}"></label>`;
     $('#settingsBody').innerHTML = `<div class="settings-grid">
-      <label class="field"><span>Округление цены</span><select data-s="round">${[1, 10, 50, 100].map(r => `<option value="${r}" ${+S.round === r ? 'selected' : ''}>до ${r} ₽</option>`).join('')}</select></label>
+      <label class="field"><span>Округление цены</span><select data-s="round"><option value="1">до 1 ₽</option></select></label>
       <p class="muted" style="font-size:12px;margin:0">Цена = цена в $ × курс × 1,1${S.vat ? ' × 1,22 (НДС)' : ''} × длина по правилу прайса + наценки, затем ± % из шапки и округление.</p>
       <h3>Подпись в КП</h3>
       ${f('manager.name', 'ФИО', S.manager.name)}
@@ -1020,7 +1021,7 @@
       const l = KP.lines[i];
       r++;
       const row = ws.getRow(r);
-      row.values = [i + 1, '', lineTitle(l), l.unit, +l.qty || 0, lineUnitPrice(l), { formula: `E${r}*F${r}`, result: lineSum(l) }];
+      row.values = [i + 1, '', lineTitle(l), l.unit, +l.qty || 0, lineUnitPrice(l), { formula: `ROUND(E${r}*F${r},0)`, result: lineSum(l) }];
       row.height = 50;
       row.eachCell({ includeEmpty: true }, c => {
         c.font = font;
@@ -1389,6 +1390,7 @@
   function docTerms() {
     const m = KP.meta;
     return [
+      `Курс доллара для расчёта КП: 1 USD = ${fmtRate(workRate())} ₽`,
       m.delivery && `Срок поставки: ${m.delivery}`,
       m.warranty && `Гарантия: ${m.warranty}`,
       m.payment && `Оплата: ${m.payment}`,
