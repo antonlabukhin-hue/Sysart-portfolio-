@@ -728,6 +728,46 @@
   $('#dock').addEventListener('click', e => { if (e.target.closest('button')) { renderKp(); openSheet('#kp'); } });
 
   // ---------- Экран КП ----------
+  // Фото живут только в памяти вкладки; в saveKp/localStorage они не попадают.
+  const quotePhotos = new Map();
+  const photoRequests = new Map();
+  const photoKey = l => KP.id + ':' + (l.id || (l.id = uid()));
+  const quotePhoto = l => quotePhotos.get(photoKey(l)) || (PROD[l.pid]?.photo ? 'img/' + PROD[l.pid].photo : '');
+  const photoInput = document.createElement('input');
+  photoInput.type = 'file'; photoInput.accept = 'image/jpeg,image/png,image/webp'; photoInput.hidden = true;
+  document.body.append(photoInput);
+  let photoTarget = null;
+  async function compactQuotePhoto(file) {
+    if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) throw new Error('Выберите JPG, PNG или WebP.');
+    if (file.size > 15 * 1024 * 1024) throw new Error('Фото должно быть не больше 15 МБ.');
+    const url = URL.createObjectURL(file);
+    try {
+      const img = new Image(); img.src = url; await img.decode();
+      const scale = Math.min(1, 800 / Math.max(img.naturalWidth, img.naturalHeight));
+      const canvas = document.createElement('canvas');
+      canvas.width = Math.max(1, Math.round(img.naturalWidth * scale));
+      canvas.height = Math.max(1, Math.round(img.naturalHeight * scale));
+      const ctx = canvas.getContext('2d');
+      ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, canvas.width, canvas.height);
+      ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+      return canvas.toDataURL('image/jpeg', .85);
+    } finally { URL.revokeObjectURL(url); }
+  }
+  photoInput.addEventListener('change', async () => {
+    const file = photoInput.files[0], target = photoTarget;
+    photoInput.value = '';
+    if (!file || !target) return;
+    const request = {}; photoRequests.set(target.key, request);
+    toast('Подготавливаем фото…');
+    try {
+      const photo = await compactQuotePhoto(file);
+      if (photoRequests.get(target.key) !== request) return;
+      if (KP.id !== target.kpId || !KP.lines.some(l => l.id === target.lineId)) return;
+      quotePhotos.set(target.key, photo);
+      saveKp(); renderKp(); toast('Фото добавлено до закрытия страницы');
+    } catch (e) { toast(e.message || 'Не удалось прочитать фото.'); }
+    finally { if (photoRequests.get(target.key) === request) photoRequests.delete(target.key); }
+  });
   $('#openKp').addEventListener('click', () => { renderKp(); openSheet('#kp'); });
 
   $('#kpKaliningrad').addEventListener('change', e => {
@@ -766,7 +806,7 @@
           const manual = l.manual != null && l.manual !== '';
           return `<div class="kp-row" data-i="${i}">
             <span class="n">${i + 1}</span>
-            <div class="ph ${p?.photo ? '' : 'none'}">${p?.photo ? `<img src="img/${p.photo}" alt="">` : ''}</div>
+            <div class="quote-photo"><button type="button" class="ph ${quotePhoto(l) ? '' : 'none'}" data-act="photo" title="Загрузить фото для этой позиции" aria-label="Загрузить фото позиции ${i + 1}">${quotePhoto(l) ? `<img src="${quotePhoto(l)}" alt="">` : '<span>+ Фото</span>'}</button>${quotePhotos.has(photoKey(l)) ? '<button type="button" class="photo-reset" data-act="photo-reset" title="Вернуть исходное фото">Убрать</button>' : ''}</div>
             <textarea class="name" data-f="name" rows="3">${esc(lineTitle(l))}</textarea>
             <input class="unit" type="text" data-f="unit" value="${esc(l.unit)}" style="text-align:center">
             <input class="qty" data-f="qty" type="number" min="0" step="1" value="${l.qty}">
@@ -833,6 +873,14 @@
     if (!a) return;
     const i = +a.closest('.kp-row').dataset.i;
     const act = a.dataset.act;
+    if (act === 'photo') {
+      const l = KP.lines[i];
+      photoTarget = { kpId: KP.id, lineId: l.id, key: photoKey(l) };
+      photoInput.click(); return;
+    }
+    if (act === 'photo-reset') {
+      const key = photoKey(KP.lines[i]); quotePhotos.delete(key); photoRequests.delete(key); renderKp(); return;
+    }
     if (act === 'del') KP.lines.splice(i, 1);
     if (act === 'up' && i > 0) [KP.lines[i - 1], KP.lines[i]] = [KP.lines[i], KP.lines[i - 1]];
     if (act === 'reset') KP.lines[i].manual = null;
@@ -953,11 +1001,15 @@
       img.onload = () => {
         const c = document.createElement('canvas');
         c.width = c.height = size;
-        c.getContext('2d').drawImage(img, 0, 0, size, size);
+        const ctx = c.getContext('2d');
+        ctx.fillStyle = '#fff'; ctx.fillRect(0, 0, size, size);
+        const scale = Math.min(size / img.naturalWidth, size / img.naturalHeight);
+        const w = img.naturalWidth * scale, h = img.naturalHeight * scale;
+        ctx.drawImage(img, (size - w) / 2, (size - h) / 2, w, h);
         res(c.toDataURL('image/png'));
       };
       img.onerror = () => res(null);
-      img.src = 'img/' + file;
+      img.src = /^(data:|blob:|img\/)/.test(file) ? file : 'img/' + file;
     });
   }
 
@@ -1032,7 +1084,8 @@
       row.getCell(7).numFmt = money;
       row.getCell(7).font = { ...font, bold: true };
       const p = PROD[l.pid];
-      const png = p?.photo ? await photoPng(p.photo) : null;
+      const src = quotePhoto(l);
+      const png = src ? await photoPng(src) : null;
       if (png) ws.addImage(wb.addImage({ base64: png, extension: 'png' }), { tl: { col: 1.08, row: r - 1 + 0.06 }, ext: { width: 60, height: 60 } });
     }
     const last = r;
@@ -1425,7 +1478,7 @@
             const p = PROD[l.pid];
             return `<tr>
               <td class="i">${i + 1}</td>
-              <td class="ph">${p?.photo ? `<div><img src="img/${p.photo}" alt=""></div>` : ''}</td>
+              <td class="ph">${quotePhoto(l) ? `<div><img src="${quotePhoto(l)}" alt=""></div>` : ''}</td>
               <td class="nm">${esc(lineTitle(l))}</td>
               <td class="c">${esc(l.unit)}</td>
               <td class="num">${fmt(+l.qty || 0)}</td>
@@ -1621,7 +1674,7 @@
       projects: (albumProjects || []).filter(p => draft.selected.has(p.id)),
       items: KP.lines.map(l => ({
         name: lineTitle(l), unit: l.unit, qty: l.qty, price: fmt(lineUnitPrice(l)), sum: fmt(lineSum(l)),
-        photo: PROD[l.pid]?.photo ? 'img/' + PROD[l.pid].photo : '',
+        photo: quotePhoto(l),
       })),
       total: fmt(kpTotal()), tax: S.vat ? 'В том числе НДС 22 %: ' + fmt(kpTotal() * 22 / 122) + ' ₽' : 'Без НДС',
       terms: docTerms(), signature: draft.partner ? signature.filter(value => !houseBrand.test(value)) : signature,

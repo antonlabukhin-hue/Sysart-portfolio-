@@ -516,3 +516,10 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
 .kp-insert-notice[hidden] { display:none; }
 .kp-insert-notice button { color:white; text-decoration:underline; min-height:32px; }
 @media(max-width:700px) { .kp-insert { height:36px; } .kp-insert button { width:36px; height:36px; } .kp-insert-notice { top:110px; margin:10px 16px; font-size:12px; } }
+.quote-photo { position:relative; width:56px; }
+.kp-row .quote-photo .ph { border:1px dashed var(--line-2); padding:0; cursor:pointer; }
+.kp-row .quote-photo .ph:hover { border-color:var(--red); }
+.kp-row .quote-photo .ph img { object-fit:contain; }
+.quote-photo .ph span { font-size:10px; color:var(--soft); }
+.photo-reset { display:block; width:100%; font-size:10px; color:var(--muted); padding:3px 0; }
+@media(max-width:700px) { .kp-row .quote-photo { grid-area:ph; } }
