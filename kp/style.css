@@ -526,3 +526,7 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
 .kp-row .tools button.merge-row { color:var(--red); border:1px solid rgba(239,59,54,.45); font-size:18px; flex-shrink:0; }
 .kp-row .tools { flex-wrap:wrap; }
 @media(min-width:901px) { .kp-row { grid-template-columns:26px 56px minmax(0,1fr) 70px 96px 120px 130px 180px; } }
+.warranty-options { display:flex; gap:8px; }
+.warranty-options button { flex:1; padding:11px 8px; border:1px solid var(--line-2); border-radius:10px; color:var(--soft); font-size:14px; white-space:nowrap; }
+.warranty-options button[aria-pressed="true"] { color:#fff; background:var(--red); border-color:var(--red); }
+.warranty-options small { font-size:10px; opacity:.8; margin-left:3px; }

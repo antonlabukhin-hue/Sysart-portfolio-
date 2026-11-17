@@ -332,7 +332,8 @@
     const num = `${String(d.getFullYear()).slice(2)}${String(d.getMonth() + 1).padStart(2, '0')}${String(d.getDate()).padStart(2, '0')}-${String(d.getHours()).padStart(2, '0')}${String(d.getMinutes()).padStart(2, '0')}`;
     return {
       id: uid(), created: Date.now(), updated: Date.now(),
-      meta: { client: '', object: '', number: num, date: today(), delivery: 'от 40 дней до склада во Владивостоке', warranty: '3 года, до 5 лет по запросу', payment: 'предоплата 70 %, 30 % перед отгрузкой', terms: S.terms, note: '' },
+      warrantyYears: 3,
+      meta: { client: '', object: '', number: num, date: today(), delivery: 'от 40 дней до склада во Владивостоке', warranty: '3 года', payment: 'предоплата 70 %, 30 % перед отгрузкой', terms: S.terms, note: '' },
       lines: [],
     };
   }
@@ -350,6 +351,10 @@
   }
   // КП, собранные до автокурса, запоминают курс, по которому их считали (раньше он хранился в настройках)
   function migrateRate(k) {
+    if (k) {
+      k.warrantyYears = k.warrantyYears === 5 ? 5 : 3;
+      k.meta.warranty = k.warrantyYears === 5 ? '5 лет' : '3 года';
+    }
     if (k && k.lines.length && !k.rate) { k.rate = S.rate || DATA.general.rate; k.rateKind = 'manual'; k.rateNote = `курс ${fmtRate(k.rate)} (до автокурса)`; }
   }
 
@@ -366,7 +371,8 @@
     const b = basePrice(p, l.cfg);
     return b == null ? 0 : adjusted(b);
   }
-  const lineUnitPrice = l => roundTo(lineBasePrice(l) + kaliningradExtra(l));
+  const warrantyFactor = () => KP.warrantyYears === 5 ? 1.15 : 1;
+  const lineUnitPrice = l => roundTo((lineBasePrice(l) + kaliningradExtra(l)) * warrantyFactor());
   const lineTitle = l => (l.nameEdited || !PROD[l.pid]) ? l.name : lineName(PROD[l.pid], l.cfg);
   const lineSum = l => roundTo(lineUnitPrice(l) * (+l.qty || 0));
   const kpTotal = () => KP.lines.reduce((s, l) => s + lineSum(l), 0);
@@ -811,7 +817,8 @@
     $('#kpPassports').checked = !!KP.passports;
     $('#kpPassportsPdf').hidden = !KP.passports;
     $('#kpTitle').innerHTML = esc(m.client || 'Новое КП') + (m.object ? ` <em>· ${esc(m.object)}</em>` : '');
-    $('#kpMeta').innerHTML = META_FIELDS.map(([k, label, cls, ph, type]) =>
+    $('#kpMeta').innerHTML = META_FIELDS.map(([k, label, cls, ph, type]) => k === 'warranty' ?
+      `<div class="field warranty-field"><span>Гарантия</span><div class="warranty-options" role="group" aria-label="Гарантия КП"><button type="button" data-warranty="3" aria-pressed="${KP.warrantyYears !== 5}">3 года</button><button type="button" data-warranty="5" aria-pressed="${KP.warrantyYears === 5}">5 лет <small>+15%</small></button></div></div>` :
       `<label class="field ${cls}"><span>${label}</span><input type="${type || 'text'}" data-meta="${k}" value="${esc(m[k])}" placeholder="${ph}"></label>`).join('') +
       `<label class="field wide"><span>Условия (каждое с новой строки)</span><textarea data-meta="terms" rows="4">${esc(m.terms)}</textarea></label>
        <label class="field wide"><span>Примечание к КП</span><textarea data-meta="note" rows="4" placeholder="Например: цены действительны 14 дней">${esc(m.note)}</textarea></label>`;
@@ -860,6 +867,13 @@
     if (k === 'client' || k === 'object') $('#kpTitle').innerHTML = esc(KP.meta.client || 'Новое КП') + (KP.meta.object ? ` <em>· ${esc(KP.meta.object)}</em>` : '');
     saveKp();
   });
+  $('#kpMeta').addEventListener('click', e => {
+    const button = e.target.closest('[data-warranty]');
+    if (!button) return;
+    KP.warrantyYears = +button.dataset.warranty === 5 ? 5 : 3;
+    KP.meta.warranty = KP.warrantyYears === 5 ? '5 лет' : '3 года';
+    saveKp(); renderKp();
+  });
 
   $('#kpLines').addEventListener('input', e => {
     const row = e.target.closest('.kp-row');
@@ -869,7 +883,7 @@
     if (f === 'name') { l.name = e.target.value; l.nameEdited = true; }
     if (f === 'unit') l.unit = e.target.value;
     if (f === 'qty') l.qty = e.target.value;
-    if (f === 'manual') l.manual = e.target.value === '' ? null : Math.max(0, +e.target.value - kaliningradExtra(l));
+    if (f === 'manual') l.manual = e.target.value === '' ? null : Math.max(0, +e.target.value / warrantyFactor() - kaliningradExtra(l));
     row.querySelector('.sum').textContent = fmt(lineSum(l));
     renderTotal();
     saveKp();
