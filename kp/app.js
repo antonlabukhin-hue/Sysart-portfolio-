@@ -795,6 +795,34 @@
   });
   $('#openKp').addEventListener('click', () => { renderKp(); openSheet('#kp'); });
 
+  // Договор открывается отдельно. Данные КП передаются только в свою вкладку
+  // того же origin; новые реквизиты покупателя не сохраняются в localStorage.
+  const contractWindows = new Map();
+  function contractSnapshot() {
+    return {
+      id: KP.id, meta: { ...KP.meta }, vat: !!S.vat, vatCoef: DATA.general.vatCoef,
+      warrantyYears: KP.warrantyYears === 5 ? 5 : 3, rate: workRate(), total: kpTotal(),
+      items: KP.lines.map(l => ({ name: lineTitle(l), unit: l.unit, qty: +l.qty || 0, price: lineUnitPrice(l), sum: lineSum(l) })),
+    };
+  }
+  $('#kpContract').addEventListener('click', () => {
+    if (!KP.lines.length) { toast('Сначала добавьте позиции в КП.'); return; }
+    for (const [key, entry] of contractWindows) if (entry.window.closed) contractWindows.delete(key);
+    const channel = uid() + uid();
+    const child = window.open('contract.html#' + channel, '_blank');
+    if (!child) { toast('Разрешите открытие вкладки договора для этого сайта.'); return; }
+    contractWindows.set(channel, { window: child, kpId: KP.id });
+  });
+  window.addEventListener('message', event => {
+    if (event.origin !== location.origin || !['sysart:contract:ready', 'sysart:contract:check'].includes(event.data?.type)) return;
+    const entry = contractWindows.get(event.data.channel);
+    if (!entry || event.source !== entry.window) return;
+    const message = { type: 'sysart:contract:data', channel: event.data.channel, requestId: event.data.requestId };
+    if (KP.id !== entry.kpId) message.error = 'В конструкторе открыто другое КП. Откройте договор заново из нужного КП.';
+    else message.quote = contractSnapshot();
+    event.source.postMessage(message, event.origin);
+  });
+
   $('#kpKaliningrad').addEventListener('change', e => {
     KP.kaliningrad = e.target.checked;
     saveKp();
