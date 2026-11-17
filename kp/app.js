@@ -702,10 +702,8 @@
         return;
       }
       clearInsertion();
-      // Такая же конфигурация уже есть — увеличиваем количество
-      const same = KP.lines.find(l => l.pid === p.id && JSON.stringify(l.cfg) === JSON.stringify(c) && !l.nameEdited && l.manual == null);
-      if (same) same.qty = (+same.qty || 0) + qty;
-      else { freezeRate(); KP.lines.push(line); }
+      // Каждое добавление — отдельная позиция; объединение только по кнопке.
+      freezeRate(); KP.lines.push(line);
       toast(`Добавлено в КП: ${p.sku} × ${qty}`);
       closeSheet($('#cfg'));
     }
@@ -733,6 +731,27 @@
   const photoRequests = new Map();
   const photoKey = l => KP.id + ':' + (l.id || (l.id = uid()));
   const quotePhoto = l => quotePhotos.get(photoKey(l)) || (PROD[l.pid]?.photo ? 'img/' + PROD[l.pid].photo : '');
+  const cfgKey = c => JSON.stringify(Object.entries(c || {}).sort(([a], [b]) => a.localeCompare(b)));
+  function mergeTarget(index) {
+    const source = KP.lines[index];
+    if (!source?.pid) return -1;
+    return KP.lines.findIndex((target, j) => j !== index && target.pid === source.pid &&
+      cfgKey(target.cfg) === cfgKey(source.cfg) && target.unit === source.unit &&
+      lineTitle(target) === lineTitle(source) &&
+      (target.manual == null || target.manual === '' ? null : +target.manual) === (source.manual == null || source.manual === '' ? null : +source.manual) &&
+      quotePhoto(target) === quotePhoto(source) && lineUnitPrice(target) === lineUnitPrice(source) &&
+      roundTo(lineUnitPrice(target) * ((+target.qty || 0) + (+source.qty || 0))) === lineSum(target) + lineSum(source));
+  }
+  function mergeButton(index) {
+    const target = mergeTarget(index);
+    return target < 0 ? '' : `<button type="button" class="merge-row" data-act="merge" title="Объединить с позицией ${target + 1}" aria-label="Объединить позицию ${index + 1} с позицией ${target + 1}">⊕</button>`;
+  }
+  function refreshMergeButtons() {
+    document.querySelectorAll('#kpLines .kp-row[data-i]').forEach(row => {
+      row.querySelector('[data-act="merge"]')?.remove();
+      row.querySelector('.tools').insertAdjacentHTML('afterbegin', mergeButton(+row.dataset.i));
+    });
+  }
   const photoInput = document.createElement('input');
   photoInput.type = 'file'; photoInput.accept = 'image/jpeg,image/png,image/webp'; photoInput.hidden = true;
   document.body.append(photoInput);
@@ -813,6 +832,7 @@
             <div class="price-cell ${manual ? 'manual' : ''}"><input data-f="manual" type="number" min="0" step="10" value="${lineUnitPrice(l)}">${manual && p ? '<small data-act="reset" title="Вернуть цену по прайсу">по прайсу ↺</small>' : ''}</div>
             <span class="sum">${fmt(lineSum(l))}</span>
             <div class="tools">
+              ${mergeButton(i)}
               ${p ? '<button data-act="edit" title="Изменить параметры">✎</button>' : ''}
               ${ppAvailable(p) ? '<button data-act="pp" title="Паспорт этой позиции (PDF)" class="pp-row">паспорт</button>' : ''}
               <button data-act="up" title="Выше">↑</button>
@@ -853,6 +873,7 @@
     row.querySelector('.sum').textContent = fmt(lineSum(l));
     renderTotal();
     saveKp();
+    refreshMergeButtons();
   });
   $('#kpLines').addEventListener('change', e => {
     if (e.target.dataset.f === 'manual') renderKp();
@@ -873,6 +894,15 @@
     if (!a) return;
     const i = +a.closest('.kp-row').dataset.i;
     const act = a.dataset.act;
+    if (act === 'merge') {
+      const targetIndex = mergeTarget(i);
+      if (targetIndex < 0) { renderKp(); toast('Для объединения нужны одинаковые параметры, цена, название и фото.'); return; }
+      const source = KP.lines[i], target = KP.lines[targetIndex];
+      target.qty = (+target.qty || 0) + (+source.qty || 0);
+      const key = photoKey(source); quotePhotos.delete(key); photoRequests.delete(key);
+      KP.lines.splice(i, 1);
+      saveKp(); renderKp(); toast('Позиции объединены, количество сложено'); return;
+    }
     if (act === 'photo') {
       const l = KP.lines[i];
       photoTarget = { kpId: KP.id, lineId: l.id, key: photoKey(l) };

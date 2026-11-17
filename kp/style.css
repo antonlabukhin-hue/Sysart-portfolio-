@@ -523,3 +523,6 @@ details.cfg-params summary::-webkit-details-marker { color: var(--red); }
 .quote-photo .ph span { font-size:10px; color:var(--soft); }
 .photo-reset { display:block; width:100%; font-size:10px; color:var(--muted); padding:3px 0; }
 @media(max-width:700px) { .kp-row .quote-photo { grid-area:ph; } }
+.kp-row .tools button.merge-row { color:var(--red); border:1px solid rgba(239,59,54,.45); font-size:18px; flex-shrink:0; }
+.kp-row .tools { flex-wrap:wrap; }
+@media(min-width:901px) { .kp-row { grid-template-columns:26px 56px minmax(0,1fr) 70px 96px 120px 130px 180px; } }
