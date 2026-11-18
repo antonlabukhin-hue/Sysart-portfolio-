@@ -86,7 +86,7 @@
         .burger { display: none; width: 46px; height: 46px; border-radius: 50%; border: 1px solid rgba(255,255,255,.18); background: rgba(10,10,10,.4); flex-direction: column; align-items: center; justify-content: center; gap: 6px; }
         .burger span { width: 18px; height: 2px; background: var(--paper); border-radius: 2px; }
         .burger span + span { width: 12px; margin-left: 6px; background: var(--lime); }
-        /* Вход для партнёров: конфигуратор КП по паролю (/kp/) */
+        /* Личный кабинет партнёра: личный вход и сохранённые КП. */
         .header-partner { height: 42px; padding: 0 16px; border-radius: 999px; border: 1px solid rgba(255,255,255,.22); display: inline-flex; align-items: center; gap: 8px; font-family: 'DM Mono', monospace; font-size: 11px; text-transform: uppercase; letter-spacing: .1em; color: #cfcbc3; white-space: nowrap; transition: color .25s, border-color .25s; }
         .header-partner svg { width: 14px; height: 14px; color: var(--lime); flex: none; }
         .header-partner:hover { color: var(--paper); border-color: var(--lime); }
@@ -672,6 +672,12 @@
 .hero-action-main {background:#c92f28;border-color:#c92f28}
 .hero-action:hover,.hero-action:focus-visible {outline:2px solid #fff;outline-offset:3px}
 @media(max-width:680px){.hero-sales {grid-template-columns:1fr;grid-template-rows:auto;gap:0}.hero-sales .hero-index {display:none}.hero-lead {margin-bottom:14px}.hero-action {padding:0 12px;font-size:13px;gap:6px}}
+        /* Вход в кабинет всегда виден, в том числе на телефоне. */
+        @media(max-width:1320px){.header-phone{display:none}}
+        @media(min-width:761px) and (max-width:1180px){.header-partner{width:auto;padding:0 14px}.header-partner span{display:inline}.main-nav a{padding:10px 12px;font-size:12px}}
+        @media(min-width:761px) and (max-width:1000px){.header-cta{display:none}.main-nav{margin-left:16px}.main-nav a{padding:10px 9px;font-size:11px}.header-actions{gap:12px}}
+        @media(max-width:760px){.header-partner{display:inline-flex;width:auto;height:38px;padding:0 10px;font-size:9px;gap:6px}.header-partner span{display:inline}.header-actions{gap:10px}}
+        @media(max-width:360px){.site-header{padding:0 16px}.site-header>a img{max-width:86px;object-fit:contain}.header-partner{font-size:8px;padding:0 8px}.header-actions{gap:8px}.burger{width:38px;height:38px}}
 </style>
 </head>
 <body>
@@ -689,7 +695,7 @@
         </nav>
         <div class="header-actions">
             <a class="header-phone" href="tel:+79149704000">+7 914 970 40 00</a>
-            <a class="header-partner" href="kp/" target="_blank" rel="noopener" title="Оптовый прайс и расчёт КП — вход по паролю"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Партнёрам</span></a>
+            <a class="header-partner" href="https://bbaeqksu0tg8vtdvh270.containers.yandexcloud.net/" title="Личный кабинет партнёра — сохранённые КП и подбор оборудования"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg><span>Личный кабинет</span></a>
             <button class="header-cta" onclick="openCallback()">Связаться</button>
             <button class="burger" onclick="toggleMenu(true)" aria-label="Открыть меню"><span></span><span></span></button>
         </div>
@@ -1070,7 +1076,7 @@
         </nav>
         <div class="mnav-bottom">
             <button class="main" onclick="toggleMenu(false); openCallback();">Заказать звонок</button>
-            <a class="line" href="kp/" target="_blank" rel="noopener"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Вход для партнёров</a>
+            <a class="line" href="https://bbaeqksu0tg8vtdvh270.containers.yandexcloud.net/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><rect x="4" y="11" width="16" height="10" rx="2"/><path d="M8 11V7a4 4 0 0 1 8 0v4"/></svg>Личный кабинет</a>
             <a class="line" href="album/"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M4 5a2 2 0 0 1 2-2h12a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H6a2 2 0 0 1-2-2z"/><path d="M12 8v8M8 12h8"/></svg>Создать альбом</a>
             <a class="line" href="mailto:info@sysart.ru">info@sysart.ru</a>
         </div>
