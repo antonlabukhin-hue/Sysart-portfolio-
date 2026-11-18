@@ -1,8 +1,15 @@
-import {SUPPLIERS,initialForm,specification,validate,contractData,format,fingerprint} from './contract-core.mjs?v=2026111801';
+import {SUPPLIERS,initialForm,specification,validate,contractData,format,fingerprint} from './contract-core.mjs?v=2026111803';
 import {buildContract,escapeHtml as esc,printStyles} from './contract-export.mjs?v=2026111801';
+import {readDraft,writeDraft} from './contract-draft.mjs?v=2026111802';
 const $=s=>document.querySelector(s);
 let quote=null,form=null,step=0,pendingCompany=null,busy=false,prepared=null,sourceFingerprint='';
 const channel=location.hash.slice(1),origin=location.origin;
+const host=window.parent!==window?window.parent:window.opener;
+function persist(){
+  if(!form||!quote)return;
+  let saved=false;try{saved=writeDraft(localStorage,{quote,form,step});}catch{}
+  $('#draftStatus').textContent=saved?'Черновик сохранён в этом браузере':'Черновик открыт. Браузер не разрешил сохранение — не закрывайте страницу.';
+}
 const fields={
   parties:[
     ['buyerName','Полное наименование покупателя','wide'],['buyerInn','ИНН · организация','', '10 цифр'],['buyerKpp','КПП','', '9 цифр'],['buyerOgrn','ОГРН','wide','13 цифр'],
@@ -39,15 +46,18 @@ function render(){
   document.querySelectorAll('[data-step]').forEach(b=>{b.classList.toggle('active',+b.dataset.step===step);b.setAttribute('aria-current',+b.dataset.step===step?'step':'false');});
   $('#next').hidden=step===3;
   $('#fields').innerHTML=step===0?`<h2>Поставщик и покупатель</h2>${supplierHtml()}<div class="fields">${fields.parties.map(fieldHtml).join('')}</div><p class="hint">ФИО и должность в родительном падеже используются в преамбуле. Эти поля вводятся отдельно, чтобы избежать ошибок склонения.</p>`:
-  step===1?`<h2>Объект и условия договора</h2><div class="fields">${fields.conditions.map(fieldHtml).join('')}<div class="field"><span>Гарантия · из КП</span><div class="readonly">${quote.warrantyYears===5?'5 лет':'3 года'}</div></div><label class="field"><span>Обмен документами</span><select name="exchange"><option value="originals" ${form.exchange==='originals'?'selected':''}>Почта и оригиналы</option><option value="edo" ${form.exchange==='edo'?'selected':''}>ЭДО и электронная почта</option></select></label></div><p class="hint">Условия из КП можно уточнить для договора. Выбранная гарантия и итоговые цены уже перенесены.</p>`:
+  step===1?`<h2>Объект и условия договора</h2><div class="fields">${fields.conditions.map(fieldHtml).join('')}<div class="field"><span>Гарантия · из КП</span><div class="readonly">${quote.warrantyYears===5?'5 лет':'3 года'}</div></div><div class="field"><span>Обмен документами · обязательное условие</span><div class="readonly">ЭДО и электронная почта, указанная в реквизитах</div></div></div><p class="hint">Условия из КП можно уточнить для договора. Выбранная гарантия и итоговые цены уже перенесены.</p>`:
   step===2?`<h2>Спецификация из КП</h2><p class="hint">Характеристики, количество и конечные цены взяты из текущего КП. Для изменения позиций вернитесь в конструктор, затем обновите данные договора.</p>${specHtml()}<button type="button" id="reloadQuote">Обновить из КП</button>`:
   `<h2>Проверка перед выгрузкой</h2><div id="checkStatus"></div><label class="review"><input type="checkbox" name="reviewed" ${form.reviewed?'checked':''}><span>Реквизиты сторон, спецификация, сроки и условия проверены.</span></label><div class="export-actions"><button type="button" id="exportWord" class="primary">Скачать Word</button><button type="button" id="exportPdf">Скачать PDF</button></div><p class="status" id="exportStatus" role="status"></p><details class="preview" open><summary>Предпросмотр договора и спецификации</summary><div id="documentPreview" class="doc">Подготавливаем предпросмотр…</div></details>`;
   summary();$('#errors').innerHTML='';
+  persist();
   if(step===3)preparePreview();
 }
 function specHtml(){const s=specification(quote,form.company);return `<div class="quote-table"><table><thead><tr><th>№</th><th>Наименование</th><th>Ед.</th><th>Кол-во</th><th>Цена, ₽</th><th>Сумма, ₽</th></tr></thead><tbody>${s.items.map((l,i)=>`<tr><td>${i+1}</td><td>${esc(l.name)}</td><td>${esc(l.unit)}</td><td>${esc(l.qty)}</td><td>${format(l.price)}</td><td>${format(l.sum)}</td></tr>`).join('')}</tbody></table></div><div class="row"><span>Итого</span><strong>${format(s.total)} ₽</strong></div><p class="hint">${s.vat?'В том числе НДС '+s.vatPercent+'%: '+format(s.tax)+' ₽':'Без НДС'}. Гарантия: ${quote.warrantyYears===5?'5 лет':'3 года'}.</p>`;}
 function collect(){
+  if(!form)return;
   document.querySelectorAll('#fields [name]').forEach(input=>{form[input.name]=input.type==='checkbox'?input.checked:input.value.trim();});
+  persist();
 }
 function showErrors(errors){
   const list=Object.entries(errors);$('#errors').innerHTML=list.length?'<strong>Проверьте данные:</strong>'+list.map(([k,v])=>`<button type="button" data-error="${esc(k)}">${esc(v)}</button>`).join(''):'';
@@ -65,13 +75,13 @@ async function preparePreview(){
 const waiters=new Map();let messageId=0;
 function requestSource(type='ready'){
   return new Promise((resolve,reject)=>{
-    if(!window.opener||window.opener.closed){reject(Error('Откройте договор из текущего КП в конструкторе.'));return;}
+    if(!host||host.closed){reject(Error('Откройте договор из текущего КП в конструкторе.'));return;}
     const requestId=String(++messageId),timer=setTimeout(()=>{waiters.delete(requestId);reject(Error('Нет связи с КП. Оставьте вкладку конструктора открытой.'));},12000);
-    waiters.set(requestId,{resolve,reject,timer});window.opener.postMessage({type:'sysart:contract:'+type,channel,requestId},origin);
+    waiters.set(requestId,{resolve,reject,timer});host.postMessage({type:'sysart:contract:'+type,channel,requestId},origin);
   });
 }
 window.addEventListener('message',e=>{
-  if(e.origin!==origin||e.source!==window.opener||e.data?.channel!==channel)return;
+  if(e.origin!==origin||e.source!==host||e.data?.channel!==channel)return;
   const entry=waiters.get(e.data.requestId);if(!entry)return;clearTimeout(entry.timer);waiters.delete(e.data.requestId);
   if(e.data.error)entry.reject(Error(e.data.error));else if(e.data.type==='sysart:contract:data')entry.resolve(e.data.quote);
 });
@@ -101,6 +111,7 @@ async function exportFile(formatName){
 }
 $('#fields').addEventListener('input',e=>{
   if(!e.target.name)return;collect();if(e.target.name!=='reviewed'){form.reviewed=false;prepared=null;}
+  persist();
   const msg=document.getElementById('err-'+e.target.name);if(msg)msg.textContent='';e.target.removeAttribute('aria-invalid');
   if(['buyerName','object'].includes(e.target.name))summary();
 });
@@ -113,17 +124,46 @@ $('#workspace').addEventListener('click',async e=>{
     if(SUPPLIERS[next].vat!==SUPPLIERS[form.company].vat){pendingCompany=next;render();return;}
   }
   if(button.id==='cancelCompany'){pendingCompany=null;render();return;}
-  if(button.dataset.applyCompany){form.company=button.dataset.applyCompany;form.exchange=SUPPLIERS[form.company].vat?'originals':'edo';form.reviewed=false;pendingCompany=null;prepared=null;render();return;}
+  if(button.dataset.applyCompany){form.company=button.dataset.applyCompany;form.reviewed=false;pendingCompany=null;prepared=null;render();return;}
   if(button.dataset.error){const key=button.dataset.error;step=fields.parties.some(f=>f[0]===key)?0:key==='reviewed'?3:1;render();document.getElementById('f-'+key)?.focus();return;}
   if(button.id==='next'){collect();step=Math.min(3,step+1);render();return;}
   if(button.id==='exportWord'||button.id==='exportPdf'){await exportFile(button.id==='exportWord'?'word':'pdf');return;}
   if(button.id==='reloadQuote'){
+    $('#draftNotice').hidden=true;
     collect();try{const fresh=await requestSource('check');quote=fresh;sourceFingerprint=fingerprint(fresh);form.company=fresh.vat?'vat':'no-vat';form.object=fresh.meta.object||form.object;form.reviewed=false;pendingCompany=null;prepared=null;render();$('#errors').textContent='Данные КП обновлены. Проверьте спецификацию и условия.';}catch(err){$('#errors').textContent=err.message;}
   }
 });
-function back(e){if(window.opener&&!window.opener.closed){e.preventDefault();window.opener.focus();}}
-$('#back').addEventListener('click',e=>{back(e);if(!window.opener||window.opener.closed)location.href='./';});$('#backLink').addEventListener('click',back);
+function back(e){
+  e.preventDefault();if(busy)return;collect();
+  if(window.parent!==window){host.postMessage({type:'sysart:contract:back',channel},origin);return;}
+  location.href='./#contract-return='+encodeURIComponent(quote?.id||'');
+}
+$('#back').addEventListener('click',back);$('#backLink').addEventListener('click',back);
+window.addEventListener('pagehide',collect);
+$('#newContract').addEventListener('click',()=>{if(!busy)$('#newConfirm').hidden=false;});
+$('#keepDraft').addEventListener('click',()=>{$('#newConfirm').hidden=true;});
+$('#clearDraft').addEventListener('click',async()=>{
+  if(busy)return;busy=true;$('#clearDraft').disabled=true;
+  try{
+    const fresh=await requestSource('check');quote=fresh;sourceFingerprint=fingerprint(fresh);
+    form=initialForm(fresh);form.buyerName='';step=0;pendingCompany=null;prepared=null;previewRequest++;
+    $('#newConfirm').hidden=true;$('#draftNotice').hidden=true;render();
+  }catch(e){$('#resetStatus').textContent=e.message;}
+  finally{busy=false;$('#clearDraft').disabled=false;}
+});
 (async()=>{
-  try{if(!channel)throw Error('Откройте текущее КП и нажмите «Подготовить договор».');quote=await requestSource();if(!quote.items?.length)throw Error('В КП нет позиций.');sourceFingerprint=fingerprint(quote);form=initialForm(quote);$('#boot').hidden=true;$('#workspace').hidden=false;render();}
+  try{
+    if(!channel)throw Error('Откройте текущее КП и нажмите «Подготовить договор».');
+    const current=await requestSource();if(!current.items?.length)throw Error('В КП нет позиций.');
+    let draft=null;try{draft=readDraft(localStorage,current.id);}catch{}
+    quote=draft?.quote||current;form={...initialForm(quote),...draft?.form};
+    if(!SUPPLIERS[form.company])form.company=current.vat?'vat':'no-vat';
+    step=Number.isInteger(draft?.step)?Math.max(0,Math.min(3,draft.step)):0;
+    sourceFingerprint=fingerprint(quote);
+    if(draft&&sourceFingerprint!==fingerprint(current)){
+      form.reviewed=false;$('#draftNotice').hidden=false;
+    }
+    $('#boot').hidden=true;$('#workspace').hidden=false;$('#newContract').hidden=false;render();
+  }
   catch(e){$('#boot').textContent=e.message;}
 })();

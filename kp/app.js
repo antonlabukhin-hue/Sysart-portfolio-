@@ -391,6 +391,13 @@
     $('#setVat').checked = S.vat;
     $('#setAdjust').value = S.adjust;
     loadKp();
+    const returnId = location.hash.startsWith('#contract-return=') ? location.hash.slice('#contract-return='.length) : null;
+    if (returnId !== null) {
+      const saved = allKp()[returnId];
+      if (saved) { KP = saved; migrateRate(KP); store.set('kp.currentId', KP.id); }
+      history.replaceState(null, '', location.pathname + location.search);
+      renderKp(); openSheet('#kp');
+    }
     loadCbr();
     renderCats();
     renderGrid();
@@ -795,9 +802,9 @@
   });
   $('#openKp').addEventListener('click', () => { renderKp(); openSheet('#kp'); });
 
-  // Договор открывается отдельно. Данные КП передаются только в свою вкладку
-  // того же origin; новые реквизиты покупателя не сохраняются в localStorage.
-  const contractWindows = new Map();
+  // Полноэкранный договор сохраняет живую вкладку КП и загруженные фото.
+  const contractFrames = new Map();
+  let contractPanel;
   function contractSnapshot() {
     return {
       id: KP.id, meta: { ...KP.meta }, vat: !!S.vat, vatCoef: DATA.general.vatCoef,
@@ -807,16 +814,33 @@
   }
   $('#kpContract').addEventListener('click', () => {
     if (!KP.lines.length) { toast('Сначала добавьте позиции в КП.'); return; }
-    for (const [key, entry] of contractWindows) if (entry.window.closed) contractWindows.delete(key);
+    saveKp();
+    if (!contractPanel) {
+      contractPanel = document.createElement('dialog');
+      contractPanel.setAttribute('aria-label', 'Подготовка договора');
+      contractPanel.style.cssText = 'position:fixed;inset:0;margin:0;padding:0;border:0;max-width:none;max-height:none;width:100%;height:100%;background:#0b0b0c;';
+      contractPanel.addEventListener('cancel', e => e.preventDefault());
+      document.body.append(contractPanel);
+    }
+    let entry = [...contractFrames.values()].find(e => e.kpId === KP.id);
+    for (const item of contractFrames.values()) item.frame.hidden = item !== entry;
+    if (entry) { entry.frame.hidden = false; contractPanel.showModal(); return; }
     const channel = uid() + uid();
-    const child = window.open('contract.html#' + channel, '_blank');
-    if (!child) { toast('Разрешите открытие вкладки договора для этого сайта.'); return; }
-    contractWindows.set(channel, { window: child, kpId: KP.id });
+    const frame = document.createElement('iframe');
+    frame.title = 'Подготовить договор';
+    frame.style.cssText = 'display:block;width:100%;height:100%;border:0;';
+    contractFrames.set(channel, { frame, kpId: KP.id });
+    contractPanel.append(frame);
+    contractPanel.showModal();
+    frame.src = 'contract.html?v=2026111802#' + channel;
   });
   window.addEventListener('message', event => {
-    if (event.origin !== location.origin || !['sysart:contract:ready', 'sysart:contract:check'].includes(event.data?.type)) return;
-    const entry = contractWindows.get(event.data.channel);
-    if (!entry || event.source !== entry.window) return;
+    if (event.origin !== location.origin || !['sysart:contract:ready', 'sysart:contract:check', 'sysart:contract:back'].includes(event.data?.type)) return;
+    const entry = contractFrames.get(event.data.channel);
+    if (!entry || event.source !== entry.frame.contentWindow) return;
+    if (event.data.type === 'sysart:contract:back') {
+      contractPanel.close(); renderKp(); openSheet('#kp'); $('#kpContract').focus(); return;
+    }
     const message = { type: 'sysart:contract:data', channel: event.data.channel, requestId: event.data.requestId };
     if (KP.id !== entry.kpId) message.error = 'В конструкторе открыто другое КП. Откройте договор заново из нужного КП.';
     else message.quote = contractSnapshot();

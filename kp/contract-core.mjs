@@ -1,3 +1,4 @@
+export const DOCUMENT_EXCHANGE = 'Обмен информацией и документами по договору осуществляется через систему электронного документооборота (ЭДО) и по электронной почте, указанной в реквизитах Сторон.';
 export const SUPPLIERS = {
   vat: {
     id:'vat', vat:true, short:'ООО «СТК „Система Арт СПБ“»',
@@ -6,7 +7,7 @@ export const SUPPLIERS = {
     address:'188651, Ленинградская область, м. р-н Всеволожский, г.п. Сертоловское, г. Сертолово, мкр. Чёрная Речка, ул. Любимая, д. 5, кв. 24',
     postal:'188632, Ленинградская область, м. р-н Всеволожский, г.п. Сертоловское, г. Сертолово, мкр. Чёрная Речка, а/я № 4',
     inn:'4706055778', kpp:'470601001', ogrn:'1234700001062', bank:'Филиал «Центральный» Банка ВТБ (ПАО)', bic:'044525411', account:'40702810726740000653', correspondent:'30101810145250000411', email:'info@sysart.ru',
-    exchange:'Стороны договорились использовать для обмена информацией и документами по договору электронную почту, указанную в реквизитах Сторон, с обязательной досылкой оригиналов.'
+    exchange:DOCUMENT_EXCHANGE
   },
   'no-vat': {
     id:'no-vat', vat:false, short:'ООО СТК «Система Арт»',
@@ -14,7 +15,7 @@ export const SUPPLIERS = {
     signer:'Клементьев Андрей Анатольевич', signerGen:'Клементьева Андрея Анатольевича', title:'Исполнительный директор', titleGen:'исполнительного директора', powers:'доверенности № 2 от 09.01.2024',
     address:'690089, Приморский край, г. Владивосток, ул. Днепровская, д. 29, офис 1', postal:'690089, Приморский край, г. Владивосток, ул. Днепровская, д. 29, офис 1',
     inn:'2543125743',kpp:'254301001',ogrn:'1182536016948',okpo:'28687062',bank:'Филиал «Центральный» Банка ВТБ (ПАО)',bic:'044525411',account:'40702810913540000116',correspondent:'30101810145250000411',email:'info@sysart.ru',
-    exchange:'Стороны договорились использовать для обмена информацией и документами по договору систему электронного документооборота и электронную почту, указанную в реквизитах Сторон.'
+    exchange:DOCUMENT_EXCHANGE
   }
 };
 export const format = n => new Intl.NumberFormat('ru-RU',{maximumFractionDigits:0}).format(n);
@@ -34,7 +35,7 @@ export function initialForm(quote) {
     buyerName:quote.meta.client||'',buyerAddress:'',buyerPostal:'',buyerInn:'',buyerKpp:'',buyerOgrn:'',buyerBank:'',buyerBic:'',buyerAccount:'',buyerCorrespondent:'',buyerEmail:'',buyerPhone:'',buyerEdo:'',
     signer:'',signerGen:'',title:'Генеральный директор',titleGen:'генерального директора',powers:'Устава',
     object:quote.meta.object||'',scope:'Оборудование для архитектурного освещения',deliveryCity:'',delivery:quote.meta.delivery||'',deliveryStart:'с даты поступления предоплаты',shipping:'До склада транспортной компании в городе доставки; за счёт Поставщика.',
-    advance:split[0],balance:split[1],balanceEvent:'перед отгрузкой из г. Владивостока',validDays:quote.vat?'10':'3',exchange:quote.vat?'originals':'edo',reviewed:false
+    advance:split[0],balance:split[1],balanceEvent:'перед отгрузкой из г. Владивостока',validDays:quote.vat?'10':'3',reviewed:false
   };
 }
 export function specification(quote,company) {
@@ -90,7 +91,7 @@ export function contractData(form,quote) {
   const daysText=days%10===1&&days%100!==11?'календарного дня':days%10>=2&&days%10<=4&&(days%100<12||days%100>14)?'календарных дней':'календарных дней';
   const preamble=`${p.full}, именуемое в дальнейшем «Поставщик», в лице ${p.titleGen} ${p.signerGen}, действующего на основании ${p.powers}, с одной стороны, и ${form.buyerName}, именуемое в дальнейшем «Покупатель», в лице ${form.titleGen} ${form.signerGen} (на основании ${form.powers}), с другой стороны, совместно именуемые «Стороны», заключили настоящий договор о нижеследующем:`;
   const payment=+form.balance===0?'Предоплата за оборудование — 100%.':`Предоплата за оборудование — ${form.advance}%. Окончательный расчёт — ${form.balance}% ${form.balanceEvent}.`;
-  const exchange=form.exchange==='edo'?SUPPLIERS['no-vat'].exchange:SUPPLIERS.vat.exchange;
+  const exchange=DOCUMENT_EXCHANGE;
   const tokens={number:form.number,city:p.city,dateLong:longDate(form.date),preamble,warrantyMonths:quote.warrantyYears===5?'60 (шестьдесят)':'36 (тридцать шесть)',validUntil:longDate(form.validUntil).replace(/\.$/,''),exchange,
     buyerBlock:partyLines(form,true),supplierBlock:partyLines(p),taxCaption:spec.vat?'с НДС':'без НДС',taxLabel:spec.vat?`В том числе НДС ${spec.vatPercent}%`:'НДС',taxAmount:spec.vat?format(spec.tax):'Без НДС',total:format(spec.total),object:form.object,scope:form.scope,deliveryCity:form.deliveryCity,delivery:form.delivery.replace(/[.\s]+$/,''),deliveryStart:form.deliveryStart.replace(/[.\s]+$/,''),shipping:form.shipping,payment,warranty,validDaysText:days+' '+daysText};
   return {company:form.company,tokens,items:spec.items.map((l,i)=>({index:String(i+1),name:l.name,unit:l.unit,qty:String(l.qty).replace('.',','),price:format(l.price),sum:format(l.sum)})),spec};
