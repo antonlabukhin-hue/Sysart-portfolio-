@@ -678,6 +678,21 @@
         @media(min-width:761px) and (max-width:1000px){.header-cta{display:none}.main-nav{margin-left:16px}.main-nav a{padding:10px 9px;font-size:11px}.header-actions{gap:12px}}
         @media(max-width:760px){.header-partner{display:inline-flex;width:auto;height:38px;padding:0 10px;font-size:9px;gap:6px}.header-partner span{display:inline}.header-actions{gap:10px}}
         @media(max-width:360px){.site-header{padding:0 16px}.site-header>a img{max-width:86px;object-fit:contain}.header-partner{font-size:8px;padding:0 8px}.header-actions{gap:8px}.burger{width:38px;height:38px}}
+
+/* Homepage partner invitation */
+.home-partners{max-width:var(--max);margin:auto;padding:100px clamp(22px,5vw,80px) 48px;justify-content:center;min-height:100dvh;height:auto;background:radial-gradient(ellipse at 0 80%,rgba(239,59,54,.075),transparent 60%)}
+.hp-meta{display:flex;justify-content:space-between;gap:20px;padding-bottom:24px;border-bottom:1px solid var(--line);font:11px 'DM Mono',monospace;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+.hp-meta span:first-child{color:var(--lime)}
+.hp-grid{display:grid;grid-template-columns:1fr 1.05fr;gap:clamp(32px,5vw,72px);padding-top:42px;align-items:start}
+.hp-lead h2{font-size:clamp(32px,3.5vw,52px);font-weight:500;letter-spacing:-.045em;line-height:1.08;margin:0 0 24px}.hp-lead h2 em{font-style:normal;color:var(--lime)}
+.hp-lead p{max-width:450px;font-size:15px;line-height:1.7;color:#aaa9a5;margin:0 0 30px}.hp-actions{display:flex;flex-wrap:wrap;gap:12px}
+.hp-btn{display:inline-flex;align-items:center;justify-content:space-between;gap:18px;padding:15px 20px;border:1px solid var(--line);border-radius:50px;color:var(--paper);font-size:12px;font-weight:600;text-decoration:none;transition:background .2s,border-color .2s}.hp-btn:hover{border-color:var(--paper);background:#ffffff08}.hp-btn-primary{background:var(--lime);border-color:var(--lime)}.hp-btn-primary:hover{background:#d32e29;border-color:#d32e29}
+.hp-features{display:grid;grid-template-columns:1fr 1fr;border-left:1px solid var(--line);border-top:1px solid var(--line)}.hp-feature{padding:25px 22px;border-right:1px solid var(--line);border-bottom:1px solid var(--line)}.hp-feature small{font:11px 'DM Mono',monospace;color:var(--lime)}.hp-feature h3{font-size:18px;line-height:1.3;font-weight:500;margin:20px 0 12px;letter-spacing:-.025em}.hp-feature p{font-size:13px;line-height:1.65;color:#aaa9a5;margin:0}
+#cf-object:focus{outline:1px solid var(--lime);outline-offset:3px}
+@media(max-width:1000px){.hp-grid{gap:30px}.hp-feature{padding:22px 16px}.hp-lead h2{font-size:36px}}
+@media(max-width:760px){.home-partners{padding:100px 20px 40px}.hp-meta{font-size:10px;flex-direction:column;gap:8px;padding-bottom:20px}.hp-grid{grid-template-columns:1fr;padding-top:28px;gap:30px}.hp-lead h2{font-size:36px;max-width:500px}.hp-lead p{font-size:14px;margin-bottom:24px}.hp-features{grid-template-columns:1fr 1fr}.hp-feature h3{font-size:16px;margin-top:16px}.hp-feature p{font-size:12px}.hp-actions{gap:10px}.hp-btn{font-size:11px;padding:14px 16px}}
+@media(max-width:360px){.hp-features{grid-template-columns:1fr}}
+
 </style>
 </head>
 <body>
@@ -809,10 +824,31 @@
             </div>
         </section>
 
-        <!-- ЭКРАН 4: КОНТАКТЫ + ПОДВАЛ -->
+        <!-- ПАРТНЁРАМ: приглашение перед заявкой -->
+        <section class="snap-section home-partners" id="home-partners" aria-labelledby="hp-title">
+            <div class="hp-meta"><span>04 / Партнёрам</span><span>Светотехническим · Монтажным · Проектным компаниям</span></div>
+            <div class="hp-grid">
+                <div class="hp-lead">
+                    <h2 id="hp-title">Ваш проект.<br>Ваш заказчик.<br><em>Наша поддержка.</em></h2>
+                    <p>Подбираем и поставляем архитектурное освещение для ваших объектов. Помогаем с визуализацией и техническими решениями — от первого запроса до запуска.</p>
+                    <div class="hp-actions">
+                        <a class="hp-btn hp-btn-primary" href="#contact" onclick="partnerRequest();return false;">Обсудить партнёрство <span aria-hidden="true">↓</span></a>
+                        <a class="hp-btn" href="partners/">Условия работы <span aria-hidden="true">↗</span></a>
+                    </div>
+                </div>
+                <div class="hp-features">
+                    <article class="hp-feature"><small>01 / УСЛОВИЯ</small><h3>Партнёрская скидка<br>до 40%</h3><p>Оборудование под ваше ТЗ и подбор аналогов под задачи проекта.</p></article>
+                    <article class="hp-feature"><small>02 / ИНЖЕНЕРИЯ</small><h3>Подбор<br>и визуализация</h3><p>Помогаем представить решение заказчику и согласовать оборудование.</p></article>
+                    <article class="hp-feature"><small>03 / ИНСТРУМЕНТЫ</small><h3>КП под вашим<br>брендом</h3><p>Готовьте предложения в личном кабинете со своей наценкой и реквизитами.</p></article>
+                    <article class="hp-feature"><small>04 / ПОДДЕРЖКА</small><h3>На связи<br>до запуска</h3><p>Технические материалы и консультации при монтаже и настройке освещения.</p></article>
+                </div>
+            </div>
+        </section>
+
+        <!-- КОНТАКТЫ + ПОДВАЛ -->
         <section class="snap-section contact-section" id="contact">
             <div class="contact-content">
-                <div class="contact-top"><span class="eyebrow" style="margin:0;">04 / Оставить заявку</span><span>Владивосток · Санкт-Петербург</span></div>
+                <div class="contact-top"><span class="eyebrow" style="margin:0;">05 / Оставить заявку</span><span>Владивосток · Санкт-Петербург</span></div>
                 <div class="cf-grid">
                     <div class="cf-main">
                         <h2>Есть объект?<br><em>Давайте добавим ему света.</em></h2>
@@ -1598,6 +1634,15 @@
         const mnav = document.getElementById('mnav');
         function toggleMenu(open) { mnav.classList.toggle('active', open); }
         // Переход к блоку главной; с внутренней страницы — сначала вернуться на главную
+        function partnerRequest() {
+            const input = document.getElementById('cf-object');
+            if (!input.value.trim()) {
+                input.value = 'Партнёрство / Светотехническая компания';
+                input.dispatchEvent(new Event('input', { bubbles: true }));
+            }
+            navGo('contact');
+            input.focus({ preventScroll: true });
+        }
         function navGo(id) {
             const fromView = currentView !== 'home';
             showView('home');
