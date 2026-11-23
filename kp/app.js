@@ -70,7 +70,20 @@
     }
     if (remember) store.set('kp.pass', pass);
     try { sessionStorage.setItem('kp.pass', pass); } catch { }
-    DATA.products.forEach(p => { PROD[p.id] = p; });
+    DATA.products.forEach(p => {
+      if (isWpl60105(p)) {
+        p.power = 9;
+        p.standardAngles = (p.angles || []).map(String).filter(a => a !== '3' && a !== '4');
+        p.angles = [...new Set(['3', ...p.standardAngles, ...WPL60105_9W_ANGLES])].sort((a, b) => Number(a) - Number(b));
+        p.markups = { ...p.markups, visor: 200, swivelBracket: 200 };
+        p.note = '8 Вт — только 3°; 9 Вт — 10°, 25°, 30°, 45°, 60°, 90°, 120°';
+        p.params = String(p.params || '')
+          .replace(/Мощность:[\s\S]*?(?=Напряжение)/i, 'Мощность: 3, 6, 9 Вт; 8 Вт — только 3° ')
+          .replace(/Угол свечения:[\s\S]*?(?=Размер)/i, 'Угол свечения: 8 Вт — 3°; 9 Вт — 10, 25, 30, 45, 60, 90, 120°; 3 и 6 Вт — ' + p.standardAngles.join(', ') + '° ')
+          .replace(/Крепление:\s*неповоротное/i, 'Крепление: стандартное или поворотный кронштейн');
+      }
+      PROD[p.id] = p;
+    });
     // Снятые с предложения модели сохраняем только для ранее созданных КП.
     const discontinued = new Set([
       'sa-sftl-1515-single-3d-led-neon',
@@ -258,8 +271,23 @@
     };
   }
 
+  const WPL60105_9W_ANGLES = ['10', '25', '30', '45', '60', '90', '120'];
+  function wpl60105Angles(p, power) {
+    if (power === 8) return ['3'];
+    if (power === 9) return WPL60105_9W_ANGLES;
+    return p.standardAngles || p.angles.filter(a => String(a) !== '3');
+  }
+  const isWpl60105 = p => p?.id === 'accent:sa-wpl-60105';
+  function normalizeWpl60105(p, c) {
+    if (!isWpl60105(p)) return;
+    if (![3, 6, 8, 9].includes(c.power)) c.power = 9;
+    const available = wpl60105Angles(p, c.power);
+    if (!available.includes(String(c.angle))) c.angle = available[0];
+    c.angle = String(c.angle);
+  }
   const POWER_STEPS = [1, 3, 5, 6, 9, 12, 15, 18, 24, 30, 36, 48, 54, 60, 72, 90, 100, 120, 150, 200, 300, 400];
   function powersOf(p) {
+    if (isWpl60105(p)) return [3, 6, 9, 8];
     if (!p.power) return [];
     const list = POWER_STEPS.filter(v => v < p.power);
     return [...list.slice(-5), p.power];
@@ -291,6 +319,7 @@
     if (c.voltage === 220 && typeof m.v220 === 'number') r += m.v220;
     if (c.paint && typeof m.paint === 'number') r += m.paint;
     if (c.visor && typeof m.visor === 'number') r += m.visor;
+    if (c.swivelBracket && typeof m.swivelBracket === 'number') r += m.swivelBracket;
     return r;
   }
 
@@ -311,6 +340,7 @@
     if (p.ip) parts.push(p.ip);
     if (c.paint) parts.push(`окраска RAL ${c.ral || '(по согласованию)'}`);
     if (c.visor) parts.push('с козырьком');
+    if (c.swivelBracket) parts.push('с поворотным кронштейном');
     return parts.join(', ');
   }
 
@@ -564,6 +594,7 @@
 
   function renderCfg() {
     const { p, c } = CFG;
+    normalizeWpl60105(p, c);
     const cat = catOf(p);
     const cols = colorsOf(p);
     const rows = [];
@@ -594,9 +625,12 @@
     if (!isSimple(p) && p.usd.dmx != null && !rgbChosen) {
       rows.push(['Управление', `<div class="chips">${chip('dmx', false, 'Без управления', !c.dmx, '', p.usd.mono == null)}${chip('dmx', true, 'DMX', c.dmx)}</div>`]);
     }
-    if (p.angles?.length) rows.push(['Угол, °', `<div class="chips">${p.angles.map(a => chip('angle', a, a, c.angle === a)).join('')}</div>`]);
+    if (p.angles?.length) rows.push(['Угол, °', `<div class="chips">${p.angles.map(a => chip('angle', a, a, c.angle === a, '', isWpl60105(p) && !wpl60105Angles(p, c.power).includes(String(a)))).join('')}</div>`]);
     const pw = powersOf(p);
-    if (pw.length) {
+    if (isWpl60105(p)) {
+      rows.push(['Мощность, Вт', `<div class="chips">${[3,6,9].map(w => chip('power', w, w + ' Вт', c.power === w)).join('')}</div>`]);
+      rows.push(['Узкий луч 3°', `<div class="chips">${chip('power', 8, '8 Вт · только 3°', c.power === 8)}</div><small class="muted">У 3, 6 и 9 Вт угол 3° недоступен.</small>`]);
+    } else if (pw.length) {
       rows.push([`Мощность, ${p.powerUnit}`, `<div class="chips">${pw.map(w => chip('power', w, 'до ' + w, c.power === w,
         isRigid(p) && c.length ? `≈${Math.round(w * c.length / 1000)} Вт` : '')).join('')}</div>`]);
     }
@@ -611,6 +645,9 @@
       rows.push(['Козырёк', '<div class="chips muted" style="padding-top:8px">в комплекте</div>']);
     }
 
+    if (typeof p.markups.swivelBracket === 'number') {
+      rows.push(['Кронштейн', `<div class="chips">${chip('swivelBracket', false, 'Стандартный', !c.swivelBracket)}${chip('swivelBracket', true, 'Поворотный', !!c.swivelBracket, '+' + fmt(p.markups.swivelBracket) + ' ₽')}</div>`]);
+    }
     const base = basePrice(p, c);
     const unit = base == null ? null : adjusted(base);
     const unitName = isFlex(p) ? 'м' : 'шт.';
@@ -647,6 +684,7 @@
       const k = b.dataset.k;
       const v = JSON.parse(b.dataset.v);
       CFG.c[k] = v;
+      normalizeWpl60105(CFG.p, CFG.c);
       if (k === 'color' && (v === 'RGB' || v === 'RGBW')) CFG.c.dmx = true;
       // Сменили напряжение — длину переводим на ближайшую допустимую для него
       if (k === 'voltage') {
@@ -1377,7 +1415,7 @@
         ['Длина', isRigid(p) && c.length ? fmtLen(c.length) + ' мм' : ''], ['Количество', `${fmt(+line.qty || 0)} ${line.unit}`]];
       right = [ppHousing(t), ['Цвет корпуса', c.paint ? `RAL ${c.ral || '(по согласованию)'}` : ppField(t, 'Цвет корпуса')],
         ['Рассеиватель', ppField(t, 'Рассеиватель') || ppField(t, 'Исполнение рассеивателя')], ['Размер корпуса', p.size ? p.size.replace(/\*/g, ' × ') + ' мм' : ''],
-        ['Крепление', ppField(t, 'Крепление')], ['Козырёк', c.visor ? 'есть' : (p.markups.visor === 'included' ? 'в комплекте' : '')],
+        ['Крепление', c.swivelBracket ? 'Поворотный кронштейн' : ppField(t, 'Крепление')], ['Козырёк', c.visor ? 'есть' : (p.markups.visor === 'included' ? 'в комплекте' : '')],
         ['Степень защиты', p.ip || ''], ['Вес', isRigid(p) && c.length && p.weight ? `≈ ${String(Math.round(p.weight * c.length / 100) / 10).replace('.', ',')} кг` : weight]];
       chips = [powerTxt.replace(/ \(.*\)/, ''), c.voltage && c.voltage + ' В', p.ip, c.angle && ppAngle(c.angle), color, ctrl === 'без управления' ? '' : ctrl, isRigid(p) && c.length && fmtLen(c.length) + ' мм'];
     } else {
