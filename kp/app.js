@@ -1524,6 +1524,7 @@
     const lines = KP.lines.map((l, i) =>
       `${i + 1}. ${lineTitle(l)}\n   ${fmt(+l.qty || 0)} ${l.unit} × ${fmt(lineUnitPrice(l))} ₽ = ${fmt(lineSum(l))} ₽${l.manual != null && l.manual !== '' ? ' (цена изменена вручную)' : ''}`);
     return [
+      'Источник: конструктор сайта (вне личного кабинета)',
       `КП № ${m.number} от ${fmtDate(m.date)}`,
       `Заказчик: ${m.client || '—'}`,
       `Объект: ${m.object || '—'}`,
